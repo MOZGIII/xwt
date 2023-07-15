@@ -1,0 +1,12 @@
+[package]
+name = "xwebtransport-tests-native"
+version = "0.1.0"
+edition = "2021"
+
+[target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
+xwebtransport = { path = "../xwebtransport", features = ["wtransport"] }
+xwebtransport-tests = { path = "../xwebtransport-tests" }
+
+anyhow = "1"
+tokio = { version = "1", features = ["full"] }
+wtransport = "0.1"

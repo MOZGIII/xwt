@@ -1,0 +1,36 @@
+[package]
+name = "xwebtransport"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+A common WebTransport interface for browser and native.
+Write once, run anywhere. Originally intended for use with bevy.
+"""
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen-futures = { version = "0.4", optional = true }
+wasm-bindgen = { version = "0.2", optional = true }
+
+[target.'cfg(target_family = "wasm")'.dependencies.web-sys]
+version = "0.3"
+optional = true
+features = [
+  "WebTransport", "WebTransportOptions",
+  "WebTransportBidirectionalStream",
+  "WebTransportSendStream", "WebTransportReceiveStream",
+  "ReadableStreamDefaultReader", "WritableStreamDefaultWriter",
+]
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+wtransport = { version = "0.1", optional = true }
+
+[features]
+default = ["all"]
+
+all = ["wtransport", "web-sys"]
+
+wtransport = ["dep:wtransport"]
+
+web-sys = ["dep:web-sys", "dep:wasm-bindgen", "dep:wasm-bindgen-futures"]

@@ -1,0 +1,4 @@
+{
+  // Comment this out when working on native part.
+  "rust-analyzer.cargo.target": "wasm32-unknown-unknown"
+}

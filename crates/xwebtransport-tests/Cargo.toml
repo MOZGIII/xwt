@@ -1,0 +1,13 @@
+[package]
+name = "xwebtransport-tests"
+version = "0.1.0"
+edition = "2021"
+description = """
+Common test suite for xwebtransport.
+Intended for reuse to provide the same coverage in all the execution
+environments.
+"""
+
+[dependencies]
+xwebtransport = { path = "../xwebtransport", default-features = false }
+anyhow = "1"
