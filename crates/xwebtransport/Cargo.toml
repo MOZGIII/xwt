@@ -17,10 +17,13 @@ wasm-bindgen = { version = "0.2", optional = true }
 version = "0.3"
 optional = true
 features = [
-  "WebTransport", "WebTransportOptions",
+  "WebTransport",
+  "WebTransportOptions",
   "WebTransportBidirectionalStream",
-  "WebTransportSendStream", "WebTransportReceiveStream",
-  "ReadableStreamDefaultReader", "WritableStreamDefaultWriter",
+  "WebTransportSendStream",
+  "WebTransportReceiveStream",
+  "ReadableStreamDefaultReader",
+  "WritableStreamDefaultWriter",
 ]
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
