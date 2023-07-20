@@ -737,6 +737,7 @@ checksum = "532826ff75199d5833b9d2c5fe410f29235e25704ee5f0ef599fb51c21f4a4da"
 dependencies = [
  "autocfg",
  "backtrace",
+ "bytes",
  "libc",
  "mio",
  "pin-project-lite",
@@ -934,6 +935,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "web-sys-async-io"
+version = "0.1.0"
+dependencies = [
+ "js-sys",
+ "tokio",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasm-bindgen-test",
+ "web-sys",
+]
+
+[[package]]
 name = "which"
 version = "4.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1075,6 +1088,7 @@ name = "xwebtransport-core"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "tokio",
 ]
 
 [[package]]
@@ -1090,6 +1104,7 @@ name = "xwebtransport-tests"
 version = "0.1.0"
 dependencies = [
  "thiserror",
+ "tokio",
  "xwebtransport-core",
  "xwebtransport-error",
 ]
@@ -1098,10 +1113,12 @@ dependencies = [
 name = "xwebtransport-web-sys"
 version = "0.1.0"
 dependencies = [
+ "tokio",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
  "web-sys",
+ "web-sys-async-io",
  "xwebtransport-core",
  "xwebtransport-tests",
 ]

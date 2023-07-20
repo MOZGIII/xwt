@@ -3,8 +3,8 @@ use async_trait::async_trait;
 use crate::utils::maybe;
 
 pub trait Streams: maybe::Send {
-    type SendStream: maybe::Send;
-    type RecvStream: maybe::Send;
+    type SendStream: maybe::Send + tokio::io::AsyncWrite;
+    type RecvStream: maybe::Send + tokio::io::AsyncRead;
 }
 
 pub type BiStreamsFor<T> = (<T as Streams>::SendStream, <T as Streams>::RecvStream);

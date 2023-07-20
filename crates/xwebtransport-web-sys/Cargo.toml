@@ -11,7 +11,9 @@ Write once, run anywhere. Originally intended for use with bevy.
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwebtransport-core = { path = "../xwebtransport-core" }
+web-sys-async-io = { path = "../web-sys-async-io" }
 
+tokio = { version = "1", default-features = false, features = [] }
 wasm-bindgen-futures = { version = "0.4" }
 wasm-bindgen = { version = "0.2" }
 web-sys = { version = "0.3", features = [

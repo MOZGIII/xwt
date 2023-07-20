@@ -44,13 +44,13 @@ impl xwebtransport_core::traits::Streams for Connection {
 pub struct SendStream {
     pub transport: Rc<web_sys::WebTransport>,
     pub stream: web_sys::WebTransportSendStream,
-    pub writer: web_sys::WritableStreamDefaultWriter,
+    pub writer: web_sys_async_io::Writer,
 }
 
 pub struct RecvStream {
     pub transport: Rc<web_sys::WebTransport>,
     pub stream: web_sys::WebTransportReceiveStream,
-    pub reader: web_sys::ReadableStreamDefaultReader,
+    pub reader: web_sys_async_io::Reader,
 }
 
 fn wrap_recv_stream(
@@ -60,6 +60,7 @@ fn wrap_recv_stream(
     let reader = stream.get_reader();
     let reader: wasm_bindgen::JsValue = reader.into();
     let reader = reader.into();
+    let reader = web_sys_async_io::Reader::new(reader);
 
     RecvStream {
         transport: Rc::clone(transport),
@@ -73,6 +74,7 @@ fn wrap_send_stream(
     stream: web_sys::WebTransportSendStream,
 ) -> SendStream {
     let writer = stream.get_writer().unwrap();
+    let writer = web_sys_async_io::Writer::new(writer);
     SendStream {
         transport: Rc::clone(transport),
         stream,
@@ -153,5 +155,39 @@ impl xwebtransport_core::traits::AcceptUniStream for Connection {
         let value: web_sys::WebTransportReceiveStream = read_result.into();
         let recv_stream = wrap_recv_stream(&self.transport, value);
         Ok(recv_stream)
+    }
+}
+
+impl tokio::io::AsyncWrite for SendStream {
+    fn poll_write(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &[u8],
+    ) -> std::task::Poll<Result<usize, std::io::Error>> {
+        std::pin::Pin::new(&mut self.writer).poll_write(cx, buf)
+    }
+
+    fn poll_flush(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), std::io::Error>> {
+        std::pin::Pin::new(&mut self.writer).poll_flush(cx)
+    }
+
+    fn poll_shutdown(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), std::io::Error>> {
+        std::pin::Pin::new(&mut self.writer).poll_shutdown(cx)
+    }
+}
+
+impl tokio::io::AsyncRead for RecvStream {
+    fn poll_read(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> std::task::Poll<std::io::Result<()>> {
+        std::pin::Pin::new(&mut self.reader).poll_read(cx, buf)
     }
 }
