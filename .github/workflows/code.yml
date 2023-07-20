@@ -1,0 +1,142 @@
+name: code
+
+on:
+  push:
+    branches:
+      - "**"
+      - "!gh-readonly-queue/**"
+  merge_group:
+  schedule:
+    - cron: "0 20 * * 0"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' && github.event_name != 'merge_group' }}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CARGO_INCREMENTAL: "0"
+  RUSTDOCFLAGS: "-D warnings"
+
+jobs:
+  plan:
+    name: Plan the execution
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Compute matrix
+        uses: ./.github/actions/plan
+        id: set-matrix
+        with:
+          plan-name: code
+
+  test:
+    needs:
+      - plan
+    strategy:
+      matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
+      fail-fast: false
+    name: ${{ matrix.plan.platform.name }} / ${{ matrix.plan.mode.name }}
+    runs-on: ${{ matrix.plan.platform.os }}
+    env: ${{ matrix.plan.platform.env }}
+    timeout-minutes: 50
+    permissions:
+      contents: read
+    steps:
+      - name: Job config
+        run: printf "%s\n" "$MATRIX_CONTEXT"
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        timeout-minutes: 5
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ matrix.plan.platform.cacheKey }}-${{ matrix.plan.mode.cargoCacheKey }}
+        if: "!matrix.plan.platform.isOnSelfHostedRunner"
+        timeout-minutes: 10
+
+      - name: Install rust toolchain
+        run: rustup show
+        timeout-minutes: 10
+
+      - name: Prepare the build environment
+        uses: ./.github/actions/env
+        with:
+          script: ${{ matrix.plan.platform.buildEnvScript }}
+
+      - name: Print build environment info
+        run: |
+          set -x
+          cargo --version
+          cargo clippy --version
+          env
+
+      - name: Run cargo ${{ matrix.plan.mode.cargoCommand }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: ${{ matrix.plan.mode.cargoCommand }}
+          args: ${{ matrix.plan.mode.cargoArgs }}
+
+  downloadable-utils:
+    strategy:
+      matrix:
+        util:
+          - name: cargo deny
+            download: >
+              curl -sSL "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.13.7/cargo-deny-0.13.7-x86_64-unknown-linux-musl.tar.gz" |
+                sudo tar -xzvf - -C /usr/local/bin --strip-components=1
+            run: cargo-deny check --hide-inclusion-graph --show-stats
+            requiresRust: true
+
+          - name: taplo
+            download: >
+              curl -sSL "https://github.com/tamasfe/taplo/releases/download/0.8.1/taplo-linux-x86_64.gz" |
+                zcat > /usr/local/bin/taplo \
+              && chmod +x /usr/local/bin/taplo
+            run: taplo format --check
+
+          - name: cargo-sort
+            download: >
+              curl -sSL "https://github.com/DevinR528/cargo-sort/releases/download/v1.0.9/cargo-sort-x86_64-unknown-linux-gnu.tar.gz" |
+                sudo tar -xzvf - -C /usr/local/bin
+            run: cargo-sort -cwg
+
+      fail-fast: false
+    name: ${{ matrix.util.name }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        timeout-minutes: 5
+
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+        if: ${{ matrix.util.requiresRust }}
+        timeout-minutes: 10
+
+      - name: Install rust toolchain
+        run: rustup show
+        if: ${{ matrix.util.requiresRust }}
+        timeout-minutes: 10
+
+      - name: Download ${{ matrix.util.name }}
+        run: ${{ matrix.util.download }}
+        timeout-minutes: 10
+
+      - run: ${{ matrix.util.run }}
+        timeout-minutes: 10
