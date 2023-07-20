@@ -1121,3 +1121,12 @@ dependencies = [
  "xwebtransport",
  "xwebtransport-tests",
 ]
+
+[[package]]
+name = "xwebtransport-tests-wasm"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "xwebtransport",
+ "xwebtransport-tests",
+]

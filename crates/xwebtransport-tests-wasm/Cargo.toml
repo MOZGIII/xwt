@@ -1,0 +1,10 @@
+[package]
+name = "xwebtransport-tests-wasm"
+version = "0.1.0"
+edition = "2021"
+
+[target.'cfg(target_family = "wasm")'.dev-dependencies]
+xwebtransport = { path = "../xwebtransport", features = ["web-sys"] }
+xwebtransport-tests = { path = "../xwebtransport-tests" }
+
+anyhow = "1"
