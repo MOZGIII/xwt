@@ -1,5 +1,5 @@
 [package]
-name = "xwebtransport"
+name = "xwebtransport-wtransport"
 version = "0.1.0"
 edition = "2021"
 resolver = "2"
@@ -9,8 +9,13 @@ A common WebTransport interface for browser and native.
 Write once, run anywhere. Originally intended for use with bevy.
 """
 
-[target.'cfg(target_family = "wasm")'.dependencies]
-xwebtransport-web-sys = { path = "../xwebtransport-web-sys" }
-
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwebtransport-wtransport = { path = "../xwebtransport-wtransport" }
+xwebtransport-core = { path = "../xwebtransport-core" }
+
+wtransport = { version = "0.1.3" }
+
+[target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
+xwebtransport-tests = { path = "../xwebtransport-tests" }
+
+anyhow = "1"
+tokio = "1"

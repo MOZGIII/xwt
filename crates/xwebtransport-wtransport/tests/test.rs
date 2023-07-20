@@ -10,7 +10,12 @@ async fn main() {
     )
     .unwrap();
 
-    xwebtransport_tests::connect(endpoint, "https://echo.webtransport.day", ())
-        .await
-        .unwrap()
+    let endpoint = xwebtransport_wtransport::Endpoint(endpoint);
+
+    let connection =
+        xwebtransport_tests::utils::connect(endpoint, "https://echo.webtransport.day", ())
+            .await
+            .unwrap();
+
+    xwebtransport_tests::tests::echo(connection).await.unwrap();
 }

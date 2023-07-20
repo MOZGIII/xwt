@@ -9,6 +9,7 @@ environments.
 """
 
 [dependencies]
-xwebtransport = { path = "../xwebtransport", default-features = false }
+xwebtransport-core = { path = "../xwebtransport-core", default-features = false }
+xwebtransport-error = { path = "../xwebtransport-error", default-features = false }
 
-anyhow = "1"
+thiserror = "1"

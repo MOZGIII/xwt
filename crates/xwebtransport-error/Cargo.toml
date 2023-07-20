@@ -1,0 +1,16 @@
+[package]
+name = "xwebtransport-error"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+A suite of reusable error types that natirally emerge from the xwebtransport
+API.
+Use when you don't want/need your own more precise types.
+"""
+
+[dependencies]
+xwebtransport-core = { path = "../xwebtransport-core" }
+
+thiserror = "1"
