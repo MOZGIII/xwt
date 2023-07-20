@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+FILE="$1"
+
+if [[ "$FILE" == *"/deps/"* ]]; then
+  # Running a dep, must be a cargo test command.
+  IS_TEST="true"
+else
+  # Not running a dep, must be a cargo run command.
+  IS_TEST="false"
+fi
+
+if [[ "$IS_TEST" == "true" ]]; then
+  exec "wasm-bindgen-test-runner" "$@"
+else
+  exec "wasm-server-runner" "$@"
+fi
