@@ -1,0 +1,6 @@
+[licenses]
+unlicensed = "allow"
+allow-osi-fsf-free = "either"
+
+[bans]
+multiple-versions = "allow"
