@@ -4,7 +4,6 @@ use xwebtransport_core::{prelude::*, traits};
 pub enum Connect<Endpoint>
 where
     Endpoint: traits::EndpointConnect,
-    EndpointConnectConnectionFor<Endpoint>: traits::Connection,
 {
     Connect(Endpoint::Error),
     Connecting(<Endpoint::Connecting as traits::Connecting>::Error),
@@ -14,7 +13,6 @@ where
 pub enum Accept<Endpoint>
 where
     Endpoint: traits::EndpointAccept,
-    EndpointAcceptConnectionFor<Endpoint>: traits::Connection,
 {
     Accept(Endpoint::Error),
     Connecting(<Endpoint::Connecting as traits::Connecting>::Error),

@@ -1,20 +1,33 @@
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use xwebtransport_core::trait_utils::EndpointConnectConnectionFor;
 
 #[derive(Debug, thiserror::Error)]
-pub enum EchoError<Connection>
+pub enum EchoError<Endpoint>
 where
-    Connection: xwebtransport_core::OpenBiStream,
+    Endpoint: xwebtransport_core::EndpointConnect + std::fmt::Debug,
+    Endpoint::Connecting: std::fmt::Debug,
+    EndpointConnectConnectionFor<Endpoint>: xwebtransport_core::OpenBiStream + std::fmt::Debug,
 {
-    Open(xwebtransport_error::OpenBi<Connection>),
+    Connect(xwebtransport_error::Connect<Endpoint>),
+    Open(xwebtransport_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
     Send(std::io::Error),
     Recv(std::io::Error),
     BadData(Vec<u8>),
 }
 
-pub async fn echo<Connection>(connection: Connection) -> Result<(), EchoError<Connection>>
+pub async fn echo<Endpoint>(
+    endpoint: Endpoint,
+    params: Endpoint::Params<'_>,
+) -> Result<(), EchoError<Endpoint>>
 where
-    Connection: xwebtransport_core::Connection,
+    Endpoint: xwebtransport_core::EndpointConnect + std::fmt::Debug,
+    Endpoint::Connecting: std::fmt::Debug,
+    EndpointConnectConnectionFor<Endpoint>: xwebtransport_core::OpenBiStream + std::fmt::Debug,
 {
+    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day", params)
+        .await
+        .map_err(EchoError::Connect)?;
+
     let (send_stream, recv_stream) = crate::utils::open_bi(connection)
         .await
         .map_err(EchoError::Open)?;

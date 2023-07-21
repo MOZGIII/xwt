@@ -7,7 +7,6 @@ pub async fn connect<Endpoint>(
 ) -> Result<EndpointConnectConnectionFor<Endpoint>, xwebtransport_error::Connect<Endpoint>>
 where
     Endpoint: xwebtransport_core::EndpointConnect,
-    EndpointConnectConnectionFor<Endpoint>: xwebtransport_core::Connection,
 {
     let connecting = endpoint
         .connect(url, params)
