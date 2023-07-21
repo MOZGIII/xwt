@@ -1,6 +1,7 @@
+mod impls;
+
 use xwebtransport_core::{prelude::*, traits};
 
-#[derive(Debug, thiserror::Error)]
 pub enum Connect<Endpoint>
 where
     Endpoint: traits::EndpointConnect,
@@ -9,7 +10,6 @@ where
     Connecting(<Endpoint::Connecting as traits::Connecting>::Error),
 }
 
-#[derive(Debug, thiserror::Error)]
 pub enum Accept<Endpoint>
 where
     Endpoint: traits::EndpointAccept,
@@ -18,7 +18,6 @@ where
     Connecting(<Endpoint::Connecting as traits::Connecting>::Error),
 }
 
-#[derive(Debug, thiserror::Error)]
 pub enum OpenBi<Connection>
 where
     Connection: traits::OpenBiStream,
@@ -27,7 +26,6 @@ where
     Opening(BiStreamOpeningErrorFor<Connection>),
 }
 
-#[derive(Debug, thiserror::Error)]
 pub enum OpenUni<Connection>
 where
     Connection: traits::OpenUniStream,

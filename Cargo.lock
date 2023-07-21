@@ -1095,7 +1095,6 @@ dependencies = [
 name = "xwebtransport-error"
 version = "0.1.0"
 dependencies = [
- "thiserror",
  "xwebtransport-core",
 ]
 

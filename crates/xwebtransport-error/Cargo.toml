@@ -12,5 +12,3 @@ Use when you don't want/need your own more precise types.
 
 [dependencies]
 xwebtransport-core = { path = "../xwebtransport-core" }
-
-thiserror = "1"
