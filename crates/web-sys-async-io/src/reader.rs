@@ -11,7 +11,7 @@ use crate::Op;
 #[derive(Debug)]
 pub struct Reader {
     pub inner: web_sys::ReadableStreamDefaultReader,
-    pub op: crate::Op,
+    pub op: Op,
 }
 
 impl Reader {
