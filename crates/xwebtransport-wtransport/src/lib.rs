@@ -8,14 +8,14 @@ pub use self::types::*;
 
 #[async_trait]
 impl xwebtransport_core::traits::EndpointConnect for Endpoint<wtransport::endpoint::Client> {
-    type Params<'params> = ();
+    type Params = ();
     type Connecting = xwebtransport_core::utils::dummy::Connecting<Connection>;
     type Error = wtransport::error::ConnectingError;
 
     async fn connect(
         &self,
         url: &str,
-        _params: Self::Params<'_>,
+        _params: &Self::Params,
     ) -> Result<Self::Connecting, Self::Error> {
         let connecting = self.0.connect(url).await.map(Connection)?;
         Ok(xwebtransport_core::utils::dummy::Connecting(connecting))

@@ -3,7 +3,7 @@ use xwebtransport_core::prelude::*;
 pub async fn connect<Endpoint>(
     endpoint: Endpoint,
     url: &str,
-    params: Endpoint::Params<'_>,
+    params: &Endpoint::Params,
 ) -> Result<EndpointConnectConnectionFor<Endpoint>, xwebtransport_error::Connect<Endpoint>>
 where
     Endpoint: xwebtransport_core::EndpointConnect,

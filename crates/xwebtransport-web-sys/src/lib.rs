@@ -14,13 +14,13 @@ pub struct Endpoint;
 #[async_trait(?Send)]
 impl xwebtransport_core::traits::EndpointConnect for Endpoint {
     type Error = Error;
-    type Params<'params> = &'params web_sys::WebTransportOptions;
+    type Params = web_sys::WebTransportOptions;
     type Connecting = xwebtransport_core::utils::dummy::Connecting<Connection>;
 
     async fn connect(
         &self,
         url: &str,
-        params: Self::Params<'_>,
+        params: &Self::Params,
     ) -> Result<Self::Connecting, Self::Error> {
         let transport = web_sys::WebTransport::new_with_options(url, params)?;
         let _ = wasm_bindgen_futures::JsFuture::from(transport.ready()).await?;

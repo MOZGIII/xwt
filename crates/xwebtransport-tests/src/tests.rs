@@ -17,7 +17,7 @@ where
 
 pub async fn echo<Endpoint>(
     endpoint: Endpoint,
-    params: Endpoint::Params<'_>,
+    params: &Endpoint::Params,
 ) -> Result<(), EchoError<Endpoint>>
 where
     Endpoint: xwebtransport_core::EndpointConnect + std::fmt::Debug,
