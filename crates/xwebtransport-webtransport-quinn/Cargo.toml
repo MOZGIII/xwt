@@ -1,0 +1,27 @@
+[package]
+name = "xwebtransport-webtransport-quinn"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+An implementation of the xwebtransport that runs natively via
+webtransport-quinn crate.
+"""
+repository = "https://github.com/MOZGIII/xwebtransport"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+xwebtransport-core = { version = "0.1", path = "../xwebtransport-core", default-features = false }
+
+http = "0.2"
+quinn = { version = "0.10" }
+thiserror = "1"
+webtransport-quinn = { version = "0.4.2" }
+
+[target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
+xwebtransport-tests = { version = "0.1", path = "../xwebtransport-tests" }
+
+anyhow = "1"
+rustls = "0.21"
+rustls-native-certs = "0.6"
+tokio = { version = "1", features = ["macros"] }
