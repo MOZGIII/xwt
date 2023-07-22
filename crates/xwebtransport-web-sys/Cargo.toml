@@ -11,8 +11,8 @@ Powered by wasm-bindgen and web-sys.
 repository = "https://github.com/MOZGIII/xwebtransport"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-xwebtransport-core = { path = "../xwebtransport-core" }
-web-sys-async-io = { path = "../web-sys-async-io" }
+xwebtransport-core = { version = "0.1", path = "../xwebtransport-core", default-features = false }
+web-sys-async-io = { version = "0.1", path = "../web-sys-async-io" }
 
 tokio = { version = "1", default-features = false, features = [] }
 wasm-bindgen-futures = { version = "0.4" }
@@ -28,6 +28,6 @@ web-sys = { version = "0.3", features = [
 ] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwebtransport-tests = { path = "../xwebtransport-tests" }
+xwebtransport-tests = { version = "0.1", path = "../xwebtransport-tests" }
 
 wasm-bindgen-test = "0.3"

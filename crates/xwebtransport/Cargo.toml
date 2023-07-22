@@ -11,7 +11,7 @@ Write once, run anywhere. Originally intended for use with bevy.
 repository = "https://github.com/MOZGIII/xwebtransport"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-xwebtransport-web-sys = { path = "../xwebtransport-web-sys" }
+xwebtransport-web-sys = { version = "0.1", path = "../xwebtransport-web-sys", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwebtransport-wtransport = { path = "../xwebtransport-wtransport" }
+xwebtransport-wtransport = { version = "0.1", path = "../xwebtransport-wtransport", default-features = false }

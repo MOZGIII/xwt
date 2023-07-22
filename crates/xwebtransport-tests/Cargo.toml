@@ -12,8 +12,8 @@ environments.
 repository = "https://github.com/MOZGIII/xwebtransport"
 
 [dependencies]
-xwebtransport-core = { path = "../xwebtransport-core", default-features = false }
-xwebtransport-error = { path = "../xwebtransport-error", default-features = false }
+xwebtransport-core = { version = "0.1", path = "../xwebtransport-core", default-features = false }
+xwebtransport-error = { version = "0.1", path = "../xwebtransport-error", default-features = false }
 
 thiserror = "1"
 tokio = { version = "1", default-features = false, features = ["io-util"] }

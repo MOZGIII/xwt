@@ -12,4 +12,4 @@ Use when you don't want/need your own more precise types.
 repository = "https://github.com/MOZGIII/xwebtransport"
 
 [dependencies]
-xwebtransport-core = { path = "../xwebtransport-core" }
+xwebtransport-core = { version = "0.1", path = "../xwebtransport-core", default-features = false }
