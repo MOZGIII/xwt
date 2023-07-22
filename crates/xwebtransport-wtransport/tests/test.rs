@@ -4,7 +4,7 @@
 async fn main() {
     let endpoint = wtransport::Endpoint::client(
         wtransport::ClientConfig::builder()
-            .with_bind_address("[::]:0".parse().unwrap())
+            .with_bind_address("0.0.0.0:0".parse().unwrap())
             .with_native_certs()
             .build(),
     )
