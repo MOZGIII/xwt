@@ -2,11 +2,14 @@
 name = "xwebtransport-tests"
 version = "0.1.0"
 edition = "2021"
+resolver = "2"
+license = "MIT"
 description = """
 Common test suite for xwebtransport.
 Intended for reuse to provide the same coverage in all the execution
 environments.
 """
+repository = "https://github.com/MOZGIII/xwebtransport"
 
 [dependencies]
 xwebtransport-core = { path = "../xwebtransport-core", default-features = false }

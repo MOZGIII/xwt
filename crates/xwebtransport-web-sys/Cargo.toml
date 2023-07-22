@@ -5,9 +5,10 @@ edition = "2021"
 resolver = "2"
 license = "MIT"
 description = """
-A common WebTransport interface for browser and native.
-Write once, run anywhere. Originally intended for use with bevy.
+An implementation of the xwebtransport that runs in the browser.
+Powered by wasm-bindgen and web-sys.
 """
+repository = "https://github.com/MOZGIII/xwebtransport"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwebtransport-core = { path = "../xwebtransport-core" }

@@ -2,6 +2,13 @@
 name = "web-sys-async-io"
 version = "0.1.0"
 edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+An async-IO implementation read/write stream in the browser, using the web-sys
+types.
+"""
+repository = "https://github.com/MOZGIII/xwebtransport"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3"

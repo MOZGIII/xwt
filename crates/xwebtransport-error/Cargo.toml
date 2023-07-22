@@ -5,10 +5,11 @@ edition = "2021"
 resolver = "2"
 license = "MIT"
 description = """
-A suite of reusable error types that natirally emerge from the xwebtransport
+A suite of reusable error types that naturally emerge from the xwebtransport
 API.
 Use when you don't want/need your own more precise types.
 """
+repository = "https://github.com/MOZGIII/xwebtransport"
 
 [dependencies]
 xwebtransport-core = { path = "../xwebtransport-core" }
