@@ -15,16 +15,13 @@ where
     BadData(Vec<u8>),
 }
 
-pub async fn echo<Endpoint>(
-    endpoint: Endpoint,
-    params: &Endpoint::Params,
-) -> Result<(), EchoError<Endpoint>>
+pub async fn echo<Endpoint>(endpoint: Endpoint) -> Result<(), EchoError<Endpoint>>
 where
     Endpoint: xwebtransport_core::EndpointConnect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
     EndpointConnectConnectionFor<Endpoint>: xwebtransport_core::OpenBiStream + std::fmt::Debug,
 {
-    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day", params)
+    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day")
         .await
         .map_err(EchoError::Connect)?;
 

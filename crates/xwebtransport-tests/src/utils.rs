@@ -3,13 +3,12 @@ use xwebtransport_core::prelude::*;
 pub async fn connect<Endpoint>(
     endpoint: Endpoint,
     url: &str,
-    params: &Endpoint::Params,
 ) -> Result<EndpointConnectConnectionFor<Endpoint>, xwebtransport_error::Connect<Endpoint>>
 where
     Endpoint: xwebtransport_core::EndpointConnect,
 {
     let connecting = endpoint
-        .connect(url, params)
+        .connect(url)
         .await
         .map_err(xwebtransport_error::Connect::Connect)?;
 

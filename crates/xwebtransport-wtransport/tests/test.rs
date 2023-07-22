@@ -12,7 +12,5 @@ async fn main() {
 
     let endpoint = xwebtransport_wtransport::Endpoint(endpoint);
 
-    xwebtransport_tests::tests::echo(endpoint, &())
-        .await
-        .unwrap();
+    xwebtransport_tests::tests::echo(endpoint).await.unwrap();
 }
