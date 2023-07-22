@@ -8,21 +8,18 @@ mod error;
 
 pub use error::*;
 
-#[derive(Debug, Clone)]
-pub struct Endpoint;
+#[derive(Debug, Clone, Default)]
+pub struct Endpoint {
+    pub options: web_sys::WebTransportOptions,
+}
 
 #[async_trait(?Send)]
 impl xwebtransport_core::traits::EndpointConnect for Endpoint {
     type Error = Error;
-    type Params = web_sys::WebTransportOptions;
     type Connecting = xwebtransport_core::utils::dummy::Connecting<Connection>;
 
-    async fn connect(
-        &self,
-        url: &str,
-        params: &Self::Params,
-    ) -> Result<Self::Connecting, Self::Error> {
-        let transport = web_sys::WebTransport::new_with_options(url, params)?;
+    async fn connect(&self, url: &str) -> Result<Self::Connecting, Self::Error> {
+        let transport = web_sys::WebTransport::new_with_options(url, &self.options)?;
         let _ = wasm_bindgen_futures::JsFuture::from(transport.ready()).await?;
         let connection = Connection {
             transport: Rc::new(transport),

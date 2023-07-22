@@ -64,15 +64,10 @@ pub trait AcceptUniStream: Streams {
 #[cfg_attr(not(target_family = "wasm"), async_trait)]
 #[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait EndpointConnect: Sized + maybe::Send {
-    type Params;
     type Connecting: Connecting;
     type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn connect(
-        &self,
-        url: &str,
-        params: &Self::Params,
-    ) -> Result<Self::Connecting, Self::Error>;
+    async fn connect(&self, url: &str) -> Result<Self::Connecting, Self::Error>;
 }
 
 #[cfg_attr(not(target_family = "wasm"), async_trait)]
