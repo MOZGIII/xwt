@@ -21,7 +21,21 @@ where
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Accept::Accept(inner) => f.debug_tuple("Accept::Accept").field(inner).finish(),
-            Accept::Connecting(inner) => f.debug_tuple("Accept::Connecting").field(inner).finish(),
+        }
+    }
+}
+
+impl<TAccepting> std::fmt::Debug for Accepting<TAccepting>
+where
+    TAccepting: xwebtransport_core::Accepting,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Accepting::Accepting(inner) => f.debug_tuple("Accept::Accepting").field(inner).finish(),
+            Accepting::RequestOk(inner) => f.debug_tuple("Accept::RequestOk").field(inner).finish(),
+            Accepting::RequestClose(inner) => {
+                f.debug_tuple("Accept::RequestClose").field(inner).finish()
+            }
         }
     }
 }

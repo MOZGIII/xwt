@@ -24,28 +24,49 @@ impl xwebtransport_core::traits::EndpointConnect for Endpoint<wtransport::endpoi
 
 #[async_trait]
 impl xwebtransport_core::traits::EndpointAccept for Endpoint<wtransport::endpoint::Server> {
-    type Connecting = SessionRequest;
+    type Accepting = IncomingSession;
+    type Error = std::convert::Infallible;
+
+    async fn accept(&self) -> Result<Option<Self::Accepting>, Self::Error> {
+        let incoming_session = self.0.accept().await;
+        let incoming_session = IncomingSession(incoming_session);
+        Ok(Some(incoming_session))
+    }
+}
+
+#[async_trait]
+impl xwebtransport_core::traits::Accepting for IncomingSession {
+    type Request = SessionRequest;
     type Error = wtransport::error::ConnectionError;
 
-    async fn accept(&self) -> Result<Self::Connecting, Self::Error> {
-        let incoming = self.0.accept().await;
-        incoming.await.map(SessionRequest)
+    async fn wait_accept(self) -> Result<Self::Request, Self::Error> {
+        self.0.await.map(SessionRequest)
+    }
+}
+
+#[async_trait]
+impl xwebtransport_core::traits::Request for SessionRequest {
+    type Connection = Connection;
+    type OkError = wtransport::error::ConnectionError;
+    type CloseError = std::convert::Infallible;
+
+    async fn ok(self) -> Result<Self::Connection, Self::OkError> {
+        self.0.accept().await.map(Connection)
+    }
+
+    async fn close(self, status: u16) -> Result<(), Self::CloseError> {
+        debug_assert!(
+            status == 404,
+            "wtransport driver only supports closing requests with 404 status code"
+        );
+        self.0.not_found().await;
+        Ok(())
     }
 }
 
 impl xwebtransport_core::traits::Streams for Connection {
     type SendStream = wtransport::SendStream;
     type RecvStream = wtransport::RecvStream;
-}
-
-#[async_trait]
-impl xwebtransport_core::traits::Connecting for SessionRequest {
-    type Connection = Connection;
-    type Error = wtransport::error::ConnectionError;
-
-    async fn wait(self) -> Result<Self::Connection, Self::Error> {
-        self.0.accept().await.map(Connection)
-    }
 }
 
 #[async_trait]

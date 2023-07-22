@@ -19,7 +19,19 @@ where
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Accept::Accept(inner) => write!(f, "accept: {inner}"),
-            Accept::Connecting(inner) => write!(f, "connecting: {inner}"),
+        }
+    }
+}
+
+impl<TAccepting> std::fmt::Display for Accepting<TAccepting>
+where
+    TAccepting: xwebtransport_core::Accepting,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Accepting::Accepting(inner) => write!(f, "accepting: {inner}"),
+            Accepting::RequestOk(inner) => write!(f, "oking request: {inner}"),
+            Accepting::RequestClose(inner) => write!(f, "closing request: {inner}"),
         }
     }
 }

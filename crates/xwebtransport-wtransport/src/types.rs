@@ -21,6 +21,7 @@ macro_rules! newtype {
 
 newtype!(Endpoint<Side> => wtransport::Endpoint<Side>);
 newtype!(Connection => wtransport::Connection);
+newtype!(IncomingSession => wtransport::endpoint::IncomingSession);
 newtype!(SessionRequest => wtransport::endpoint::SessionRequest);
 newtype!(OpeningBiStream => wtransport::stream::OpeningBiStream);
 newtype!(OpeningUniStream => wtransport::stream::OpeningUniStream);

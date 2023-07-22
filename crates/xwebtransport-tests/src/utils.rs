@@ -14,28 +14,29 @@ where
         .map_err(xwebtransport_error::Connect::Connect)?;
 
     let connection = connecting
-        .wait()
+        .wait_connect()
         .await
         .map_err(xwebtransport_error::Connect::Connecting)?;
 
     Ok(connection)
 }
 
-pub async fn accept<Endpoint>(
-    endpoint: Endpoint,
-) -> Result<EndpointAcceptConnectionFor<Endpoint>, xwebtransport_error::Accept<Endpoint>>
+pub async fn ok_accepting<Accepting>(
+    accepting: Accepting,
+) -> Result<AcceptingConnectionFor<Accepting>, xwebtransport_error::Accepting<Accepting>>
 where
-    Endpoint: xwebtransport_core::EndpointAccept,
-    EndpointAcceptConnectionFor<Endpoint>: xwebtransport_core::Connection,
+    Accepting: xwebtransport_core::Accepting,
+    AcceptingConnectionFor<Accepting>: xwebtransport_core::Connection,
 {
-    let connecting = endpoint
-        .accept()
+    let request = accepting
+        .wait_accept()
         .await
-        .map_err(xwebtransport_error::Accept::Accept)?;
-    let connection = connecting
-        .wait()
+        .map_err(xwebtransport_error::Accepting::Accepting)?;
+
+    let connection = request
+        .ok()
         .await
-        .map_err(xwebtransport_error::Accept::Connecting)?;
+        .map_err(xwebtransport_error::Accepting::RequestOk)?;
 
     Ok(connection)
 }

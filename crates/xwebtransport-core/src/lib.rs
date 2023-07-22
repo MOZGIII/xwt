@@ -12,9 +12,9 @@ pub use traits::*;
 
 pub mod prelude {
     pub use crate::traits::{
-        AcceptBiStream as _, AcceptUniStream as _, Connecting as _, Connection as _,
-        EndpointAccept as _, EndpointConnect as _, OpenBiStream as _, OpenUniStream as _,
-        OpeningBiStream as _, OpeningUniStream as _,
+        AcceptBiStream as _, AcceptUniStream as _, Accepting as _, Connecting as _,
+        Connection as _, EndpointAccept as _, EndpointConnect as _, OpenBiStream as _,
+        OpenUniStream as _, OpeningBiStream as _, OpeningUniStream as _, Request as _,
     };
 
     pub use crate::trait_utils::*;

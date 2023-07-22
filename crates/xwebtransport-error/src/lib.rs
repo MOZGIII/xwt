@@ -15,7 +15,15 @@ where
     Endpoint: traits::EndpointAccept,
 {
     Accept(Endpoint::Error),
-    Connecting(<Endpoint::Connecting as traits::Connecting>::Error),
+}
+
+pub enum Accepting<TAccepting>
+where
+    TAccepting: traits::Accepting,
+{
+    Accepting(TAccepting::Error),
+    RequestOk(<TAccepting::Request as traits::Request>::OkError),
+    RequestClose(<TAccepting::Request as traits::Request>::CloseError),
 }
 
 pub enum OpenBi<Connection>

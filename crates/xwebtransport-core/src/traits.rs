@@ -63,15 +63,6 @@ pub trait AcceptUniStream: Streams {
 
 #[cfg_attr(not(target_family = "wasm"), async_trait)]
 #[cfg_attr(target_family = "wasm", async_trait(?Send))]
-pub trait Connecting: maybe::Send {
-    type Connection: maybe::Send;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
-
-    async fn wait(self) -> Result<Self::Connection, Self::Error>;
-}
-
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait EndpointConnect: Sized + maybe::Send {
     type Params;
     type Connecting: Connecting;
@@ -86,11 +77,40 @@ pub trait EndpointConnect: Sized + maybe::Send {
 
 #[cfg_attr(not(target_family = "wasm"), async_trait)]
 #[cfg_attr(target_family = "wasm", async_trait(?Send))]
-pub trait EndpointAccept: Sized + maybe::Send {
-    type Connecting: Connecting;
+pub trait Connecting: maybe::Send {
+    type Connection: maybe::Send;
     type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn accept(&self) -> Result<Self::Connecting, Self::Error>;
+    async fn wait_connect(self) -> Result<Self::Connection, Self::Error>;
+}
+
+#[cfg_attr(not(target_family = "wasm"), async_trait)]
+#[cfg_attr(target_family = "wasm", async_trait(?Send))]
+pub trait EndpointAccept: Sized + maybe::Send {
+    type Accepting: Accepting;
+    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+
+    async fn accept(&self) -> Result<Option<Self::Accepting>, Self::Error>;
+}
+
+#[cfg_attr(not(target_family = "wasm"), async_trait)]
+#[cfg_attr(target_family = "wasm", async_trait(?Send))]
+pub trait Accepting: maybe::Send {
+    type Request: Request;
+    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+
+    async fn wait_accept(self) -> Result<Self::Request, Self::Error>;
+}
+
+#[cfg_attr(not(target_family = "wasm"), async_trait)]
+#[cfg_attr(target_family = "wasm", async_trait(?Send))]
+pub trait Request: maybe::Send {
+    type Connection: maybe::Send;
+    type OkError: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type CloseError: std::error::Error + maybe::Send + maybe::Sync + 'static;
+
+    async fn ok(self) -> Result<Self::Connection, Self::OkError>;
+    async fn close(self, status: u16) -> Result<(), Self::CloseError>;
 }
 
 pub trait Connection:

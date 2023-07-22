@@ -10,6 +10,11 @@ impl<Endpoint> std::error::Error for Accept<Endpoint> where
 {
 }
 
+impl<TAccepting> std::error::Error for Accepting<TAccepting> where
+    TAccepting: xwebtransport_core::Accepting
+{
+}
+
 impl<Connect> std::error::Error for OpenBi<Connect> where Connect: xwebtransport_core::OpenBiStream {}
 
 impl<Connect> std::error::Error for OpenUni<Connect> where Connect: xwebtransport_core::OpenUniStream

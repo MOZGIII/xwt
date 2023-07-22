@@ -16,7 +16,7 @@ where
     type Connection = T;
     type Error = std::convert::Infallible;
 
-    async fn wait(self) -> Result<Self::Connection, Self::Error> {
+    async fn wait_connect(self) -> Result<Self::Connection, Self::Error> {
         Ok(self.0)
     }
 }
