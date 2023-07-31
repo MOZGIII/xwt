@@ -18,12 +18,16 @@ pub type BiStreamOpeningErrorFor<T> =
 pub type UniStreamOpeningErrorFor<T> =
     <<T as traits::OpenUniStream>::Opening as traits::OpeningUniStream>::Error;
 
-pub type BiStreamsFor<T> = traits::BiStreamsFor<
-    <<T as traits::OpenBiStream>::Opening as traits::OpeningBiStream>::Streams,
->;
+pub type SendStreamFor<T> = <T as traits::Streams>::SendStream;
+
+pub type RecvStreamFor<T> = <T as traits::Streams>::RecvStream;
 
 pub type SendUniStreamFor<T> =
     <<<T as traits::OpenUniStream>::Opening as traits::OpeningUniStream>::Streams as traits::Streams>::SendStream;
 
 pub type RecvUniStreamFor<T> =
     <<<T as traits::OpenUniStream>::Opening as traits::OpeningUniStream>::Streams as traits::Streams>::RecvStream;
+
+pub type BiStreamsFor<T> = traits::BiStreamsFor<
+    <<T as traits::OpenBiStream>::Opening as traits::OpeningBiStream>::Streams,
+>;

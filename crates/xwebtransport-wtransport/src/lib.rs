@@ -60,8 +60,15 @@ impl xwebtransport_core::traits::Request for SessionRequest {
 }
 
 impl xwebtransport_core::traits::Streams for Connection {
-    type SendStream = wtransport::SendStream;
-    type RecvStream = wtransport::RecvStream;
+    type SendStream = SendStream;
+    type RecvStream = RecvStream;
+}
+
+fn map_streams(
+    streams: (wtransport::SendStream, wtransport::RecvStream),
+) -> (SendStream, RecvStream) {
+    let (send, recv) = streams;
+    (SendStream(send), RecvStream(recv))
 }
 
 #[async_trait]
@@ -72,7 +79,7 @@ impl xwebtransport_core::traits::OpeningBiStream for OpeningBiStream {
     async fn wait_bi(
         self,
     ) -> Result<xwebtransport_core::traits::BiStreamsFor<Self::Streams>, Self::Error> {
-        self.0.await
+        self.0.await.map(map_streams)
     }
 }
 
@@ -93,7 +100,7 @@ impl xwebtransport_core::traits::AcceptBiStream for Connection {
     async fn accept_bi(
         &self,
     ) -> Result<xwebtransport_core::traits::BiStreamsFor<Self>, Self::Error> {
-        self.0.accept_bi().await
+        self.0.accept_bi().await.map(map_streams)
     }
 }
 
@@ -106,7 +113,7 @@ impl xwebtransport_core::traits::OpeningUniStream for OpeningUniStream {
         self,
     ) -> Result<<Self::Streams as xwebtransport_core::traits::Streams>::SendStream, Self::Error>
     {
-        self.0.await
+        self.0.await.map(SendStream)
     }
 }
 
@@ -125,6 +132,34 @@ impl xwebtransport_core::traits::AcceptUniStream for Connection {
     type Error = wtransport::error::ConnectionError;
 
     async fn accept_uni(&self) -> Result<Self::RecvStream, Self::Error> {
-        self.0.accept_uni().await
+        self.0.accept_uni().await.map(RecvStream)
+    }
+}
+
+#[async_trait]
+impl xwebtransport_core::io::Read for RecvStream {
+    type Error = wtransport::error::StreamReadError;
+
+    async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
+        println!("QQ {:?}", self);
+        self.0.read(buf).await
+    }
+}
+
+#[async_trait]
+impl xwebtransport_core::io::Write for SendStream {
+    type Error = wtransport::error::StreamWriteError;
+
+    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+        self.0.write(buf).await
+    }
+}
+
+#[async_trait]
+impl xwebtransport_core::io::WriteChunk<xwebtransport_core::io::chunk::U8> for SendStream {
+    type Error = wtransport::error::StreamWriteError;
+
+    async fn write_chunk(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
+        self.0.write_all(buf).await
     }
 }
