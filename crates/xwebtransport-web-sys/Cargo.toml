@@ -17,6 +17,7 @@ web-sys-async-io = { version = "0.1", path = "../web-sys-async-io" }
 tokio = { version = "1", default-features = false, features = [] }
 wasm-bindgen-futures = { version = "0.4" }
 wasm-bindgen = { version = "0.2" }
+js-sys = "0.3"
 web-sys = { version = "0.3", features = [
   "WebTransport",
   "WebTransportOptions",

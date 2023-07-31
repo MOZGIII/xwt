@@ -1,7 +1,7 @@
 #![cfg(not(target_family = "wasm"))]
 
 #[tokio::test]
-async fn main() {
+async fn echo() {
     let endpoint = wtransport::Endpoint::client(
         wtransport::ClientConfig::builder()
             .with_bind_address("0.0.0.0:0".parse().unwrap())

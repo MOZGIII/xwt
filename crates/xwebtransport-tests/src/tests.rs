@@ -1,5 +1,4 @@
-use tokio::io::{AsyncReadExt, AsyncWriteExt};
-use xwebtransport_core::trait_utils::EndpointConnectConnectionFor;
+use xwebtransport_core::prelude::*;
 
 #[derive(Debug, thiserror::Error)]
 pub enum EchoError<Endpoint>
@@ -10,8 +9,9 @@ where
 {
     Connect(xwebtransport_error::Connect<Endpoint>),
     Open(xwebtransport_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
-    Send(std::io::Error),
-    Recv(std::io::Error),
+    Send(WriteErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    Recv(ReadErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    NoResponse,
     BadData(Vec<u8>),
 }
 
@@ -25,27 +25,102 @@ where
         .await
         .map_err(EchoError::Connect)?;
 
-    let (send_stream, recv_stream) = crate::utils::open_bi(connection)
+    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(connection)
         .await
         .map_err(EchoError::Open)?;
 
-    let mut send_stream = std::pin::pin!(send_stream);
+    let mut to_write = &b"hello"[..];
+    loop {
+        let written = send_stream.write(to_write).await.map_err(EchoError::Send)?;
+        to_write = &to_write[written..];
+        if to_write.is_empty() {
+            break;
+        }
+    }
 
+    let mut read_buf = vec![0u8; 1024];
+
+    let Some(read) = recv_stream
+        .read(&mut read_buf[..])
+        .await
+        .map_err(EchoError::Recv)?
+    else {
+        return Err(EchoError::NoResponse);
+    };
+    read_buf.truncate(read);
+
+    if read_buf != b"hello" {
+        return Err(EchoError::BadData(read_buf));
+    }
+
+    Ok(())
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum EchoChunksError<Endpoint, WriteChunk, ReadChunk>
+where
+    Endpoint: xwebtransport_core::EndpointConnect + std::fmt::Debug,
+    Endpoint::Connecting: std::fmt::Debug,
+    EndpointConnectConnectionFor<Endpoint>: xwebtransport_core::OpenBiStream + std::fmt::Debug,
+
+    WriteChunk: xwebtransport_core::WriteableChunk + std::fmt::Debug,
+    ReadChunk: xwebtransport_core::ReadableChunk + std::fmt::Debug,
+
+    SendStreamFor<EndpointConnectConnectionFor<Endpoint>>:
+        xwebtransport_core::WriteChunk<WriteChunk>,
+    RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwebtransport_core::ReadChunk<ReadChunk>,
+{
+    Connect(xwebtransport_error::Connect<Endpoint>),
+    Open(xwebtransport_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
+    Send(WriteChunkErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>, WriteChunk>),
+    Recv(ReadChunkErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>, ReadChunk>),
+    NoResponse,
+    BadData(Vec<u8>),
+}
+
+pub async fn echo_chunks<Endpoint, WriteChunk, ReadChunk>(
+    endpoint: Endpoint,
+) -> Result<(), EchoChunksError<Endpoint, WriteChunk, ReadChunk>>
+where
+    Endpoint: xwebtransport_core::EndpointConnect + std::fmt::Debug,
+    Endpoint::Connecting: std::fmt::Debug,
+    EndpointConnectConnectionFor<Endpoint>: xwebtransport_core::OpenBiStream + std::fmt::Debug,
+
+    WriteChunk: xwebtransport_core::WriteableChunk + std::fmt::Debug,
+    ReadChunk: xwebtransport_core::ReadableChunk + std::fmt::Debug,
+
+    <WriteChunk as xwebtransport_core::WriteableChunk>::Data<'static>: From<&'static [u8]>,
+    for<'a> <ReadChunk as xwebtransport_core::ReadableChunk>::Data<'a>: AsRef<[u8]>,
+
+    SendStreamFor<EndpointConnectConnectionFor<Endpoint>>:
+        xwebtransport_core::WriteChunk<WriteChunk>,
+    RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwebtransport_core::ReadChunk<ReadChunk>,
+{
+    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day")
+        .await
+        .map_err(EchoChunksError::Connect)?;
+
+    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(connection)
+        .await
+        .map_err(EchoChunksError::Open)?;
+
+    let write_data: WriteChunk::Data<'static> = (&b"hello"[..]).into();
     send_stream
-        .write_all(b"hello")
+        .write_chunk(write_data)
         .await
-        .map_err(EchoError::Send)?;
+        .map_err(EchoChunksError::Send)?;
 
-    let mut recv_stream = std::pin::pin!(recv_stream);
-
-    let mut data = Vec::with_capacity(1024);
-    let read = recv_stream
-        .read_buf(&mut data)
+    let maybe_read_chunk = recv_stream
+        .read_chunk(1024, false)
         .await
-        .map_err(EchoError::Recv)?;
+        .map_err(EchoChunksError::Recv)?;
+    let Some(read_chunk) = maybe_read_chunk else {
+        return Err(EchoChunksError::NoResponse);
+    };
+    let read_data = read_chunk.data.as_ref();
 
-    if &data[..read] != b"hello" {
-        return Err(EchoError::BadData(data));
+    if read_data != b"hello" {
+        return Err(EchoChunksError::BadData(read_data.into()));
     }
 
     Ok(())

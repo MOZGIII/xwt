@@ -5,6 +5,7 @@ use std::rc::Rc;
 use xwebtransport_core::async_trait;
 
 mod error;
+mod sys;
 
 pub use error::*;
 
@@ -186,5 +187,43 @@ impl tokio::io::AsyncRead for RecvStream {
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> std::task::Poll<std::io::Result<()>> {
         std::pin::Pin::new(&mut self.reader).poll_read(cx, buf)
+    }
+}
+
+#[async_trait(?Send)]
+impl xwebtransport_core::io::Write for SendStream {
+    type Error = Error;
+
+    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+        let chunk = js_sys::Uint8Array::from(buf);
+        let fut = wasm_bindgen_futures::JsFuture::from(
+            self.writer.inner.write_with_chunk(chunk.as_ref()),
+        );
+        fut.await.map_err(Error)?;
+        Ok(buf.len())
+    }
+}
+
+#[async_trait(?Send)]
+impl xwebtransport_core::io::Read for RecvStream {
+    type Error = Error;
+
+    async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
+        let fut = wasm_bindgen_futures::JsFuture::from(self.reader.inner.read());
+        let result = fut.await.map_err(Error)?;
+        let result: crate::sys::ReadableStreamDefaultReaderValue = result.into();
+        let value = result.value();
+
+        let Some(js_buf) = value else {
+            if result.is_done() {
+                return Ok(None);
+            }
+            unreachable!("no value and we are also not done, this should be impossible");
+        };
+
+        let data = js_buf.to_vec();
+        buf[..data.len()].copy_from_slice(&data[..]);
+
+        Ok(Some(data.len()))
     }
 }
