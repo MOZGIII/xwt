@@ -141,7 +141,6 @@ impl xwebtransport_core::io::Read for RecvStream {
     type Error = wtransport::error::StreamReadError;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
-        println!("QQ {:?}", self);
         self.0.read(buf).await
     }
 }
