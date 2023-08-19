@@ -5,6 +5,7 @@ use std::rc::Rc;
 use xwebtransport_core::async_trait;
 
 mod error;
+mod stream_utils;
 mod sys;
 
 pub use error::*;
@@ -22,8 +23,15 @@ impl xwebtransport_core::traits::EndpointConnect for Endpoint {
     async fn connect(&self, url: &str) -> Result<Self::Connecting, Self::Error> {
         let transport = web_sys::WebTransport::new_with_options(url, &self.options)?;
         let _ = wasm_bindgen_futures::JsFuture::from(transport.ready()).await?;
+
+        let datagrams = transport.datagrams();
+        let datagram_readable_stream_reader = stream_utils::get_reader(datagrams.readable());
+        let datagram_writable_stream_writer = stream_utils::get_writer(datagrams.writable());
+
         let connection = Connection {
             transport: Rc::new(transport),
+            datagram_readable_stream_reader,
+            datagram_writable_stream_writer,
         };
         Ok(xwebtransport_core::utils::dummy::Connecting(connection))
     }
@@ -32,6 +40,8 @@ impl xwebtransport_core::traits::EndpointConnect for Endpoint {
 #[derive(Debug)]
 pub struct Connection {
     pub transport: Rc<web_sys::WebTransport>,
+    pub datagram_readable_stream_reader: web_sys::ReadableStreamDefaultReader,
+    pub datagram_writable_stream_writer: web_sys::WritableStreamDefaultWriter,
 }
 
 impl xwebtransport_core::traits::Streams for Connection {
@@ -195,11 +205,7 @@ impl xwebtransport_core::io::Write for SendStream {
     type Error = Error;
 
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
-        let chunk = js_sys::Uint8Array::from(buf);
-        let fut = wasm_bindgen_futures::JsFuture::from(
-            self.writer.inner.write_with_chunk(chunk.as_ref()),
-        );
-        fut.await.map_err(Error)?;
+        stream_utils::write(&self.writer.inner, buf).await?;
         Ok(buf.len())
     }
 }
@@ -209,21 +215,38 @@ impl xwebtransport_core::io::Read for RecvStream {
     type Error = Error;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
-        let fut = wasm_bindgen_futures::JsFuture::from(self.reader.inner.read());
-        let result = fut.await.map_err(Error)?;
-        let result: crate::sys::ReadableStreamDefaultReaderValue = result.into();
-        let value = result.value();
-
-        let Some(js_buf) = value else {
-            if result.is_done() {
-                return Ok(None);
-            }
-            unreachable!("no value and we are also not done, this should be impossible");
+        let maybe_data = stream_utils::read(&self.reader.inner).await?;
+        let Some(data) = maybe_data else {
+            return Ok(None);
         };
-
-        let data = js_buf.to_vec();
         buf[..data.len()].copy_from_slice(&data[..]);
-
         Ok(Some(data.len()))
+    }
+}
+
+#[async_trait(?Send)]
+impl xwebtransport_core::datagram::Receive for Connection {
+    type Datagram = Vec<u8>;
+    type Error = Error;
+
+    async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
+        let maybe_data = stream_utils::read(&self.datagram_readable_stream_reader).await?;
+        let Some(data) = maybe_data else {
+            return Err(Error("unexpected stream termination".into()));
+        };
+        Ok(data)
+    }
+}
+
+#[async_trait(?Send)]
+impl xwebtransport_core::datagram::Send for Connection {
+    type Error = Error;
+
+    async fn send_datagram<D>(&self, payload: D) -> Result<(), Self::Error>
+    where
+        D: AsRef<[u8]>,
+    {
+        stream_utils::write(&self.datagram_writable_stream_writer, payload.as_ref()).await?;
+        Ok(())
     }
 }
