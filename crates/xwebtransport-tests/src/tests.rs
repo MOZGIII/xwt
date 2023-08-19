@@ -125,3 +125,47 @@ where
 
     Ok(())
 }
+
+#[derive(Debug, thiserror::Error)]
+pub enum EchoDatagrmsError<Endpoint>
+where
+    Endpoint: xwebtransport_core::EndpointConnect + std::fmt::Debug,
+    Endpoint::Connecting: std::fmt::Debug,
+    EndpointConnectConnectionFor<Endpoint>:
+        xwebtransport_core::datagram::Datagrams + std::fmt::Debug,
+    ReceiveDatagramFor<EndpointConnectConnectionFor<Endpoint>>: std::fmt::Debug,
+{
+    Connect(xwebtransport_error::Connect<Endpoint>),
+    Send(SendErrorFor<EndpointConnectConnectionFor<Endpoint>>),
+    Recv(ReceiveErrorFor<EndpointConnectConnectionFor<Endpoint>>),
+    BadData(ReceiveDatagramFor<EndpointConnectConnectionFor<Endpoint>>),
+}
+
+pub async fn echo_datagrams<Endpoint>(endpoint: Endpoint) -> Result<(), EchoDatagrmsError<Endpoint>>
+where
+    Endpoint: xwebtransport_core::EndpointConnect + std::fmt::Debug,
+    Endpoint::Connecting: std::fmt::Debug,
+    EndpointConnectConnectionFor<Endpoint>:
+        xwebtransport_core::datagram::Datagrams + std::fmt::Debug,
+    ReceiveDatagramFor<EndpointConnectConnectionFor<Endpoint>>: std::fmt::Debug,
+{
+    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day")
+        .await
+        .map_err(EchoDatagrmsError::Connect)?;
+
+    connection
+        .send_datagram(&b"hello"[..])
+        .await
+        .map_err(EchoDatagrmsError::Send)?;
+
+    let read = connection
+        .receive_datagram()
+        .await
+        .map_err(EchoDatagrmsError::Recv)?;
+
+    if read.as_ref() != b"hello" {
+        return Err(EchoDatagrmsError::BadData(read));
+    }
+
+    Ok(())
+}
