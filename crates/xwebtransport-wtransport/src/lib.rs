@@ -162,3 +162,31 @@ impl xwebtransport_core::io::WriteChunk<xwebtransport_core::io::chunk::U8> for S
         self.0.write_all(buf).await
     }
 }
+
+#[async_trait]
+impl xwebtransport_core::datagram::Receive for Connection {
+    type Datagram = Datagram;
+    type Error = wtransport::error::ConnectionError;
+
+    async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
+        self.0.receive_datagram().await.map(Datagram)
+    }
+}
+
+impl AsRef<[u8]> for Datagram {
+    fn as_ref(&self) -> &[u8] {
+        &self.0
+    }
+}
+
+#[async_trait]
+impl xwebtransport_core::datagram::Send for Connection {
+    type Error = wtransport::error::SendDatagramError;
+
+    async fn send_datagram<D>(&self, payload: D) -> Result<(), Self::Error>
+    where
+        D: Send + AsRef<[u8]>,
+    {
+        self.0.send_datagram(payload)
+    }
+}
