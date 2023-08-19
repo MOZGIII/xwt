@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 
 use crate::{
+    datagram,
     io::{Read, Write},
     utils::maybe,
 };
@@ -112,11 +113,16 @@ pub trait Request: maybe::Send {
 }
 
 pub trait Connection:
-    Streams + OpenBiStream + OpenUniStream + AcceptBiStream + AcceptUniStream
+    Streams + OpenBiStream + OpenUniStream + AcceptBiStream + AcceptUniStream + datagram::Datagrams
 {
 }
 
 impl<T> Connection for T where
-    T: Streams + OpenBiStream + OpenUniStream + AcceptBiStream + AcceptUniStream
+    T: Streams
+        + OpenBiStream
+        + OpenUniStream
+        + AcceptBiStream
+        + AcceptUniStream
+        + datagram::Datagrams
 {
 }
