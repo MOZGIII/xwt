@@ -36,7 +36,7 @@ impl tokio::io::AsyncRead for Reader {
 
                 let read_result = match result {
                     Ok(val) => val,
-                    Err(err) => return Poll::Ready(Err(err).map_err(super::js_value_to_io_error)),
+                    Err(err) => return Poll::Ready(Err(super::js_value_to_io_error(err))),
                 };
                 let read_result: crate::sys::ReadableStreamDefaultReaderValue = read_result.into();
 
