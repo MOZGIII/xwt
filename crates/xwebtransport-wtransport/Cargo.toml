@@ -1,6 +1,6 @@
 [package]
 name = "xwebtransport-wtransport"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -12,7 +12,7 @@ repository = "https://github.com/MOZGIII/xwebtransport"
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwebtransport-core = { version = "0.1", path = "../xwebtransport-core", default-features = false }
 
-wtransport = { version = "0.1.3" }
+wtransport = { version = "0.1.7" }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 xwebtransport-tests = { version = "0.1", path = "../xwebtransport-tests" }
