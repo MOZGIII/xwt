@@ -7,7 +7,9 @@ mod types;
 pub use self::types::*;
 
 #[async_trait]
-impl xwebtransport_core::traits::EndpointConnect for Endpoint<wtransport::endpoint::Client> {
+impl xwebtransport_core::traits::EndpointConnect
+    for Endpoint<wtransport::endpoint::endpoint_side::Client>
+{
     type Connecting = xwebtransport_core::utils::dummy::Connecting<Connection>;
     type Error = wtransport::error::ConnectingError;
 
@@ -18,7 +20,9 @@ impl xwebtransport_core::traits::EndpointConnect for Endpoint<wtransport::endpoi
 }
 
 #[async_trait]
-impl xwebtransport_core::traits::EndpointAccept for Endpoint<wtransport::endpoint::Server> {
+impl xwebtransport_core::traits::EndpointAccept
+    for Endpoint<wtransport::endpoint::endpoint_side::Server>
+{
     type Accepting = IncomingSession;
     type Error = std::convert::Infallible;
 
