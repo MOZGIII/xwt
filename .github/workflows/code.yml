@@ -31,7 +31,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Compute matrix
         uses: ./.github/actions/plan
         id: set-matrix
@@ -57,7 +57,7 @@ jobs:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         timeout-minutes: 5
 
       - name: Cache
@@ -121,7 +121,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         timeout-minutes: 5
 
       - name: Cache
