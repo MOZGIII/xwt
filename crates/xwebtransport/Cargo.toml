@@ -1,6 +1,6 @@
 [package]
 name = "xwebtransport"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -11,7 +11,7 @@ Write once, run anywhere. Originally intended for use with bevy.
 repository = "https://github.com/MOZGIII/xwebtransport"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-xwebtransport-web-sys = { version = "0.1", path = "../xwebtransport-web-sys", default-features = false }
+xwebtransport-web-sys = { version = "0.2", path = "../xwebtransport-web-sys", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwebtransport-wtransport = { version = "0.1", path = "../xwebtransport-wtransport", default-features = false }
+xwebtransport-wtransport = { version = "0.2", path = "../xwebtransport-wtransport", default-features = false }

@@ -1107,7 +1107,7 @@ dependencies = [
 
 [[package]]
 name = "xwebtransport"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "xwebtransport-web-sys",
  "xwebtransport-wtransport",
@@ -1115,7 +1115,7 @@ dependencies = [
 
 [[package]]
 name = "xwebtransport-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "tokio",
@@ -1123,14 +1123,14 @@ dependencies = [
 
 [[package]]
 name = "xwebtransport-error"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "xwebtransport-core",
 ]
 
 [[package]]
 name = "xwebtransport-tests"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "thiserror",
  "tokio",
@@ -1140,7 +1140,7 @@ dependencies = [
 
 [[package]]
 name = "xwebtransport-web-sys"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1155,7 +1155,7 @@ dependencies = [
 
 [[package]]
 name = "xwebtransport-wtransport"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "tokio",

@@ -1,6 +1,6 @@
 [package]
 name = "xwebtransport-wtransport"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -10,12 +10,12 @@ An implementation of the xwebtransport that runs natively via wtransport crate.
 repository = "https://github.com/MOZGIII/xwebtransport"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwebtransport-core = { version = "0.1", path = "../xwebtransport-core", default-features = false }
+xwebtransport-core = { version = "0.2", path = "../xwebtransport-core", default-features = false }
 
 wtransport = { version = "0.1.7" }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
-xwebtransport-tests = { version = "0.1", path = "../xwebtransport-tests" }
+xwebtransport-tests = { version = "0.2", path = "../xwebtransport-tests" }
 
 anyhow = "1"
 tokio = { version = "1", features = ["macros"] }
