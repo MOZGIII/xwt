@@ -991,7 +991,7 @@ dependencies = [
 
 [[package]]
 name = "web-sys-async-io"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1143,7 +1143,7 @@ dependencies = [
 
 [[package]]
 name = "xwebtransport"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "xwebtransport-web-sys",
  "xwebtransport-wtransport",
@@ -1176,7 +1176,7 @@ dependencies = [
 
 [[package]]
 name = "xwebtransport-web-sys"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "js-sys",
  "tokio",
