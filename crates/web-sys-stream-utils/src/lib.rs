@@ -3,15 +3,17 @@
 pub mod sys;
 
 pub fn get_reader(
-    readable_stream: web_sys::ReadableStream,
+    readable_stream: impl Into<web_sys::ReadableStream>,
 ) -> web_sys::ReadableStreamDefaultReader {
+    let readable_stream = readable_stream.into();
     let reader: wasm_bindgen::JsValue = readable_stream.get_reader().into();
     reader.into()
 }
 
 pub fn get_reader_byob(
-    readable_stream: web_sys::ReadableStream,
+    readable_stream: impl Into<web_sys::ReadableStream>,
 ) -> web_sys::ReadableStreamByobReader {
+    let readable_stream = readable_stream.into();
     let mut options = web_sys::ReadableStreamGetReaderOptions::new();
     options.mode(web_sys::ReadableStreamReaderMode::Byob);
     let reader: wasm_bindgen::JsValue = readable_stream.get_reader_with_options(&options).into();
@@ -59,8 +61,7 @@ pub async fn read_byob(
     // at the very least there is this guard-rail of taking
     // an `js_sys::ArrayBuffer`, which should suggest that user of this API
     // has to allocate a new `Uint8Array`.
-    let fut =
-        wasm_bindgen_futures::JsFuture::from(reader.read_with_array_buffer_view(&buf.buffer()));
+    let fut = wasm_bindgen_futures::JsFuture::from(reader.read_with_array_buffer_view(&buf));
     let result = fut.await?;
     let result: crate::sys::ReadableStreamByobReaderValue = result.into();
     let value = result.value();
