@@ -1002,6 +1002,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "web-sys-stream-utils"
+version = "0.1.0"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
 name = "which"
 version = "4.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1175,6 +1185,7 @@ dependencies = [
  "wasm-bindgen-test",
  "web-sys",
  "web-sys-async-io",
+ "web-sys-stream-utils",
  "xwebtransport-core",
  "xwebtransport-tests",
 ]
