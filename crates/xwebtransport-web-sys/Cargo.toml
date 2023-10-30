@@ -13,6 +13,7 @@ repository = "https://github.com/MOZGIII/xwebtransport"
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwebtransport-core = { version = "0.2", path = "../xwebtransport-core", default-features = false }
 web-sys-async-io = { version = "0.1", path = "../web-sys-async-io" }
+web-sys-stream-utils = { version = "0.1", path = "../web-sys-stream-utils" }
 
 tokio = { version = "1", default-features = false, features = [] }
 wasm-bindgen-futures = { version = "0.4" }

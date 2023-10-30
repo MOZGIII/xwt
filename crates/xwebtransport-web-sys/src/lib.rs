@@ -5,8 +5,6 @@ use std::rc::Rc;
 use xwebtransport_core::async_trait;
 
 mod error;
-mod stream_utils;
-mod sys;
 
 pub use error::*;
 
@@ -25,8 +23,10 @@ impl xwebtransport_core::traits::EndpointConnect for Endpoint {
         let _ = wasm_bindgen_futures::JsFuture::from(transport.ready()).await?;
 
         let datagrams = transport.datagrams();
-        let datagram_readable_stream_reader = stream_utils::get_reader(datagrams.readable());
-        let datagram_writable_stream_writer = stream_utils::get_writer(datagrams.writable());
+        let datagram_readable_stream_reader =
+            web_sys_stream_utils::get_reader(datagrams.readable());
+        let datagram_writable_stream_writer =
+            web_sys_stream_utils::get_writer(datagrams.writable());
 
         let connection = Connection {
             transport: Rc::new(transport),
@@ -205,7 +205,7 @@ impl xwebtransport_core::io::Write for SendStream {
     type Error = Error;
 
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
-        stream_utils::write(&self.writer.inner, buf).await?;
+        web_sys_stream_utils::write(&self.writer.inner, buf).await?;
         Ok(buf.len())
     }
 }
@@ -215,12 +215,19 @@ impl xwebtransport_core::io::Read for RecvStream {
     type Error = Error;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
-        let maybe_data = stream_utils::read(&self.reader.inner).await?;
-        let Some(data) = maybe_data else {
+        let internal_buf = js_sys::Uint8Array::new_with_length(buf.len().try_into().unwrap());
+        let maybe_output_buf =
+            web_sys_stream_utils::read_byob(&self.reader.inner, internal_buf).await?;
+        let Some(output_buf) = maybe_output_buf else {
             return Ok(None);
         };
-        buf[..data.len()].copy_from_slice(&data[..]);
-        Ok(Some(data.len()))
+
+        // Unwrap is safe assuming the `usize` is `u32` in wasm.
+        let len = output_buf.byte_length().try_into().unwrap();
+
+        output_buf.copy_to(&mut buf[..len]);
+
+        Ok(Some(len))
     }
 }
 
@@ -230,7 +237,7 @@ impl xwebtransport_core::datagram::Receive for Connection {
     type Error = Error;
 
     async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
-        let maybe_data = stream_utils::read(&self.datagram_readable_stream_reader).await?;
+        let maybe_data = web_sys_stream_utils::read(&self.datagram_readable_stream_reader).await?;
         let Some(data) = maybe_data else {
             return Err(Error("unexpected stream termination".into()));
         };
@@ -246,7 +253,8 @@ impl xwebtransport_core::datagram::Send for Connection {
     where
         D: AsRef<[u8]>,
     {
-        stream_utils::write(&self.datagram_writable_stream_writer, payload.as_ref()).await?;
+        web_sys_stream_utils::write(&self.datagram_writable_stream_writer, payload.as_ref())
+            .await?;
         Ok(())
     }
 }
