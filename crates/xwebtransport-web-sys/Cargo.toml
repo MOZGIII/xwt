@@ -1,6 +1,6 @@
 [package]
 name = "xwebtransport-web-sys"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -13,7 +13,7 @@ repository = "https://github.com/MOZGIII/xwebtransport"
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwebtransport-core = { version = "0.2", path = "../xwebtransport-core", default-features = false }
 web-sys-async-io = { version = "0.2", path = "../web-sys-async-io" }
-web-sys-stream-utils = { version = "0.1", path = "../web-sys-stream-utils" }
+web-sys-stream-utils = { version = "0.2", path = "../web-sys-stream-utils" }
 
 tokio = { version = "1", default-features = false, features = [] }
 wasm-bindgen-futures = { version = "0.4" }

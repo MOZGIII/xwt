@@ -1003,7 +1003,7 @@ dependencies = [
 
 [[package]]
 name = "web-sys-stream-utils"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
@@ -1176,7 +1176,7 @@ dependencies = [
 
 [[package]]
 name = "xwebtransport-web-sys"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "js-sys",
  "tokio",
