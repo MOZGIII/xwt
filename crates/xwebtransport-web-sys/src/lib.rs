@@ -65,7 +65,7 @@ fn wrap_recv_stream(
     transport: &Rc<web_sys::WebTransport>,
     stream: web_sys::WebTransportReceiveStream,
 ) -> RecvStream {
-    let reader = stream.get_reader();
+    let reader = web_sys_stream_utils::get_reader_byob(stream.clone());
     let reader: wasm_bindgen::JsValue = reader.into();
     let reader = reader.into();
     let reader = web_sys_async_io::Reader::new(reader);

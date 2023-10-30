@@ -19,3 +19,12 @@ async fn echo_datagrams() {
         .await
         .unwrap();
 }
+
+#[wasm_bindgen_test]
+async fn read_small_buf() {
+    let endpoint = xwebtransport_web_sys::Endpoint::default();
+
+    xwebtransport_tests::tests::read_small_buf::run(endpoint)
+        .await
+        .unwrap();
+}

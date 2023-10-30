@@ -31,3 +31,20 @@ async fn echo_datagrams() {
         .await
         .unwrap();
 }
+
+#[tokio::test]
+async fn read_small_buf() {
+    let endpoint = wtransport::Endpoint::client(
+        wtransport::ClientConfig::builder()
+            .with_bind_address("0.0.0.0:0".parse().unwrap())
+            .with_native_certs()
+            .build(),
+    )
+    .unwrap();
+
+    let endpoint = xwebtransport_wtransport::Endpoint(endpoint);
+
+    xwebtransport_tests::tests::read_small_buf::run(endpoint)
+        .await
+        .unwrap();
+}
