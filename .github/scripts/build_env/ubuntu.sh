@@ -8,7 +8,7 @@ curl -sSL "https://github.com/rustwasm/wasm-bindgen/releases/download/0.2.87/was
   sudo tar -xzvf - -C /usr/local/bin --strip-components=1
 
 # Install chromedriver.
-npx @puppeteer/browsers install chromedriver@stable
+npx @puppeteer/browsers install chromedriver@118.0.5993.32
 
 # Set CHROMEDRIVER env var.
 CHROMEDRIVERS=(chromedriver/*/chromedriver-*/chromedriver)
