@@ -21,6 +21,6 @@ printf "CHROMEDRIVER_ARGS=--log-level=INFO\n" >>"$GITHUB_ENV"
 
 # Prepend chrome dir to PATH.
 CHROMES=(chrome/*/chrome-*/chrome)
-printf "%s\n" "$(dirname "${CHROMES[0]}")" >>"$GITHUB_PATH"
+printf "%s\n" "$(pwd)/$(dirname "${CHROMES[0]}")" >>"$GITHUB_PATH"
 
 source "${SCRIPT_DIR}/common.sh"
