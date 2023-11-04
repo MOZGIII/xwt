@@ -23,4 +23,7 @@ printf "CHROMEDRIVER_ARGS=--log-level=INFO\n" >>"$GITHUB_ENV"
 CHROMES=(chrome/*/chrome-*/chrome)
 printf "%s\n" "$(pwd)/$(dirname "${CHROMES[0]}")" >>"$GITHUB_PATH"
 
+# Remove the preinstalled chrome.
+rm -rf /opt/google/chrome
+
 source "${SCRIPT_DIR}/common.sh"
