@@ -1,8 +1,22 @@
-# xwt
+<div align="center">
 
-a.k.a `xwebtransport` or Cross WebTransport.
+  <h1>
+    <code>xwt</code>
+  </h1>
 
-A common WebTransport interface for browser and native.
+  <p>
+    <i>
+      a.k.a. <code>xwebtransport</code> and Cross WebTransport.
+    </i>
+  </p>
+
+  <p>
+    <strong>
+      A common WebTransport interface for browser and native.
+    </strong>
+  </p>
+
+</div>
 
 ---
 
