@@ -1142,15 +1142,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "xwebtransport"
+name = "xwt"
 version = "0.3.0"
 dependencies = [
- "xwebtransport-web-sys",
- "xwebtransport-wtransport",
+ "xwt-web-sys",
+ "xwt-wtransport",
 ]
 
 [[package]]
-name = "xwebtransport-core"
+name = "xwt-core"
 version = "0.2.0"
 dependencies = [
  "async-trait",
@@ -1158,24 +1158,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "xwebtransport-error"
+name = "xwt-error"
 version = "0.2.0"
 dependencies = [
- "xwebtransport-core",
+ "xwt-core",
 ]
 
 [[package]]
-name = "xwebtransport-tests"
+name = "xwt-tests"
 version = "0.2.0"
 dependencies = [
  "thiserror",
  "tokio",
- "xwebtransport-core",
- "xwebtransport-error",
+ "xwt-core",
+ "xwt-error",
 ]
 
 [[package]]
-name = "xwebtransport-web-sys"
+name = "xwt-web-sys"
 version = "0.3.1"
 dependencies = [
  "js-sys",
@@ -1186,17 +1186,17 @@ dependencies = [
  "web-sys",
  "web-sys-async-io",
  "web-sys-stream-utils",
- "xwebtransport-core",
- "xwebtransport-tests",
+ "xwt-core",
+ "xwt-tests",
 ]
 
 [[package]]
-name = "xwebtransport-wtransport"
+name = "xwt-wtransport"
 version = "0.2.0"
 dependencies = [
  "anyhow",
  "tokio",
  "wtransport",
- "xwebtransport-core",
- "xwebtransport-tests",
+ "xwt-core",
+ "xwt-tests",
 ]

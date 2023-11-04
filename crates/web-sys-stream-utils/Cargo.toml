@@ -7,7 +7,7 @@ license = "MIT"
 description = """
 Stream-related utilities for web-sys.
 """
-repository = "https://github.com/MOZGIII/xwebtransport"
+repository = "https://github.com/MOZGIII/xwt"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3"

@@ -8,7 +8,7 @@ description = """
 An async-IO implementation read/write stream in the browser, using the web-sys
 types.
 """
-repository = "https://github.com/MOZGIII/xwebtransport"
+repository = "https://github.com/MOZGIII/xwt"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3"

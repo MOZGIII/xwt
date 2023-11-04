@@ -1,10 +1,12 @@
-# xwebtransport
+# xwt
+
+a.k.a `xwebtransport` or Cross WebTransport.
 
 A common WebTransport interface for browser and native.
 
 ---
 
-Very early work in progress.
+Work in progress. The project is slowly maturing.
 
 You can still peek around, but be aware that I might *force-push `master`*
 occasionally.
