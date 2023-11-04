@@ -16,4 +16,11 @@ npx @puppeteer/browsers install "chrome@${CHROME_VERSION}"
 CHROMEDRIVERS=(chromedriver/*/chromedriver-*/chromedriver)
 printf "CHROMEDRIVER=%s\n" "${CHROMEDRIVERS[0]}" >>"$GITHUB_ENV"
 
+# Set CHROMEDRIVER_ARGS env var.
+printf "CHROMEDRIVER_ARGS=--log-level=INFO\n" >>"$GITHUB_ENV"
+
+# Prepend chrome dir to PATH.
+CHROMES=(chrome/*/chrome-*/chrome)
+printf "%s\n" "$(dirname "${CHROMES[0]}")" >>"$GITHUB_PATH"
+
 source "${SCRIPT_DIR}/common.sh"
