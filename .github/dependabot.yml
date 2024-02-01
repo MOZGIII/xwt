@@ -4,6 +4,13 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      wasm:
+        patterns:
+          - wasm-bindgen
+          - wasm-bindgen-*
+          - js-sys
+          - web-sys
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
