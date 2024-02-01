@@ -1,0 +1,20 @@
+[package]
+name = "xwt-test-assets-build"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+A static assets generation utility.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
+
+rcgen = "0.11"
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread", "fs"], optional = true }
+
+[features]
+default = ["tokio"]
+tokio = ["dep:tokio"]

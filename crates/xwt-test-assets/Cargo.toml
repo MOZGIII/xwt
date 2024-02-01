@@ -1,0 +1,15 @@
+[package]
+name = "xwt-test-assets"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+Static test assets for xwt.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[dependencies]
+
+[build-dependencies]
+xwt-test-assets-build = { version = "0.1", path = "../xwt-test-assets-build", default-features = false }

@@ -9,21 +9,27 @@ where
     Endpoint::Connecting: std::fmt::Debug,
     EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
 {
-    Connect(xwt_error::Connect<Endpoint>),
-    Open(xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
-    Send(WriteErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
-    Recv(ReadErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    #[error("connect: {0}")]
+    Connect(#[source] xwt_error::Connect<Endpoint>),
+    #[error("open: {0}")]
+    Open(#[source] xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
+    #[error("send: {0}")]
+    Send(#[source] WriteErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    #[error("recv: {0}")]
+    Recv(#[source] ReadErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    #[error("no response")]
     NoResponse,
+    #[error("bad data")]
     BadData(Vec<u8>),
 }
 
-pub async fn echo<Endpoint>(endpoint: Endpoint) -> Result<(), EchoError<Endpoint>>
+pub async fn echo<Endpoint>(endpoint: Endpoint, url: &str) -> Result<(), EchoError<Endpoint>>
 where
     Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
     EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
 {
-    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day")
+    let connection = crate::utils::connect(endpoint, url)
         .await
         .map_err(EchoError::Connect)?;
 
@@ -71,16 +77,29 @@ where
     SendStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,
     RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::ReadChunk<ReadChunk>,
 {
-    Connect(xwt_error::Connect<Endpoint>),
-    Open(xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
-    Send(WriteChunkErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>, WriteChunk>),
-    Recv(ReadChunkErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>, ReadChunk>),
+    #[error("connect: {0}")]
+    Connect(#[source] xwt_error::Connect<Endpoint>),
+    #[error("open: {0}")]
+    Open(#[source] xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
+    #[error("send: {0}")]
+    Send(
+        #[source]
+        WriteChunkErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>, WriteChunk>,
+    ),
+    #[error("recv: {0}")]
+    Recv(
+        #[source]
+        ReadChunkErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>, ReadChunk>,
+    ),
+    #[error("no response")]
     NoResponse,
+    #[error("bad data")]
     BadData(Vec<u8>),
 }
 
 pub async fn echo_chunks<Endpoint, WriteChunk, ReadChunk>(
     endpoint: Endpoint,
+    url: &str,
 ) -> Result<(), EchoChunksError<Endpoint, WriteChunk, ReadChunk>>
 where
     Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
@@ -96,7 +115,7 @@ where
     SendStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,
     RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::ReadChunk<ReadChunk>,
 {
-    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day")
+    let connection = crate::utils::connect(endpoint, url)
         .await
         .map_err(EchoChunksError::Connect)?;
 
@@ -134,20 +153,27 @@ where
     EndpointConnectConnectionFor<Endpoint>: xwt_core::datagram::Datagrams + std::fmt::Debug,
     ReceiveDatagramFor<EndpointConnectConnectionFor<Endpoint>>: std::fmt::Debug,
 {
-    Connect(xwt_error::Connect<Endpoint>),
-    Send(SendErrorFor<EndpointConnectConnectionFor<Endpoint>>),
-    Recv(ReceiveErrorFor<EndpointConnectConnectionFor<Endpoint>>),
+    #[error("connect: {0}")]
+    Connect(#[source] xwt_error::Connect<Endpoint>),
+    #[error("send: {0}")]
+    Send(#[source] SendErrorFor<EndpointConnectConnectionFor<Endpoint>>),
+    #[error("recv: {0}")]
+    Recv(#[source] ReceiveErrorFor<EndpointConnectConnectionFor<Endpoint>>),
+    #[error("bad data")]
     BadData(ReceiveDatagramFor<EndpointConnectConnectionFor<Endpoint>>),
 }
 
-pub async fn echo_datagrams<Endpoint>(endpoint: Endpoint) -> Result<(), EchoDatagrmsError<Endpoint>>
+pub async fn echo_datagrams<Endpoint>(
+    endpoint: Endpoint,
+    url: &str,
+) -> Result<(), EchoDatagrmsError<Endpoint>>
 where
     Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
     EndpointConnectConnectionFor<Endpoint>: xwt_core::datagram::Datagrams + std::fmt::Debug,
     ReceiveDatagramFor<EndpointConnectConnectionFor<Endpoint>>: std::fmt::Debug,
 {
-    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day")
+    let connection = crate::utils::connect(endpoint, url)
         .await
         .map_err(EchoDatagrmsError::Connect)?;
 

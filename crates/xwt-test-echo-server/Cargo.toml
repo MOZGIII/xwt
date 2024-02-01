@@ -1,0 +1,33 @@
+[package]
+name = "xwt-test-echo-server"
+version = "0.2.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+The echo server to use for xwt testing.
+Not intended to be wasm-compatible.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+autobins = false
+
+[[bin]]
+name = "xwt-test-echo-server"
+path = "src/main.rs"
+required-features = ["bin"]
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+xwt-test-assets = { version = "0.1", path = "../xwt-test-assets" }
+xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
+
+color-eyre = { version = "0.6", optional = true }
+envfury = { version = "0.2", optional = true }
+thiserror = "1"
+tokio = { version = "1", default-features = false, features = ["rt-multi-thread"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", optional = true }
+wtransport = "0.1.8"
+
+[features]
+bin = ["dep:color-eyre", "dep:envfury", "dep:tracing-subscriber", "tokio/macros"]
+default = ["bin"]

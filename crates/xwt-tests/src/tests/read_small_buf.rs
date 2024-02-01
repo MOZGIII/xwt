@@ -7,21 +7,27 @@ where
     Endpoint::Connecting: std::fmt::Debug,
     EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
 {
-    Connect(xwt_error::Connect<Endpoint>),
-    Open(xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
-    Send(WriteErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
-    Recv(ReadErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    #[error("connect: {0}")]
+    Connect(#[source] xwt_error::Connect<Endpoint>),
+    #[error("open: {0}")]
+    Open(#[source] xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
+    #[error("send: {0}")]
+    Send(#[source] WriteErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    #[error("recv: {0}")]
+    Recv(#[source] ReadErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    #[error("no response")]
     NoResponse,
+    #[error("bad data")]
     BadData(Vec<u8>),
 }
 
-pub async fn run<Endpoint>(endpoint: Endpoint) -> Result<(), Error<Endpoint>>
+pub async fn run<Endpoint>(endpoint: Endpoint, url: &str) -> Result<(), Error<Endpoint>>
 where
     Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
     EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
 {
-    let connection = crate::utils::connect(endpoint, "https://echo.webtransport.day")
+    let connection = crate::utils::connect(endpoint, url)
         .await
         .map_err(Error::Connect)?;
 
