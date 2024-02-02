@@ -62,11 +62,15 @@ pub async fn serve_incoming_session(
     incoming_session: wtransport::endpoint::IncomingSession,
 ) -> Result<(), wtransport::error::ConnectionError> {
     tracing::info!(message = "got an incoming session");
-
     let session_request = incoming_session.await?;
 
-    tracing::info!(message = "accepting incoming session");
+    if session_request.path() != "/echo" {
+        tracing::info!(message = "rejecting incoming session due to path mismatch");
+        session_request.not_found().await;
+        return Ok(());
+    }
 
+    tracing::info!(message = "accepting incoming session");
     let connection = session_request.accept().await?;
 
     tracing::info!(message = "new connection accepted");
