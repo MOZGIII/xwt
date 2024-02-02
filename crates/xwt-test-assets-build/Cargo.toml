@@ -13,7 +13,12 @@ repository = "https://github.com/MOZGIII/xwt"
 xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
 
 rcgen = "0.12"
-tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread", "fs"], optional = true }
+tokio = { version = "1", default-features = false, features = [
+  "macros",
+  "rt-multi-thread",
+  "fs",
+  "io-util",
+], optional = true }
 
 [features]
 default = ["tokio"]
