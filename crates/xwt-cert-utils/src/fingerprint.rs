@@ -23,7 +23,7 @@ pub fn sha256(cert_der: &[u8]) -> String {
 
     digest
         .iter()
-        .map(|byte| format!("{:X}", byte))
+        .map(|byte| format!("{:02X}", byte))
         .collect::<Vec<_>>()
         .join(":")
 }
