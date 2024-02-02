@@ -12,11 +12,7 @@ pub struct Params<'a> {
 #[cfg(feature = "rcgen")]
 impl<'a> Params<'a> {
     /// Convert params into [`rcgen::CertificateParams`].
-    pub fn into_rcgen_params(
-        self,
-        key_alg: &'static rcgen::SignatureAlgorithm,
-        key_pair: rcgen::KeyPair,
-    ) -> rcgen::CertificateParams {
+    pub fn into_rcgen_params(self, key_pair: rcgen::KeyPair) -> rcgen::CertificateParams {
         let mut dname = rcgen::DistinguishedName::new();
         dname.push(rcgen::DnType::CommonName, self.common_name);
 
@@ -33,7 +29,7 @@ impl<'a> Params<'a> {
                 Ok(ip) => rcgen::SanType::IpAddress(ip),
                 Err(_) => rcgen::SanType::DnsName(s.to_owned()),
             }));
-        cert_params.alg = key_alg;
+        cert_params.alg = key_pair.algorithm();
         cert_params.key_pair = Some(key_pair);
         cert_params.not_before = now
             .checked_sub(time::Duration::days(self.valid_days_before.into()))
@@ -46,11 +42,11 @@ impl<'a> Params<'a> {
     }
 
     /// Convert params into [`rcgen::Certificate`].
-    pub fn into_rcgen_cert(
-        self,
-        key_alg: &'static rcgen::SignatureAlgorithm,
-        key_pair: rcgen::KeyPair,
-    ) -> Result<rcgen::Certificate, rcgen::Error> {
-        rcgen::Certificate::from_params(self.into_rcgen_params(key_alg, key_pair))
+    pub fn into_rcgen_cert(self, key_pair: rcgen::KeyPair) -> rcgen::Certificate {
+        // We `unwrap` here because the key always exists (and thus is
+        // not generated on the fly, which would be fallible) and is always
+        // compatible with the requested algorithm (because the algorithm
+        // is set from the keypair).
+        rcgen::Certificate::from_params(self.into_rcgen_params(key_pair)).unwrap()
     }
 }

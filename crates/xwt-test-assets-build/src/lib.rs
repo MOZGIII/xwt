@@ -18,7 +18,7 @@ pub fn generate() -> rcgen::Certificate {
 
     let alg = &rcgen::PKCS_ECDSA_P256_SHA256;
     let key = rcgen::KeyPair::generate(alg).unwrap();
-    params.into_rcgen_cert(alg, key).unwrap()
+    params.into_rcgen_cert(key)
 }
 
 pub fn state_dir() -> PathBuf {
