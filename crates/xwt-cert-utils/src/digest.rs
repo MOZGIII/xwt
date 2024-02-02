@@ -1,3 +1,5 @@
+//! Digest computation.
+
 /// Compute a SHA256 digest for the given data.
 ///
 /// Pass DER certificate here to compute its digest.

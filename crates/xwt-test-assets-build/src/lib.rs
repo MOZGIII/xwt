@@ -1,4 +1,7 @@
+//! The build dependency for the xwt test assets.
+
 #![cfg(not(target_family = "wasm"))]
+#![allow(missing_docs)]
 
 use std::{
     io::ErrorKind,

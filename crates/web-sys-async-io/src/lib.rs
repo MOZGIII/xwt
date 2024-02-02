@@ -1,4 +1,10 @@
+#![cfg_attr(target_family = "wasm", doc = "Utilities for [`web_sys`] async I/O.")]
+#![cfg_attr(
+    not(target_family = "wasm"),
+    doc = "Utilities for `web_sys` async I/O."
+)]
 #![cfg(target_family = "wasm")]
+#![allow(missing_docs, clippy::missing_docs_in_private_items)]
 
 use wasm_bindgen_futures::JsFuture;
 

@@ -1,3 +1,9 @@
+//! The main entrypoint of the test echo server used by xwt.
+//!
+//! The test server runs as the native app and implements a WebTransport server
+//! that responds to the interactions by sending the received data back
+//! to the sender.
+
 #[cfg(not(target_family = "wasm"))]
 #[tokio::main]
 async fn main() -> color_eyre::eyre::Result<()> {

@@ -1,3 +1,5 @@
+//! Support for the PEM data-encoding format.
+
 /// A type that represents a PEM-encoded private key.
 pub struct PrivateKey(pub String);
 
@@ -11,6 +13,7 @@ pub fn parse(data: &str) -> Result<Vec<u8>, pem::PemError> {
     Ok(data)
 }
 
+/// Serialize [`rcgen::Certificate`] into PEM format.
 #[cfg(feature = "rcgen")]
 pub fn from_rcgen(cert: &rcgen::Certificate) -> (PrivateKey, Certificate) {
     let key_pem = cert.serialize_private_key_pem();

@@ -1,3 +1,11 @@
+//! A common WebTransport interface for browser and native.
+//! Write once, run anywhere.
+//!
+//! Users should utilise the traits from this crate directly for the most
+//! flexibility at the type level.
+
+#![allow(missing_docs, clippy::missing_docs_in_private_items)]
+
 pub mod datagram;
 pub mod datagram_utils;
 pub mod io;

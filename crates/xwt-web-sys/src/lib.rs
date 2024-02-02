@@ -1,4 +1,17 @@
+#![cfg_attr(
+    target_family = "wasm",
+    doc = "The [`web_sys`]-powered implementation of [`xwt_core`]."
+)]
+#![cfg_attr(
+    not(target_family = "wasm"),
+    doc = "The `web_sys`-powered implementation of `xwt_core`."
+)]
 #![cfg(target_family = "wasm")]
+#![allow(
+    missing_docs,
+    clippy::missing_docs_in_private_items,
+    clippy::cargo_common_metadata
+)]
 
 use std::rc::Rc;
 

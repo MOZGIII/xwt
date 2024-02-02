@@ -1,3 +1,5 @@
+//! The ╳-platform WebTransport implementation.
+
 #[cfg(target_family = "wasm")]
 pub use xwt_web_sys as web_sys;
 #[cfg(not(target_family = "wasm"))]
