@@ -1,5 +1,7 @@
 //! Certificate generation facilities.
 
+/// The params for certificate generation.
+#[allow(missing_docs)]
 pub struct Params<'a> {
     pub common_name: &'a str,
     pub subject_alt_names: &'a [&'a str],
@@ -9,6 +11,7 @@ pub struct Params<'a> {
 
 #[cfg(feature = "rcgen")]
 impl<'a> Params<'a> {
+    /// Convert params into [`rcgen::CertificateParams`].
     pub fn into_rcgen_params(
         self,
         key_alg: &'static rcgen::SignatureAlgorithm,
@@ -42,6 +45,7 @@ impl<'a> Params<'a> {
         cert_params
     }
 
+    /// Convert params into [`rcgen::Certificate`].
     pub fn into_rcgen_cert(
         self,
         key_alg: &'static rcgen::SignatureAlgorithm,

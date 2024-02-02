@@ -1,3 +1,5 @@
+//! Fingerprint computation.
+
 /// RFC7469 fingerprint.
 #[cfg(feature = "fingerprint-rfc7469")]
 pub fn rfc7469(cert: &rcgen::Certificate) -> String {
