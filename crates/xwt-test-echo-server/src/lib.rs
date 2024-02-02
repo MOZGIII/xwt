@@ -1,6 +1,7 @@
-//! The echo server to use for xwt testing.
+//! The implementation of the echo server to use for xwt testing.
 //! Not intended to be wasm-compatible.
 
+#![allow(missing_docs)]
 #![cfg(not(target_family = "wasm"))]
 
 use std::sync::Arc;

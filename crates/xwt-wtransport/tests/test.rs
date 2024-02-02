@@ -1,5 +1,10 @@
 #![cfg(not(target_family = "wasm"))]
 #![feature(once_cell_try)]
+#![allow(
+    missing_docs,
+    clippy::missing_docs_in_private_items,
+    clippy::cargo_common_metadata
+)]
 
 fn setup() -> color_eyre::eyre::Result<()> {
     static INIT: std::sync::OnceLock<()> = std::sync::OnceLock::new();

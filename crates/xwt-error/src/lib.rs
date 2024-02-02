@@ -1,3 +1,8 @@
+//! A suite of reusable error types that naturally emerge from the `xwt` API.
+//! Use when you don't want/need your own more precise types.
+
+#![allow(missing_docs, clippy::missing_docs_in_private_items)]
+
 mod impls;
 
 use xwt_core::{prelude::*, traits};
