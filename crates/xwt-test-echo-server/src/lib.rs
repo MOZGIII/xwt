@@ -17,14 +17,17 @@ pub async fn endpoint(
     let EndpointParams { addr, cert } = params;
 
     let cert = cert.unwrap_or_else(|| {
-        let sha256_fingerpint = xwt_cert_utils::fingerprint::sha256(xwt_test_assets::CERT);
-        tracing::info!(message = "using builtin tls certificates", %sha256_fingerpint);
-
-        wtransport::tls::Certificate::new(
-            vec![xwt_test_assets::CERT.into()],
-            xwt_test_assets::KEY.into(),
-        )
+        wtransport::tls::Certificate::new(vec![xwt_test_assets::CERT], xwt_test_assets::KEY)
+            .unwrap()
     });
+
+    match cert.certificates().first() {
+        Some(cert) => {
+            let sha256_fingerpint = xwt_cert_utils::fingerprint::sha256(cert);
+            tracing::info!(message = "using tls certificate", %sha256_fingerpint);
+        }
+        None => tracing::info!(message = "not using tls certificate"),
+    };
 
     let server_config =
         wtransport::ServerConfig::builder()
