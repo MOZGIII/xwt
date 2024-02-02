@@ -1,5 +1,5 @@
-//! Utilities for [`web_sys`] streams.
-
+#![cfg_attr(target_family = "wasm", doc = "Utilities for [`web_sys`] streams.")]
+#![cfg_attr(not(target_family = "wasm"), doc = "Utilities for `web_sys` streams.")]
 #![cfg(target_family = "wasm")]
 #![allow(missing_docs, clippy::missing_docs_in_private_items)]
 

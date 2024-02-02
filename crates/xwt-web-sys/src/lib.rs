@@ -1,5 +1,11 @@
-//! The [`web_sys`]-powered implementation of [`xwt_core`].
-
+#![cfg_attr(
+    target_family = "wasm",
+    doc = "The [`web_sys`]-powered implementation of [`xwt_core`]."
+)]
+#![cfg_attr(
+    not(target_family = "wasm"),
+    doc = "The `web_sys`-powered implementation of `xwt_core`."
+)]
 #![cfg(target_family = "wasm")]
 #![allow(
     missing_docs,

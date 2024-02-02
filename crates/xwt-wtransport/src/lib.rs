@@ -1,5 +1,11 @@
-//! The [`wtransport`]-powered implementation of [`xwt_core`].
-
+#![cfg_attr(
+    not(target_family = "wasm"),
+    doc = "The [`wtransport`]-powered implementation of [`xwt_core`]."
+)]
+#![cfg_attr(
+    target_family = "wasm",
+    doc = "The `wtransport`-powered implementation of `xwt_core`."
+)]
 #![cfg(not(target_family = "wasm"))]
 #![allow(
     missing_docs,
