@@ -1,5 +1,4 @@
 pub use base64::engine::general_purpose::STANDARD as Base64Engine;
-pub use rcgen::RcgenError;
 
 /// A type that represents a PEM-encoded public key.
 pub struct PrivateKey(pub String);
