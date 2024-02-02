@@ -16,29 +16,26 @@ pub struct CertHashRef<'a> {
     pub value: &'a [u8],
 }
 
+impl<'a> From<CertHashRef<'a>> for web_sys::WebTransportHash {
+    fn from(cert_hash: CertHashRef<'a>) -> Self {
+        let mut wt_hash = Self::new();
+
+        wt_hash.algorithm(cert_hash.algorithm);
+        wt_hash.value(&js_sys::Uint8Array::from(cert_hash.value));
+
+        wt_hash
+    }
+}
+
 impl<'a> From<CertHashRef<'a>> for js_sys::Object {
     fn from(cert_hash: CertHashRef<'a>) -> Self {
-        let value_buffer = js_sys::Uint8Array::from(cert_hash.value);
-        let result = js_sys::Object::new();
-        js_sys::Reflect::set(
-            &result,
-            &wasm_bindgen::JsValue::from_str("algorithm"),
-            &wasm_bindgen::JsValue::from_str(cert_hash.algorithm),
-        )
-        .unwrap();
-        js_sys::Reflect::set(
-            &result,
-            &wasm_bindgen::JsValue::from_str("value"),
-            &value_buffer,
-        )
-        .unwrap();
-        result
+        web_sys::WebTransportHash::from(cert_hash).into()
     }
 }
 
 impl<'a> From<CertHashRef<'a>> for wasm_bindgen::JsValue {
-    fn from(value: CertHashRef<'a>) -> Self {
-        js_sys::Object::from(value).into()
+    fn from(cert_hash: CertHashRef<'a>) -> Self {
+        web_sys::WebTransportHash::from(cert_hash).into()
     }
 }
 

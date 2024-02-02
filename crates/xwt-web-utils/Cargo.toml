@@ -14,7 +14,7 @@ repository = "https://github.com/MOZGIII/xwt"
 [target.'cfg(target_family = "wasm")'.dependencies]
 wasm-bindgen = { version = "0.2" }
 js-sys = "0.3"
-web-sys = { version = "0.3", features = ["WebTransportOptions"] }
+web-sys = { version = "0.3", features = ["WebTransportOptions", "WebTransportHash"] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 wasm-bindgen-test = "0.3"
