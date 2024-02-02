@@ -46,7 +46,7 @@ impl<'a> Params<'a> {
         self,
         key_alg: &'static rcgen::SignatureAlgorithm,
         key_pair: rcgen::KeyPair,
-    ) -> Result<rcgen::Certificate, rcgen::RcgenError> {
+    ) -> Result<rcgen::Certificate, rcgen::Error> {
         rcgen::Certificate::from_params(self.into_rcgen_params(key_alg, key_pair))
     }
 }
