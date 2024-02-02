@@ -1,4 +1,5 @@
 /// RFC7469 fingerprint.
+#[cfg(feature = "fingerprint-rfc7469")]
 pub fn rfc7469(cert: &rcgen::Certificate) -> String {
     use base64::{engine::general_purpose::STANDARD as Base64Engine, Engine};
 
@@ -13,6 +14,7 @@ pub fn rfc7469(cert: &rcgen::Certificate) -> String {
 /// ```shell
 /// openssl x509 -noout -fingerprint -sha256 -in certificate.pem
 /// ```
+#[cfg(feature = "fingerprint-sha256")]
 pub fn sha256(cert_der: &[u8]) -> String {
     let digest = crate::digest::sha256(cert_der);
     let digest: &[u8] = digest.as_ref();

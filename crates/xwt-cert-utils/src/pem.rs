@@ -1,10 +1,10 @@
-/// A type that represents a PEM-encoded public key.
+/// A type that represents a PEM-encoded private key.
 pub struct PrivateKey(pub String);
 
 /// A type that represents a PEM-encoded certificate.
 pub struct Certificate(pub String);
 
-/// Parse the certificate in PEM format.
+/// Parse the data in PEM format.
 pub fn parse(data: &str) -> Result<Vec<u8>, pem::PemError> {
     let parsed = pem::parse(data)?;
     let data = parsed.into_contents();

@@ -12,11 +12,18 @@ Inteded to work with both wasm and native.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-base64 = "0.21"
+base64 = { version = "0.21", optional = true }
 pem = "3"
 rcgen = { version = "0.12", optional = true }
-ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"] }
+ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"], optional = true }
 time = "0.3"
 
 [features]
-default = ["rcgen"]
+default = ["rcgen", "digest-all", "fingerprint-all"]
+
+digest-all = ["digest-sha256"]
+digest-sha256 = ["dep:ring"]
+
+fingerprint-all = ["fingerprint-rfc7469", "fingerprint-sha256"]
+fingerprint-rfc7469 = ["digest-sha256", "dep:base64"]
+fingerprint-sha256 = ["digest-sha256"]
