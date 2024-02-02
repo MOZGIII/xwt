@@ -1,0 +1,20 @@
+[package]
+name = "xwt-web-utils"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+Useful utils for running in the browser, provided by and for xwt.
+Not directly required to use xwt, but can help with setting up the endpoint
+and etc.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen = { version = "0.2" }
+js-sys = "0.3"
+web-sys = { version = "0.3", features = ["WebTransportOptions"] }
+
+[target.'cfg(target_family = "wasm")'.dev-dependencies]
+wasm-bindgen-test = "0.3"

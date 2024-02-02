@@ -83,6 +83,12 @@ jobs:
           cargo clippy --version
           env
 
+      - name: Build and run the test echo server
+        run: |
+          cargo build --bin xwt-test-echo-server
+          cargo run --bin xwt-test-echo-server &
+        if: ${{ matrix.plan.mode.needsEchoServer }}
+
       - name: Run cargo ${{ matrix.plan.mode.cargoCommand }}
         uses: actions-rs/cargo@v1
         with:

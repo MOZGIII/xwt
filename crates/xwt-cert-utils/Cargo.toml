@@ -1,0 +1,22 @@
+[package]
+name = "xwt-cert-utils"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+Useful utils for working with certificates, provided by and for xwt.
+Not directly required to use xwt, but can be helpful. Also usable without xwt.
+Inteded to work with both wasm and native.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[dependencies]
+base64 = "0.21"
+pem = "3"
+rcgen = { version = "0.11", optional = true }
+ring = "0.16"
+time = "0.3"
+
+[features]
+default = ["rcgen"]

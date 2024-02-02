@@ -63,6 +63,7 @@ const codeModes = {
     cargoCommand: "test",
     cargoArgs: "--workspace",
     cargoCacheKey: "test",
+    needsEchoServer: true,
   },
   test_wasm: {
     name: "test (wasm)",
@@ -70,6 +71,7 @@ const codeModes = {
     cargoArgs: "--workspace --target wasm32-unknown-unknown",
     platformIndependent: true,
     cargoCacheKey: "test-wasm",
+    needsEchoServer: true,
   },
   build: {
     name: "build",
