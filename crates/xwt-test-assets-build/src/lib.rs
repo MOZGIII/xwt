@@ -21,8 +21,12 @@ pub fn generate() -> rcgen::Certificate {
     params.into_rcgen_cert(key)
 }
 
+pub fn env_dir(key: &str) -> PathBuf {
+    PathBuf::from(std::env::var_os(key).unwrap())
+}
+
 pub fn state_dir() -> PathBuf {
-    let mut dir = PathBuf::from(std::env::var_os("CARGO_MANIFEST_DIR").unwrap());
+    let mut dir = env_dir("CARGO_MANIFEST_DIR");
     dir.push("assets");
     println!("{}", dir.display());
     dir
