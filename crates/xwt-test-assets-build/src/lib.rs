@@ -25,13 +25,6 @@ pub fn env_dir(key: &str) -> PathBuf {
     PathBuf::from(std::env::var_os(key).unwrap())
 }
 
-pub fn state_dir() -> PathBuf {
-    let mut dir = env_dir("CARGO_MANIFEST_DIR");
-    dir.push("assets");
-    println!("{}", dir.display());
-    dir
-}
-
 #[cfg(feature = "tokio")]
 pub async fn save_tokio(certificate: rcgen::Certificate, dir: impl AsRef<Path>) {
     use tokio::io::AsyncWriteExt;
