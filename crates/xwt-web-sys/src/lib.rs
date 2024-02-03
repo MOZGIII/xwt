@@ -286,3 +286,9 @@ impl xwt_core::datagram::Send for Connection {
         Ok(())
     }
 }
+
+impl Drop for Connection {
+    fn drop(&mut self) {
+        self.transport.close();
+    }
+}
