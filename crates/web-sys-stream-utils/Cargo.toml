@@ -1,6 +1,6 @@
 [package]
 name = "web-sys-stream-utils"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -11,6 +11,7 @@ repository = "https://github.com/MOZGIII/xwt"
 
 [package.metadata.docs.rs]
 default-target = "wasm32-unknown-unknown"
+rustflags = ["--cfg=web_sys_unstable_apis"]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3"

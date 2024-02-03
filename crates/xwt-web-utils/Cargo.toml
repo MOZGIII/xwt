@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-utils"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -13,6 +13,7 @@ repository = "https://github.com/MOZGIII/xwt"
 
 [package.metadata.docs.rs]
 default-target = "wasm32-unknown-unknown"
+rustflags = ["--cfg=web_sys_unstable_apis"]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 wasm-bindgen = { version = "0.2" }

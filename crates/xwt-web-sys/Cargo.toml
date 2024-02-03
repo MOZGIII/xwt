@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-sys"
-version = "0.4.1"
+version = "0.4.2"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -12,6 +12,7 @@ repository = "https://github.com/MOZGIII/xwt"
 
 [package.metadata.docs.rs]
 default-target = "wasm32-unknown-unknown"
+rustflags = ["--cfg=web_sys_unstable_apis"]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwt-core = { version = "0.2", path = "../xwt-core", default-features = false }
