@@ -1,7 +1,7 @@
 use xwt_core::prelude::*;
 
 pub async fn connect<Endpoint>(
-    endpoint: Endpoint,
+    endpoint: &Endpoint,
     url: &str,
 ) -> Result<EndpointConnectConnectionFor<Endpoint>, xwt_error::Connect<Endpoint>>
 where
@@ -41,7 +41,7 @@ where
 }
 
 pub async fn open_bi<Connection>(
-    connection: Connection,
+    connection: &Connection,
 ) -> Result<BiStreamsFor<Connection>, xwt_error::OpenBi<Connection>>
 where
     Connection: xwt_core::OpenBiStream,
@@ -59,7 +59,7 @@ where
 }
 
 pub async fn open_uni<Connection>(
-    connection: Connection,
+    connection: &Connection,
 ) -> Result<SendUniStreamFor<Connection>, xwt_error::OpenUni<Connection>>
 where
     Connection: xwt_core::OpenUniStream,

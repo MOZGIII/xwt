@@ -27,11 +27,11 @@ where
     Endpoint::Connecting: std::fmt::Debug,
     EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
 {
-    let connection = crate::utils::connect(endpoint, url)
+    let connection = crate::utils::connect(&endpoint, url)
         .await
         .map_err(Error::Connect)?;
 
-    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(connection)
+    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(&connection)
         .await
         .map_err(Error::Open)?;
 

@@ -29,11 +29,11 @@ where
     Endpoint::Connecting: std::fmt::Debug,
     EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
 {
-    let connection = crate::utils::connect(endpoint, url)
+    let connection = crate::utils::connect(&endpoint, url)
         .await
         .map_err(EchoError::Connect)?;
 
-    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(connection)
+    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(&connection)
         .await
         .map_err(EchoError::Open)?;
 
@@ -115,11 +115,11 @@ where
     SendStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,
     RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::ReadChunk<ReadChunk>,
 {
-    let connection = crate::utils::connect(endpoint, url)
+    let connection = crate::utils::connect(&endpoint, url)
         .await
         .map_err(EchoChunksError::Connect)?;
 
-    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(connection)
+    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(&connection)
         .await
         .map_err(EchoChunksError::Open)?;
 
@@ -173,7 +173,7 @@ where
     EndpointConnectConnectionFor<Endpoint>: xwt_core::datagram::Datagrams + std::fmt::Debug,
     ReceiveDatagramFor<EndpointConnectConnectionFor<Endpoint>>: std::fmt::Debug,
 {
-    let connection = crate::utils::connect(endpoint, url)
+    let connection = crate::utils::connect(&endpoint, url)
         .await
         .map_err(EchoDatagrmsError::Connect)?;
 
