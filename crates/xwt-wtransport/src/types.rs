@@ -1,5 +1,9 @@
+//! Newtype definitions.
+
+/// Create a newtype wrapper for a given type.
 macro_rules! newtype {
     ($name:ident => $wrapped_type:path) => {
+        /// A [`$wrapped_type`] newtype.
         pub struct $name(pub $wrapped_type);
 
         impl std::fmt::Debug for $name {
@@ -9,6 +13,7 @@ macro_rules! newtype {
         }
     };
     ($name:ident < $($generics:tt),* > => $wrapped_type:path) => {
+        /// A [`$wrapped_type`] newtype.
         pub struct $name<$($generics)*>(pub $wrapped_type);
 
         impl<$($generics)*> std::fmt::Debug for $name<$($generics)*> {

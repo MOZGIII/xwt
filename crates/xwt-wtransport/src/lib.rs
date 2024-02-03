@@ -7,7 +7,6 @@
     doc = "The `wtransport`-powered implementation of `xwt_core`."
 )]
 #![cfg(not(target_family = "wasm"))]
-#![allow(missing_docs, clippy::missing_docs_in_private_items)]
 
 use xwt_core::async_trait;
 
@@ -73,6 +72,7 @@ impl xwt_core::traits::Streams for Connection {
     type RecvStream = RecvStream;
 }
 
+/// Take a pair of stream ends and wrap into our newtypes.
 fn map_streams(
     streams: (wtransport::SendStream, wtransport::RecvStream),
 ) -> (SendStream, RecvStream) {

@@ -7,7 +7,6 @@
     doc = "The `web_sys`-powered implementation of `xwt_core`."
 )]
 #![cfg(target_family = "wasm")]
-#![allow(missing_docs, clippy::missing_docs_in_private_items)]
 
 use std::rc::Rc;
 
@@ -17,8 +16,13 @@ mod error;
 
 pub use error::*;
 
+/// An endpoint for the xwt.
+///
+/// Internally holds the connection options and can create
+/// a new `WebTransport` object on the "web" side on a connection request.
 #[derive(Debug, Clone, Default)]
 pub struct Endpoint {
+    /// The options to use to create the `WebTransport`s.
     pub options: web_sys::WebTransportOptions,
 }
 
@@ -46,10 +50,16 @@ impl xwt_core::traits::EndpointConnect for Endpoint {
     }
 }
 
+/// Connection hold the [`web_sys::WebTransport`] and is responsible for
+/// providing access to the Web API of WebTransport in a way that is portable.
+/// It also holds handles to the datagram reader and writer.
 #[derive(Debug)]
 pub struct Connection {
+    /// The WebTransport instance.
     pub transport: Rc<web_sys::WebTransport>,
+    /// The datagram reader.
     pub datagram_readable_stream_reader: web_sys::ReadableStreamDefaultReader,
+    /// The datagram writer.
     pub datagram_writable_stream_writer: web_sys::WritableStreamDefaultWriter,
 }
 
@@ -58,18 +68,27 @@ impl xwt_core::traits::Streams for Connection {
     type RecvStream = RecvStream;
 }
 
+/// Send the data into a WebTransport stream.
 pub struct SendStream {
+    /// The WebTransport instance.
     pub transport: Rc<web_sys::WebTransport>,
+    /// The handle to the stream to write to.
     pub stream: web_sys::WebTransportSendStream,
+    /// A writer to conduct the operation.
     pub writer: web_sys_async_io::Writer,
 }
 
+/// Recv the data from a WebTransport stream.
 pub struct RecvStream {
+    /// The WebTransport instance.
     pub transport: Rc<web_sys::WebTransport>,
+    /// The handle to the stream to read from.
     pub stream: web_sys::WebTransportReceiveStream,
+    /// A reader to conduct the operation.
     pub reader: web_sys_async_io::Reader,
 }
 
+/// Open a reader for the given stream and create a [`RecvStream`].
 fn wrap_recv_stream(
     transport: &Rc<web_sys::WebTransport>,
     stream: web_sys::WebTransportReceiveStream,
@@ -86,6 +105,7 @@ fn wrap_recv_stream(
     }
 }
 
+/// Open a writer for the given stream and create a [`SendStream`].
 fn wrap_send_stream(
     transport: &Rc<web_sys::WebTransport>,
     stream: web_sys::WebTransportSendStream,
@@ -99,6 +119,7 @@ fn wrap_send_stream(
     }
 }
 
+/// Take a bidi stream and wrap a reader and writer for it.
 fn wrap_bi_stream(
     transport: &Rc<web_sys::WebTransport>,
     stream: web_sys::WebTransportBidirectionalStream,
