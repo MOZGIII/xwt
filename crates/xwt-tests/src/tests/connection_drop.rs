@@ -15,8 +15,6 @@ where
     Connect(#[source] xwt_error::Connect<Endpoint>),
     #[error("open: {0}")]
     Open(#[source] xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
-    #[error("send: {0}")]
-    Send(#[source] WriteErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
     #[error("read has not failed")]
     ReadNotFailed,
     #[error("got a read error that was not expected: {0}")]
