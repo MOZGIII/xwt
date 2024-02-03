@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-utils"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -10,6 +10,9 @@ Not directly required to use xwt, but can help with setting up the endpoint
 and etc.
 """
 repository = "https://github.com/MOZGIII/xwt"
+
+[package.metadata.docs.rs]
+default-target = "wasm32-unknown-unknown"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 wasm-bindgen = { version = "0.2" }

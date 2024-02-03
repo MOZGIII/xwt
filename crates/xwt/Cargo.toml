@@ -1,6 +1,6 @@
 [package]
 name = "xwt"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -9,6 +9,16 @@ A common WebTransport interface for browser and native.
 Write once, run anywhere. Originally intended for use with bevy.
 """
 repository = "https://github.com/MOZGIII/xwt"
+
+[package.metadata.docs.rs]
+targets = [
+  "x86_64-unknown-linux-gnu",
+  "x86_64-apple-darwin",
+  "x86_64-pc-windows-msvc",
+  "i686-unknown-linux-gnu",
+  "i686-pc-windows-msvc",
+  "wasm32-unknown-unknown",
+]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwt-web-sys = { version = "0.4", path = "../xwt-web-sys", default-features = false }

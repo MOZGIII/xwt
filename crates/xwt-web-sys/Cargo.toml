@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-sys"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -9,6 +9,9 @@ An implementation of the xwt that runs in the browser.
 Powered by wasm-bindgen and web-sys.
 """
 repository = "https://github.com/MOZGIII/xwt"
+
+[package.metadata.docs.rs]
+default-target = "wasm32-unknown-unknown"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwt-core = { version = "0.2", path = "../xwt-core", default-features = false }

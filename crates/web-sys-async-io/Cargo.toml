@@ -1,6 +1,6 @@
 [package]
 name = "web-sys-async-io"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -9,6 +9,9 @@ An async-IO implementation read/write stream in the browser, using the web-sys
 types.
 """
 repository = "https://github.com/MOZGIII/xwt"
+
+[package.metadata.docs.rs]
+default-target = "wasm32-unknown-unknown"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3"
