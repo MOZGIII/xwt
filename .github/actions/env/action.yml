@@ -14,3 +14,8 @@ runs:
     - name: Set up Vistual Studio Command Prompt (Windows only)
       uses: ilammy/msvc-dev-cmd@v1
       if: runner.os == 'Windows'
+
+    - name: Remove Git link.exe (Windows only)
+      run: rm -f "C:/Program Files/Git/usr/bin/link.exe"
+      shell: bash
+      if: runner.os == 'Windows'
