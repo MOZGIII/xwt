@@ -1,3 +1,6 @@
+//! Error type definition.
+
+/// A generic error encapsulating a JS-land value.
 #[derive(Debug)]
 pub struct Error(pub wasm_bindgen::JsValue);
 
