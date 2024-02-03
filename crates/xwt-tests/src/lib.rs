@@ -1,8 +1,4 @@
-#![allow(
-    missing_docs,
-    clippy::missing_docs_in_private_items,
-    clippy::cargo_common_metadata
-)]
+#![allow(missing_docs, clippy::missing_docs_in_private_items)]
 
 pub mod consts;
 pub mod tests;

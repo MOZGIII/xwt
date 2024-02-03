@@ -7,11 +7,7 @@
     doc = "The `web_sys`-powered implementation of `xwt_core`."
 )]
 #![cfg(target_family = "wasm")]
-#![allow(
-    missing_docs,
-    clippy::missing_docs_in_private_items,
-    clippy::cargo_common_metadata
-)]
+#![allow(missing_docs, clippy::missing_docs_in_private_items)]
 
 use std::rc::Rc;
 
