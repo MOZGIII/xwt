@@ -1211,7 +1211,7 @@ dependencies = [
 
 [[package]]
 name = "web-sys-async-io"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1223,7 +1223,7 @@ dependencies = [
 
 [[package]]
 name = "web-sys-stream-utils"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
@@ -1514,7 +1514,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-sys"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1535,7 +1535,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-utils"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
