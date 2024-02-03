@@ -17,3 +17,4 @@ xwt-error = { version = "0.2", path = "../xwt-error", default-features = false }
 
 thiserror = "1"
 tokio = { version = "1", default-features = false, features = ["io-util"] }
+tracing = "0.1"
