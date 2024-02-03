@@ -1,6 +1,8 @@
 #![cfg(not(target_family = "wasm"))]
 #![feature(once_cell_try)]
 
+use std::matches;
+
 fn setup() -> color_eyre::eyre::Result<()> {
     static INIT: std::sync::OnceLock<()> = std::sync::OnceLock::new();
     INIT.get_or_try_init::<_, color_eyre::eyre::Error>(|| {
@@ -62,6 +64,20 @@ async fn read_small_buf() -> color_eyre::eyre::Result<()> {
     let endpoint = test_endpoint();
 
     xwt_tests::tests::read_small_buf::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL).await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn connection_drop() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::connection_drop::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL, |error| {
+        matches!(error, wtransport::error::StreamReadError::NotConnected)
+    })
+    .await?;
 
     Ok(())
 }
