@@ -1439,7 +1439,7 @@ dependencies = [
 
 [[package]]
 name = "xwt"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "xwt-web-sys",
  "xwt-wtransport",
@@ -1504,7 +1504,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "thiserror",
  "tokio",
@@ -1514,7 +1514,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-sys"
-version = "0.3.2"
+version = "0.4.0"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1545,7 +1545,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "anyhow",
  "color-eyre",

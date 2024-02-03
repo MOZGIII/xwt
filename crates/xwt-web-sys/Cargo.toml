@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-sys"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -31,7 +31,7 @@ web-sys = { version = "0.3", features = [
 ] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwt-tests = { version = "0.2", path = "../xwt-tests" }
+xwt-tests = { version = "0.3", path = "../xwt-tests" }
 xwt-test-assets = { version = "0.1", path = "../xwt-test-assets" }
 xwt-web-utils = { version = "0.1", path = "../xwt-web-utils" }
 xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
