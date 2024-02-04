@@ -1211,7 +1211,7 @@ dependencies = [
 
 [[package]]
 name = "web-sys-async-io"
-version = "0.2.4"
+version = "0.2.5"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1504,7 +1504,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "thiserror",
  "tokio",
@@ -1515,7 +1515,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-sys"
-version = "0.4.3"
+version = "0.4.4"
 dependencies = [
  "js-sys",
  "tokio",
