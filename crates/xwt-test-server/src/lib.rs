@@ -5,6 +5,7 @@
 #![cfg(not(target_family = "wasm"))]
 
 pub mod echo;
+pub mod echo_open_bi;
 
 #[derive(Default)]
 pub struct EndpointParams {
@@ -71,6 +72,10 @@ pub async fn serve_incoming_session(
         "/echo" => {
             tracing::info!(message = "invoking echo handler");
             self::echo::serve_session_request(session_request).await
+        }
+        "/echo-open-bi" => {
+            tracing::info!(message = "invoking echo open bi handler");
+            self::echo_open_bi::serve_session_request(session_request).await
         }
         _ => {
             tracing::info!(message = "rejecting incoming session due to path mismatch");

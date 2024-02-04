@@ -10,9 +10,11 @@
 
 use std::rc::Rc;
 
+use wasm_bindgen::JsError;
 use xwt_core::async_trait;
 
 mod error;
+mod sys;
 
 pub use error::*;
 
@@ -158,7 +160,11 @@ impl xwt_core::traits::AcceptBiStream for Connection {
         let reader: wasm_bindgen::JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
-        let value: web_sys::WebTransportBidirectionalStream = read_result.into();
+        let read_result: crate::sys::ReadableStreamReadResult = read_result.into();
+        if read_result.is_done() {
+            return Err(Error(JsError::new("xwt: accept bi reader is done").into()));
+        }
+        let value: web_sys::WebTransportBidirectionalStream = read_result.value().into();
         let value = wrap_bi_stream(&self.transport, value);
         Ok(value)
     }
@@ -188,7 +194,11 @@ impl xwt_core::traits::AcceptUniStream for Connection {
         let reader: wasm_bindgen::JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
-        let value: web_sys::WebTransportReceiveStream = read_result.into();
+        let read_result: crate::sys::ReadableStreamReadResult = read_result.into();
+        if read_result.is_done() {
+            return Err(Error(JsError::new("xwt: accept uni reader is done").into()));
+        }
+        let value: web_sys::WebTransportReceiveStream = read_result.value().into();
         let recv_stream = wrap_recv_stream(&self.transport, value);
         Ok(recv_stream)
     }

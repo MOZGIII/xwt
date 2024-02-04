@@ -111,3 +111,14 @@ async fn connection_drop() {
     .await
     .unwrap();
 }
+
+#[wasm_bindgen_test]
+async fn accept_bi_stream() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::accept_bi_stream::run(endpoint, xwt_tests::consts::ECHO_OPEN_BI_SERVER_URL)
+        .await
+        .unwrap();
+}

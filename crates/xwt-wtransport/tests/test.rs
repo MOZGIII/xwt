@@ -81,3 +81,15 @@ async fn connection_drop() -> color_eyre::eyre::Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn accept_bi_stream() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::accept_bi_stream::run(endpoint, xwt_tests::consts::ECHO_OPEN_BI_SERVER_URL)
+        .await?;
+
+    Ok(())
+}
