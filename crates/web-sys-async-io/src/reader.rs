@@ -65,15 +65,23 @@ impl tokio::io::AsyncRead for Reader {
                 internal_buf.copy_to(&mut write_slice[..len]);
                 buf.advance(len);
 
+                // The buffer returned is actually the same buffer we passed
+                // earlier when we called the `read_with_array_buffer_view`
+                // under the hood - despite it being an entirely new JS object.
+                // We now have to assume the ownership of the buffer and
+                // properly keep for the next time.
                 self.internal_buf = Some(internal_buf);
 
                 Poll::Ready(Ok(()))
             }
             Op::Idle => {
-                let internal_buf = self.internal_buf.get_or_insert_with(|| {
+                let internal_buf = self.internal_buf.take().unwrap_or_else(|| {
                     js_sys::Uint8Array::new_with_length(buf.capacity().try_into().unwrap())
                 });
-                let internal_buf = internal_buf.clone(); // this only clones the reference
+                // Despite this not being properly indicated at the type system,
+                // the `read_with_array_buffer_view` fn is actually supposed
+                // to be taking the buffer by value - as it takes the ownership of
+                // the buffer and the old JS reference to it is no longer valid.
                 let fut = JsFuture::from(self.inner.read_with_array_buffer_view(&internal_buf));
                 self.op = Op::Pending(fut);
                 self.poll_read(cx, buf)
