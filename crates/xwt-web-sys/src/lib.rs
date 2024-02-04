@@ -243,17 +243,22 @@ impl xwt_core::io::Read for RecvStream {
     type Error = Error;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
-        let internal_buf = js_sys::Uint8Array::new_with_length(buf.len().try_into().unwrap());
-        let maybe_output_buf =
+        let internal_buf =
+            self.reader.internal_buf.take().unwrap_or_else(|| {
+                js_sys::Uint8Array::new_with_length(buf.len().try_into().unwrap())
+            });
+        let maybe_internal_buf =
             web_sys_stream_utils::read_byob(&self.reader.inner, internal_buf).await?;
-        let Some(output_buf) = maybe_output_buf else {
+        let Some(internal_buf) = maybe_internal_buf else {
             return Ok(None);
         };
 
         // Unwrap is safe assuming the `usize` is `u32` in wasm.
-        let len = output_buf.byte_length().try_into().unwrap();
+        let len = internal_buf.byte_length().try_into().unwrap();
 
-        output_buf.copy_to(&mut buf[..len]);
+        internal_buf.copy_to(&mut buf[..len]);
+
+        self.reader.internal_buf = Some(internal_buf);
 
         Ok(Some(len))
     }
