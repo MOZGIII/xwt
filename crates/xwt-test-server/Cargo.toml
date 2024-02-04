@@ -1,18 +1,18 @@
 [package]
-name = "xwt-test-echo-server"
+name = "xwt-test-server"
 version = "0.2.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
 description = """
-The echo server to use for xwt testing.
+The server to use for xwt testing.
 Not intended to be wasm-compatible.
 """
 repository = "https://github.com/MOZGIII/xwt"
 autobins = false
 
 [[bin]]
-name = "xwt-test-echo-server"
+name = "xwt-test-server"
 path = "src/main.rs"
 required-features = ["bin"]
 
