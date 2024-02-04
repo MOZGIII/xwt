@@ -1515,7 +1515,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-sys"
-version = "0.4.4"
+version = "0.4.5"
 dependencies = [
  "js-sys",
  "tokio",
