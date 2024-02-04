@@ -36,23 +36,23 @@ fn test_endpoint() -> xwt_wtransport::Endpoint<wtransport::endpoint::endpoint_si
 }
 
 #[tokio::test]
-async fn echo_streams() -> color_eyre::eyre::Result<()> {
+async fn streams() -> color_eyre::eyre::Result<()> {
     setup()?;
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::echo(endpoint, xwt_tests::consts::ECHO_SERVER_URL).await?;
+    xwt_tests::tests::streams::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL).await?;
 
     Ok(())
 }
 
 #[tokio::test]
-async fn echo_datagrams() -> color_eyre::eyre::Result<()> {
+async fn datagrams() -> color_eyre::eyre::Result<()> {
     setup()?;
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::echo_datagrams(endpoint, xwt_tests::consts::ECHO_SERVER_URL).await?;
+    xwt_tests::tests::datagrams::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL).await?;
 
     Ok(())
 }

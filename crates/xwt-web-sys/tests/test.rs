@@ -32,23 +32,23 @@ fn test_endpoint() -> xwt_web_sys::Endpoint {
 }
 
 #[wasm_bindgen_test]
-async fn echo_streams() {
+async fn streams() {
     setup();
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::echo(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+    xwt_tests::tests::streams::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
         .await
         .unwrap();
 }
 
 #[wasm_bindgen_test]
-async fn echo_datagrams() {
+async fn datagrams() {
     setup();
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::echo_datagrams(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+    xwt_tests::tests::datagrams::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
         .await
         .unwrap();
 }
