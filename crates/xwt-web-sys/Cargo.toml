@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-sys"
-version = "0.4.5"
+version = "0.4.6"
 edition = "2021"
 resolver = "2"
 license = "MIT"
