@@ -55,15 +55,17 @@ impl tokio::io::AsyncRead for Reader {
 
                 let value = read_result.value();
                 // No value indicates an error condition.
-                let Some(js_buf) = value else {
+                let Some(internal_buf) = value else {
                     return Poll::Ready(Ok(()));
                 };
 
-                let len = wasm_u32_to_usize(js_buf.byte_length());
+                let len = wasm_u32_to_usize(internal_buf.byte_length());
 
                 let write_slice = buf.initialize_unfilled_to(len);
-                js_buf.copy_to(&mut write_slice[..len]);
+                internal_buf.copy_to(&mut write_slice[..len]);
                 buf.advance(len);
+
+                self.internal_buf = Some(internal_buf);
 
                 Poll::Ready(Ok(()))
             }
