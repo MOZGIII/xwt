@@ -1488,7 +1488,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "xwt-test-echo-server"
+name = "xwt-test-server"
 version = "0.2.0"
 dependencies = [
  "color-eyre",
