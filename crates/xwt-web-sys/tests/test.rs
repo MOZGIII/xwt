@@ -65,6 +65,17 @@ async fn read_small_buf() {
 }
 
 #[wasm_bindgen_test]
+async fn tokio_io() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::tokio_io::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
 async fn connection_drop() {
     setup();
 

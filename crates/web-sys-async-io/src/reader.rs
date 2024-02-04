@@ -68,17 +68,11 @@ impl tokio::io::AsyncRead for Reader {
                 Poll::Ready(Ok(()))
             }
             Op::Idle => {
-                let work_buf = match &mut self.internal_buf {
-                    Some(val) => val.buffer(),
-                    None => {
-                        let internal_buf =
-                            js_sys::Uint8Array::new_with_length(buf.capacity().try_into().unwrap());
-                        let view = internal_buf.buffer();
-                        self.internal_buf = Some(internal_buf);
-                        view
-                    }
-                };
-                let fut = JsFuture::from(self.inner.read_with_array_buffer_view(&work_buf));
+                let internal_buf = self.internal_buf.get_or_insert_with(|| {
+                    js_sys::Uint8Array::new_with_length(buf.capacity().try_into().unwrap())
+                });
+                let internal_buf = internal_buf.clone(); // this only clones the reference
+                let fut = JsFuture::from(self.inner.read_with_array_buffer_view(&internal_buf));
                 self.op = Op::Pending(fut);
                 self.poll_read(cx, buf)
             }
