@@ -1,6 +1,7 @@
 pub mod connection_drop;
 pub mod read_small_buf;
 pub mod tokio_io;
+pub mod tokio_io_read_small_buf;
 
 use xwt_core::prelude::*;
 
