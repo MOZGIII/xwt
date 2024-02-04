@@ -19,6 +19,8 @@ where
     NoResponse,
     #[error("bad data")]
     BadData(Vec<u8>),
+    #[error("second read: {0}")]
+    SecondRead(#[source] std::io::Error),
 }
 
 pub async fn run<Endpoint>(endpoint: Endpoint, url: &str) -> Result<(), Error<Endpoint>>
@@ -65,6 +67,11 @@ where
     if read_buf != b"hello" {
         return Err(Error::BadData(read_buf));
     }
+
+    let read = tokio::io::AsyncReadExt::read(&mut recv_stream, &mut read_buf[..])
+        .await
+        .map_err(Error::SecondRead)?;
+    assert_eq!(read, 0);
 
     Ok(())
 }
