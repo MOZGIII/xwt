@@ -1,6 +1,6 @@
 [package]
 name = "xwt-wtransport"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -15,7 +15,7 @@ xwt-core = { version = "0.2", path = "../xwt-core", default-features = false }
 wtransport = { version = "0.1.10" }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
-xwt-tests = { version = "0.3", path = "../xwt-tests" }
+xwt-tests = { version = "0.4", path = "../xwt-tests" }
 xwt-test-assets = { version = "0.1", path = "../xwt-test-assets" }
 
 anyhow = "1"
