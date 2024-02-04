@@ -67,10 +67,10 @@ jobs:
           buildEnvScript: ${{ matrix.plan.platform.buildEnvScript }}
         timeout-minutes: 10
 
-      - name: Build and run the test echo server
+      - name: Build and run the test server
         run: |
-          cargo build --bin xwt-test-echo-server
-          cargo run --bin xwt-test-echo-server &
+          cargo build --bin xwt-test-server
+          cargo run --bin xwt-test-server &
         if: ${{ matrix.plan.mode.needsEchoServer }}
 
       - name: Run cargo ${{ matrix.plan.mode.cargoCommand }}
