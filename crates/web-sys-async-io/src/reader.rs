@@ -11,8 +11,8 @@ use crate::Op;
 #[derive(Debug)]
 pub struct Reader {
     pub inner: web_sys::ReadableStreamByobReader,
-    pub op: Op,
-    pub internal_buf: Option<js_sys::Uint8Array>,
+    op: Op,
+    internal_buf: Option<js_sys::ArrayBuffer>,
 }
 
 impl Reader {
@@ -21,17 +21,6 @@ impl Reader {
             inner,
             op: Op::default(),
             internal_buf: None,
-        }
-    }
-
-    pub fn with_buf(
-        inner: web_sys::ReadableStreamByobReader,
-        internal_buf: js_sys::Uint8Array,
-    ) -> Self {
-        Self {
-            inner,
-            op: Op::default(),
-            internal_buf: Some(internal_buf),
         }
     }
 }
@@ -68,17 +57,20 @@ impl tokio::io::AsyncRead for Reader {
                 Poll::Ready(Ok(()))
             }
             Op::Idle => {
-                let work_buf = match &mut self.internal_buf {
-                    Some(val) => val.buffer(),
-                    None => {
-                        let internal_buf =
-                            js_sys::Uint8Array::new_with_length(buf.capacity().try_into().unwrap());
-                        let view = internal_buf.buffer();
-                        self.internal_buf = Some(internal_buf);
-                        view
-                    }
-                };
-                let fut = JsFuture::from(self.inner.read_with_array_buffer_view(&work_buf));
+                let desired = buf.remaining() as u32;
+
+                let mut internal_buf = self
+                    .internal_buf
+                    .get_or_insert_with(|| js_sys::ArrayBuffer::new(desired));
+
+                if internal_buf.byte_length() < desired {
+                    internal_buf = self.internal_buf.insert(js_sys::ArrayBuffer::new(desired));
+                }
+
+                let view =
+                    js_sys::Uint8Array::new_with_byte_offset_and_length(&internal_buf, 0, desired);
+
+                let fut = JsFuture::from(self.inner.read_with_array_buffer_view(&view));
                 self.op = Op::Pending(fut);
                 self.poll_read(cx, buf)
             }
