@@ -301,7 +301,7 @@ impl xwt_core::datagram::Receive for Connection {
         let maybe_buffer =
             web_sys_stream_utils::read_byob(&self.datagram_readable_stream_reader, buffer).await?;
         let Some(buffer) = maybe_buffer else {
-            return Err(Error("unexpected stream termination".into()));
+            return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
         };
 
         let data = buffer.to_vec();
