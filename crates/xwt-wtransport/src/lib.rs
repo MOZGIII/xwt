@@ -184,6 +184,18 @@ impl AsRef<[u8]> for Datagram {
 }
 
 #[async_trait]
+impl xwt_core::datagram::ReceiveInto for Connection {
+    type Error = wtransport::error::ConnectionError;
+
+    async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        let datagram = self.0.receive_datagram().await?;
+        let len = datagram.len();
+        buf[..len].copy_from_slice(&datagram);
+        Ok(len)
+    }
+}
+
+#[async_trait]
 impl xwt_core::datagram::Send for Connection {
     type Error = wtransport::error::SendDatagramError;
 

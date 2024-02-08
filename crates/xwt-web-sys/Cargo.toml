@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-sys"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -15,7 +15,7 @@ default-target = "wasm32-unknown-unknown"
 rustc-args = ["--cfg=web_sys_unstable_apis"]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-xwt-core = { version = "0.2", path = "../xwt-core", default-features = false }
+xwt-core = { version = "0.2.2", path = "../xwt-core", default-features = false }
 web-sys-async-io = { version = "0.2.5", path = "../web-sys-async-io" }
 web-sys-stream-utils = { version = "0.2", path = "../web-sys-stream-utils" }
 
@@ -36,7 +36,7 @@ web-sys = { version = "0.3", features = [
 ] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwt-tests = { version = "0.4.1", path = "../xwt-tests" }
+xwt-tests = { version = "0.4.2", path = "../xwt-tests" }
 xwt-test-assets = { version = "0.1", path = "../xwt-test-assets" }
 xwt-web-utils = { version = "0.1", path = "../xwt-web-utils" }
 xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
