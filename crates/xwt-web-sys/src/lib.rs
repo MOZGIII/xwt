@@ -38,31 +38,43 @@ impl xwt_core::traits::EndpointConnect for Endpoint {
         let _ = wasm_bindgen_futures::JsFuture::from(transport.ready()).await?;
 
         let datagrams = transport.datagrams();
+        let max_datagram_size = datagrams.max_datagram_size();
         let datagram_readable_stream_reader =
-            web_sys_stream_utils::get_reader(datagrams.readable());
+            web_sys_stream_utils::get_reader_byob(datagrams.readable());
         let datagram_writable_stream_writer =
             web_sys_stream_utils::get_writer(datagrams.writable());
+
+        let datagram_read_buffer = js_sys::Uint8Array::new_with_length(max_datagram_size);
+        let datagram_read_buffer = tokio::sync::Mutex::new(Some(datagram_read_buffer));
 
         let connection = Connection {
             transport: Rc::new(transport),
             datagram_readable_stream_reader,
             datagram_writable_stream_writer,
+            max_datagram_size,
+            datagram_read_buffer,
         };
         Ok(xwt_core::utils::dummy::Connecting(connection))
     }
 }
 
-/// Connection hold the [`web_sys::WebTransport`] and is responsible for
+/// Connection holds the [`web_sys::WebTransport`] and is responsible for
 /// providing access to the Web API of WebTransport in a way that is portable.
-/// It also holds handles to the datagram reader and writer.
+/// It also holds handles to the datagram reader and writer, as well as
+/// the datagram reader state.
 #[derive(Debug)]
 pub struct Connection {
     /// The WebTransport instance.
     pub transport: Rc<web_sys::WebTransport>,
     /// The datagram reader.
-    pub datagram_readable_stream_reader: web_sys::ReadableStreamDefaultReader,
+    pub datagram_readable_stream_reader: web_sys::ReadableStreamByobReader,
     /// The datagram writer.
     pub datagram_writable_stream_writer: web_sys::WritableStreamDefaultWriter,
+    /// The max datagram size.
+    /// Used to allocate the datagram read buffer in case it gets lost.
+    pub max_datagram_size: u32,
+    /// The datagram read internal buffer.
+    pub datagram_read_buffer: tokio::sync::Mutex<Option<js_sys::Uint8Array>>,
 }
 
 impl xwt_core::traits::Streams for Connection {
@@ -280,10 +292,21 @@ impl xwt_core::datagram::Receive for Connection {
     type Error = Error;
 
     async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
-        let maybe_data = web_sys_stream_utils::read(&self.datagram_readable_stream_reader).await?;
-        let Some(data) = maybe_data else {
+        let mut buffer_guard = self.datagram_read_buffer.lock().await;
+
+        let buffer = buffer_guard
+            .take()
+            .unwrap_or_else(|| js_sys::Uint8Array::new_with_length(self.max_datagram_size));
+
+        let maybe_buffer =
+            web_sys_stream_utils::read_byob(&self.datagram_readable_stream_reader, buffer).await?;
+        let Some(buffer) = maybe_buffer else {
             return Err(Error("unexpected stream termination".into()));
         };
+
+        let data = buffer.to_vec();
+        *buffer_guard = Some(buffer);
+
         Ok(data)
     }
 }

@@ -18,3 +18,9 @@ impl From<wasm_bindgen::JsValue> for Error {
         Self(value)
     }
 }
+
+impl From<wasm_bindgen::JsError> for Error {
+    fn from(value: wasm_bindgen::JsError) -> Self {
+        wasm_bindgen::JsValue::from(value).into()
+    }
+}
