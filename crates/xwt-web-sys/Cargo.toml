@@ -19,7 +19,7 @@ xwt-core = { version = "0.2", path = "../xwt-core", default-features = false }
 web-sys-async-io = { version = "0.2.5", path = "../web-sys-async-io" }
 web-sys-stream-utils = { version = "0.2", path = "../web-sys-stream-utils" }
 
-tokio = { version = "1", default-features = false, features = [] }
+tokio = { version = "1", default-features = false, features = ["sync"] }
 wasm-bindgen-futures = { version = "0.4" }
 wasm-bindgen = { version = "0.2" }
 js-sys = "0.3"
@@ -30,6 +30,7 @@ web-sys = { version = "0.3", features = [
   "WebTransportSendStream",
   "WebTransportReceiveStream",
   "ReadableStreamDefaultReader",
+  "ReadableStreamByobReader",
   "WritableStreamDefaultWriter",
   "WebTransportDatagramDuplexStream",
 ] }
