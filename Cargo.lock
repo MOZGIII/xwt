@@ -1439,7 +1439,7 @@ dependencies = [
 
 [[package]]
 name = "xwt"
-version = "0.4.2"
+version = "0.5.0"
 dependencies = [
  "xwt-web-sys",
  "xwt-wtransport",
@@ -1515,7 +1515,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-sys"
-version = "0.4.7"
+version = "0.5.0"
 dependencies = [
  "js-sys",
  "tokio",
