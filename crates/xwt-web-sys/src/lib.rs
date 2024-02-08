@@ -308,12 +308,18 @@ impl xwt_core::io::Read for RecvStream {
     }
 }
 
-#[async_trait(?Send)]
-impl xwt_core::datagram::Receive for Connection {
-    type Datagram = Vec<u8>;
-    type Error = Error;
-
-    async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
+impl Connection {
+    /// Receive the datagram and handle the buffer with the given function.
+    ///
+    /// Cloning the buffer in the `f` will result in the undefined behaviour,
+    /// becaue it will create a second reference to an object that is inteded
+    /// to be under a `mut ref`.
+    /// Althoug is would not teachnically be unsafe, it would violate
+    /// the borrow checker rules.
+    pub async fn receive_datagram_with<R>(
+        &self,
+        f: impl FnOnce(&mut js_sys::Uint8Array) -> R,
+    ) -> Result<R, Error> {
         let mut buffer_guard = self.datagram_read_buffer.lock().await;
 
         let buffer = buffer_guard
@@ -322,14 +328,38 @@ impl xwt_core::datagram::Receive for Connection {
 
         let maybe_buffer =
             web_sys_stream_utils::read_byob(&self.datagram_readable_stream_reader, buffer).await?;
-        let Some(buffer) = maybe_buffer else {
+        let Some(mut buffer) = maybe_buffer else {
             return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
         };
 
-        let data = buffer.to_vec();
-        *buffer_guard = Some(buffer);
+        let result = f(&mut buffer);
 
-        Ok(data)
+        *buffer_guard = Some(buffer);
+        Ok(result)
+    }
+}
+
+#[async_trait(?Send)]
+impl xwt_core::datagram::Receive for Connection {
+    type Datagram = Vec<u8>;
+    type Error = Error;
+
+    async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
+        self.receive_datagram_with(|buffer| buffer.to_vec()).await
+    }
+}
+
+#[async_trait(?Send)]
+impl xwt_core::datagram::ReceiveInto for Connection {
+    type Error = Error;
+
+    async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        self.receive_datagram_with(|buffer| {
+            let len = buffer.length() as usize;
+            buffer.copy_to(&mut buf[..len]);
+            len
+        })
+        .await
     }
 }
 

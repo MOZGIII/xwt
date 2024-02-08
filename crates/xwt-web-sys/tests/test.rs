@@ -54,6 +54,17 @@ async fn datagrams() {
 }
 
 #[wasm_bindgen_test]
+async fn datagrams_read_into() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::datagrams_read_into::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
 async fn read_small_buf() {
     setup();
 
