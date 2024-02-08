@@ -31,11 +31,33 @@ pub struct Endpoint {
 #[async_trait(?Send)]
 impl xwt_core::traits::EndpointConnect for Endpoint {
     type Error = Error;
-    type Connecting = xwt_core::utils::dummy::Connecting<Connection>;
+    type Connecting = Connecting;
 
     async fn connect(&self, url: &str) -> Result<Self::Connecting, Self::Error> {
         let transport = web_sys::WebTransport::new_with_options(url, &self.options)?;
-        let _ = wasm_bindgen_futures::JsFuture::from(transport.ready()).await?;
+        let ready = transport.ready();
+        Ok(Connecting { ready, transport })
+    }
+}
+
+/// Connecting represents the transient connection state when
+/// the [`web_sys::WebTransport`] has been created but is not ready yet.
+#[derive(Debug)]
+pub struct Connecting {
+    /// The WebTransport instance.
+    pub transport: web_sys::WebTransport,
+    /// The readiness promise future.
+    pub ready: js_sys::Promise,
+}
+
+#[async_trait(?Send)]
+impl xwt_core::Connecting for Connecting {
+    type Connection = Connection;
+    type Error = Error;
+
+    async fn wait_connect(self) -> Result<Self::Connection, Self::Error> {
+        let Connecting { transport, ready } = self;
+        let _ = wasm_bindgen_futures::JsFuture::from(ready).await?;
 
         let datagrams = transport.datagrams();
         let max_datagram_size = datagrams.max_datagram_size();
@@ -54,7 +76,7 @@ impl xwt_core::traits::EndpointConnect for Endpoint {
             max_datagram_size,
             datagram_read_buffer,
         };
-        Ok(xwt_core::utils::dummy::Connecting(connection))
+        Ok(connection)
     }
 }
 
