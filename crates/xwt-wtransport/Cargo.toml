@@ -17,8 +17,10 @@ wtransport = { version = "0.1.11" }
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 xwt-tests = { version = "0.4.2", path = "../xwt-tests" }
 xwt-test-assets = { version = "0.1", path = "../xwt-test-assets" }
+xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
 
 anyhow = "1"
 tokio = { version = "1", features = ["macros"] }
 color-eyre = "0.6"
 tracing-subscriber = "0.3"
+tracing = "0.1"
