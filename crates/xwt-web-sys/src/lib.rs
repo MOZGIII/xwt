@@ -59,21 +59,22 @@ impl xwt_core::Connecting for Connecting {
         let Connecting { transport, ready } = self;
         let _ = wasm_bindgen_futures::JsFuture::from(ready).await?;
 
+        let datagram_read_buffer_size = 65536; // 65k buffers as per spec recommendation
+
         let datagrams = transport.datagrams();
-        let max_datagram_size = datagrams.max_datagram_size();
         let datagram_readable_stream_reader =
             web_sys_stream_utils::get_reader_byob(datagrams.readable());
         let datagram_writable_stream_writer =
             web_sys_stream_utils::get_writer(datagrams.writable());
 
-        let datagram_read_buffer = js_sys::Uint8Array::new_with_length(max_datagram_size);
+        let datagram_read_buffer = js_sys::ArrayBuffer::new(datagram_read_buffer_size);
         let datagram_read_buffer = tokio::sync::Mutex::new(Some(datagram_read_buffer));
 
         let connection = Connection {
             transport: Rc::new(transport),
             datagram_readable_stream_reader,
             datagram_writable_stream_writer,
-            max_datagram_size,
+            datagram_read_buffer_size,
             datagram_read_buffer,
         };
         Ok(connection)
@@ -92,11 +93,11 @@ pub struct Connection {
     pub datagram_readable_stream_reader: web_sys::ReadableStreamByobReader,
     /// The datagram writer.
     pub datagram_writable_stream_writer: web_sys::WritableStreamDefaultWriter,
-    /// The max datagram size.
+    /// The desired size of the datagram read buffer.
     /// Used to allocate the datagram read buffer in case it gets lost.
-    pub max_datagram_size: u32,
+    pub datagram_read_buffer_size: u32,
     /// The datagram read internal buffer.
-    pub datagram_read_buffer: tokio::sync::Mutex<Option<js_sys::Uint8Array>>,
+    pub datagram_read_buffer: tokio::sync::Mutex<Option<js_sys::ArrayBuffer>>,
 }
 
 impl xwt_core::traits::Streams for Connection {
@@ -324,17 +325,18 @@ impl Connection {
 
         let buffer = buffer_guard
             .take()
-            .unwrap_or_else(|| js_sys::Uint8Array::new_with_length(self.max_datagram_size));
+            .unwrap_or_else(|| js_sys::ArrayBuffer::new(self.datagram_read_buffer_size));
+        let view = js_sys::Uint8Array::new(&buffer);
 
-        let maybe_buffer =
-            web_sys_stream_utils::read_byob(&self.datagram_readable_stream_reader, buffer).await?;
-        let Some(mut buffer) = maybe_buffer else {
+        let maybe_view =
+            web_sys_stream_utils::read_byob(&self.datagram_readable_stream_reader, view).await?;
+        let Some(mut view) = maybe_view else {
             return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
         };
 
-        let result = f(&mut buffer);
+        let result = f(&mut view);
 
-        *buffer_guard = Some(buffer);
+        *buffer_guard = Some(view.buffer());
         Ok(result)
     }
 }
