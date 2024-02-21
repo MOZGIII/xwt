@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-sys"
-version = "0.5.1"
+version = "0.6.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -16,7 +16,7 @@ rustc-args = ["--cfg=web_sys_unstable_apis"]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwt-core = { version = "0.2.2", path = "../xwt-core", default-features = false }
-web-sys-async-io = { version = "0.2.5", path = "../web-sys-async-io" }
+web-sys-async-io = { version = "0.3", path = "../web-sys-async-io" }
 web-sys-stream-utils = { version = "0.2", path = "../web-sys-stream-utils" }
 
 tokio = { version = "1", default-features = false, features = ["sync"] }
