@@ -60,7 +60,7 @@ impl xwt_core::Connecting for Connecting {
         let _ = wasm_bindgen_futures::JsFuture::from(ready).await?;
 
         let datagrams = transport.datagrams();
-        let max_datagram_size = datagrams.max_datagram_size();
+        let max_datagram_size = 65535;
         let datagram_readable_stream_reader =
             web_sys_stream_utils::get_reader_byob(datagrams.readable());
         let datagram_writable_stream_writer =
