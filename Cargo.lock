@@ -443,9 +443,9 @@ dependencies = [
 
 [[package]]
 name = "octets"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a74f2cda724d43a0a63140af89836d4e7db6138ef67c9f96d3a0f0150d05000"
+checksum = "109983a091271ee8916076731ba5fdc9ee22fea871bc7c6ceab9bfd423eb1d99"
 
 [[package]]
 name = "oid-registry"
@@ -1388,9 +1388,9 @@ checksum = "dff9641d1cd4be8d1a070daf9e3773c5f67e78b4d9d42263020c057706765c04"
 
 [[package]]
 name = "wtransport"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3293b2a7a7fde68e03a4d70f32b1c7dc8619101e270e25413451ff5040c91bd3"
+checksum = "295c6d8c425e11f178e35ed1442eb77c1ffba98248728fecc96fb9c5a707e7f3"
 dependencies = [
  "bytes",
  "quinn",
@@ -1411,9 +1411,9 @@ dependencies = [
 
 [[package]]
 name = "wtransport-proto"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72bc7bc26eaae90d99fafa5c4ba4d51d31d56f98399e2e78344c805df9d80766"
+checksum = "4d19ee96cc428b718c1557e327c47016e12147adf773e050ae86384198699f57"
 dependencies = [
  "httlib-huffman",
  "octets",
