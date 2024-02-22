@@ -11,6 +11,18 @@ macro_rules! newtype {
                 f.debug_tuple(stringify!($name)).finish()
             }
         }
+
+        impl From<$wrapped_type> for $name {
+            fn from(value: $wrapped_type) -> Self {
+                Self(value)
+            }
+        }
+
+        impl From<$name> for $wrapped_type {
+            fn from(value: $name) -> Self {
+                value.0
+            }
+        }
     };
     ($name:ident < $($generics:tt),* > => $wrapped_type:path) => {
         #[doc = concat!("The [`", stringify!($wrapped_type), "`] newtype.")]
@@ -19,6 +31,18 @@ macro_rules! newtype {
         impl<$($generics)*> std::fmt::Debug for $name<$($generics)*> {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 f.debug_tuple(stringify!($name)).finish()
+            }
+        }
+
+        impl<$($generics)*> From<$wrapped_type> for $name<$($generics)*> {
+            fn from(value: $wrapped_type) -> Self {
+                Self(value)
+            }
+        }
+
+        impl<$($generics)*> From<$name<$($generics)*>> for $wrapped_type {
+            fn from(value: $name<$($generics)*>) -> Self {
+                value.0
             }
         }
     };
