@@ -23,6 +23,7 @@ tokio = { version = "1", default-features = false, features = ["sync"] }
 wasm-bindgen-futures = { version = "0.4" }
 wasm-bindgen = { version = "0.2" }
 js-sys = "0.3"
+tracing = "0.1"
 web-sys = { version = "0.3", features = [
   "WebTransport",
   "WebTransportOptions",
@@ -43,5 +44,4 @@ xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
 
 tracing-wasm = "0.2"
 wasm-bindgen-test = "0.3"
-tracing = "0.1"
 web-sys = { version = "0.3", features = ["console"] }

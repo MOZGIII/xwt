@@ -323,18 +323,23 @@ impl Connection {
         &self,
         f: impl FnOnce(&mut js_sys::Uint8Array) -> R,
     ) -> Result<R, Error> {
+        tracing::debug!(message = "waiting for the lock");
         let mut buffer_guard = self.datagram_read_buffer.lock().await;
+        tracing::debug!(message = "got the lock");
 
         let buffer = buffer_guard
             .take()
             .unwrap_or_else(|| js_sys::ArrayBuffer::new(self.datagram_read_buffer_size));
         let view = js_sys::Uint8Array::new(&buffer);
 
+        tracing::debug!(message = "reading");
         let maybe_view =
             web_sys_stream_utils::read_byob(&self.datagram_readable_stream_reader, view).await?;
         let Some(mut view) = maybe_view else {
+            tracing::debug!(message = "no result");
             return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
         };
+        tracing::debug!(message = "read something");
 
         let result = f(&mut view);
 
@@ -349,7 +354,12 @@ impl xwt_core::datagram::Receive for Connection {
     type Error = Error;
 
     async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
-        self.receive_datagram_with(|buffer| buffer.to_vec()).await
+        tracing::debug!(message = "waiting for a message");
+        self.receive_datagram_with(|buffer| {
+            tracing::debug!(message = "receiving a message");
+            buffer.to_vec()
+        })
+        .await
     }
 }
 
@@ -358,7 +368,9 @@ impl xwt_core::datagram::ReceiveInto for Connection {
     type Error = Error;
 
     async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        tracing::debug!(message = "waiting for a message");
         self.receive_datagram_with(|buffer| {
+            tracing::debug!(message = "receiving a message");
             let len = buffer.length() as usize;
             buffer.copy_to(&mut buf[..len]);
             len
@@ -375,6 +387,7 @@ impl xwt_core::datagram::Send for Connection {
     where
         D: AsRef<[u8]>,
     {
+        tracing::debug!(message = "sending a message", payload = ?payload.as_ref());
         web_sys_stream_utils::write(&self.datagram_writable_stream_writer, payload.as_ref())
             .await?;
         Ok(())
