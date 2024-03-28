@@ -629,6 +629,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "rcgen"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa96feb4d337a43eae1b39b6d4cafc2860a46cf9cec6f1e65294244ece65e348"
+dependencies = [
+ "pem",
+ "ring 0.17.8",
+ "rustls-pki-types",
+ "time",
+ "yasna",
+]
+
+[[package]]
 name = "ring"
 version = "0.16.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -711,6 +724,12 @@ checksum = "1c74cae0a4cf6ccbbf5f359f08efdf8ee7e1dc532573bf0db71968cb56b1448c"
 dependencies = [
  "base64 0.21.7",
 ]
+
+[[package]]
+name = "rustls-pki-types"
+version = "1.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ecd36cc4259e3e4514335c4a138c6b43171a8d61d8f5c9348f9fc7529416f247"
 
 [[package]]
 name = "rustls-webpki"
@@ -1400,7 +1419,7 @@ checksum = "295c6d8c425e11f178e35ed1442eb77c1ffba98248728fecc96fb9c5a707e7f3"
 dependencies = [
  "bytes",
  "quinn",
- "rcgen",
+ "rcgen 0.12.1",
  "ring 0.17.8",
  "rustls",
  "rustls-native-certs",
@@ -1458,7 +1477,7 @@ version = "0.1.0"
 dependencies = [
  "base64 0.22.0",
  "pem",
- "rcgen",
+ "rcgen 0.13.0",
  "ring 0.17.8",
  "time",
 ]
@@ -1489,7 +1508,7 @@ dependencies = [
 name = "xwt-test-assets-build"
 version = "0.2.0"
 dependencies = [
- "rcgen",
+ "rcgen 0.13.0",
  "tokio",
  "xwt-cert-utils",
 ]
