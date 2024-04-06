@@ -14,7 +14,7 @@ use wasm_bindgen::JsError;
 use xwt_core::async_trait;
 
 mod error;
-pub mod sys;
+mod sys;
 
 pub use error::*;
 
