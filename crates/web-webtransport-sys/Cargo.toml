@@ -9,6 +9,9 @@ The low-level rust bindings for the WebTransport Web APIs.
 """
 repository = "https://github.com/MOZGIII/xwt"
 
+[package.metadata.docs.rs]
+default-target = "wasm32-unknown-unknown"
+
 [dependencies]
-js-sys = "0.3"
-wasm-bindgen = "0.2.92"
+js-sys = { version = "0.3", default-features = false }
+wasm-bindgen = { version = "0.2.92", default-features = false }
