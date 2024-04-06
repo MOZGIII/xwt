@@ -1538,17 +1538,6 @@ dependencies = [
  "xwt-core",
  "xwt-test-assets",
  "xwt-tests",
- "xwt-web-utils",
-]
-
-[[package]]
-name = "xwt-web-utils"
-version = "0.1.3"
-dependencies = [
- "js-sys",
- "wasm-bindgen",
- "wasm-bindgen-test",
- "web-sys",
 ]
 
 [[package]]
