@@ -1,4 +1,5 @@
 //! Bindings for bidirectional stream types.
+#![allow(missing_docs)]
 
 use wasm_bindgen::prelude::*;
 

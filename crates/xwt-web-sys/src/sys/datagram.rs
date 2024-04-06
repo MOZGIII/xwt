@@ -1,4 +1,5 @@
 //! Bindings for the datagram stream.
+#![allow(missing_docs)]
 
 use wasm_bindgen::prelude::*;
 use web_sys::{ReadableStream, WritableStream};

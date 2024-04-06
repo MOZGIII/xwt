@@ -1,4 +1,5 @@
 //! Bindings for the transport itself.
+#![allow(missing_docs)]
 
 use wasm_bindgen::prelude::*;
 use web_sys::ReadableStream;
@@ -110,6 +111,7 @@ extern "C" {
 }
 
 #[wasm_bindgen]
+#[allow(missing_docs)]
 #[doc = "The `WebTransportReliabilityMode` enum."]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WebTransportReliabilityMode {

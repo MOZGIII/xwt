@@ -1,4 +1,5 @@
 //! Bindings for the transport options.
+#![allow(missing_docs)]
 
 use wasm_bindgen::prelude::*;
 
