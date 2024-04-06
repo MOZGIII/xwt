@@ -3,8 +3,10 @@ name: code
 on:
   push:
     branches:
-      - "**"
-      - "!gh-readonly-queue/**"
+      - "master"
+  pull_request:
+    branches-ignore:
+      - "gh-readonly-queue/**"
   merge_group:
   schedule:
     - cron: "0 20 * * 0"
