@@ -1239,7 +1239,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "webapi-webtransport-sys"
+name = "web-webtransport-sys"
 version = "0.1.0"
 dependencies = [
  "js-sys",

@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+CRATE_PATH="crates/web-webtransport-sys"
+
 exec wasm-bindgen-webidl \
-  crates/webapi-webtransport-sys/webidls \
-  crates/webapi-webtransport-sys/src/gen \
+  "$CRATE_PATH/webidls" \
+  "$CRATE_PATH/src/gen" \
   --no-features \
   "$@"

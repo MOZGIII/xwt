@@ -1,5 +1,5 @@
 [package]
-name = "webapi-webtransport-sys"
+name = "web-webtransport-sys"
 version = "0.1.0"
 edition = "2021"
 resolver = "2"
