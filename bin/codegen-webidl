@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+exec wasm-bindgen-webidl \
+  crates/webapi-webtransport-sys/webidls \
+  crates/webapi-webtransport-sys/src/gen \
+  --no-features \
+  "$@"

@@ -10,3 +10,5 @@ The low-level rust bindings for the WebTransport Web APIs.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
+js-sys = "0.3"
+wasm-bindgen = "0.2.92"

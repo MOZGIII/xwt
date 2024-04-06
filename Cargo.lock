@@ -1241,6 +1241,10 @@ dependencies = [
 [[package]]
 name = "webapi-webtransport-sys"
 version = "0.1.0"
+dependencies = [
+ "js-sys",
+ "wasm-bindgen",
+]
 
 [[package]]
 name = "winapi"
