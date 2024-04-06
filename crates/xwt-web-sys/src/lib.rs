@@ -14,7 +14,7 @@ use wasm_bindgen::JsError;
 use xwt_core::async_trait;
 
 mod error;
-mod sys;
+pub mod sys;
 
 pub use error::*;
 
@@ -25,7 +25,7 @@ pub use error::*;
 #[derive(Debug, Clone, Default)]
 pub struct Endpoint {
     /// The options to use to create the `WebTransport`s.
-    pub options: web_sys::WebTransportOptions,
+    pub options: sys::WebTransportOptions,
 }
 
 #[async_trait(?Send)]
@@ -34,7 +34,7 @@ impl xwt_core::traits::EndpointConnect for Endpoint {
     type Connecting = Connecting;
 
     async fn connect(&self, url: &str) -> Result<Self::Connecting, Self::Error> {
-        let transport = web_sys::WebTransport::new_with_options(url, &self.options)?;
+        let transport = sys::WebTransport::new_with_options(url, &self.options)?;
         let ready = transport.ready();
         Ok(Connecting { ready, transport })
     }
@@ -45,7 +45,7 @@ impl xwt_core::traits::EndpointConnect for Endpoint {
 #[derive(Debug)]
 pub struct Connecting {
     /// The WebTransport instance.
-    pub transport: web_sys::WebTransport,
+    pub transport: sys::WebTransport,
     /// The readiness promise future.
     pub ready: js_sys::Promise,
 }
@@ -88,7 +88,7 @@ impl xwt_core::Connecting for Connecting {
 #[derive(Debug)]
 pub struct Connection {
     /// The WebTransport instance.
-    pub transport: Rc<web_sys::WebTransport>,
+    pub transport: Rc<sys::WebTransport>,
     /// The datagram reader.
     pub datagram_readable_stream_reader: web_sys::ReadableStreamByobReader,
     /// The datagram writer.
@@ -108,9 +108,9 @@ impl xwt_core::traits::Streams for Connection {
 /// Send the data into a WebTransport stream.
 pub struct SendStream {
     /// The WebTransport instance.
-    pub transport: Rc<web_sys::WebTransport>,
+    pub transport: Rc<sys::WebTransport>,
     /// The handle to the stream to write to.
-    pub stream: web_sys::WebTransportSendStream,
+    pub stream: sys::WebTransportSendStream,
     /// A writer to conduct the operation.
     pub writer: web_sys_async_io::Writer,
 }
@@ -118,17 +118,17 @@ pub struct SendStream {
 /// Recv the data from a WebTransport stream.
 pub struct RecvStream {
     /// The WebTransport instance.
-    pub transport: Rc<web_sys::WebTransport>,
+    pub transport: Rc<sys::WebTransport>,
     /// The handle to the stream to read from.
-    pub stream: web_sys::WebTransportReceiveStream,
+    pub stream: sys::WebTransportReceiveStream,
     /// A reader to conduct the operation.
     pub reader: web_sys_async_io::Reader,
 }
 
 /// Open a reader for the given stream and create a [`RecvStream`].
 fn wrap_recv_stream(
-    transport: &Rc<web_sys::WebTransport>,
-    stream: web_sys::WebTransportReceiveStream,
+    transport: &Rc<sys::WebTransport>,
+    stream: sys::WebTransportReceiveStream,
 ) -> RecvStream {
     let reader = web_sys_stream_utils::get_reader_byob(stream.clone());
     let reader: wasm_bindgen::JsValue = reader.into();
@@ -144,8 +144,8 @@ fn wrap_recv_stream(
 
 /// Open a writer for the given stream and create a [`SendStream`].
 fn wrap_send_stream(
-    transport: &Rc<web_sys::WebTransport>,
-    stream: web_sys::WebTransportSendStream,
+    transport: &Rc<sys::WebTransport>,
+    stream: sys::WebTransportSendStream,
 ) -> SendStream {
     let writer = stream.get_writer().unwrap();
     let writer = web_sys_async_io::Writer::new(writer);
@@ -158,8 +158,8 @@ fn wrap_send_stream(
 
 /// Take a bidi stream and wrap a reader and writer for it.
 fn wrap_bi_stream(
-    transport: &Rc<web_sys::WebTransport>,
-    stream: web_sys::WebTransportBidirectionalStream,
+    transport: &Rc<sys::WebTransport>,
+    stream: sys::WebTransportBidirectionalStream,
 ) -> (SendStream, RecvStream) {
     let writeable = stream.writable();
     let readable = stream.readable();
@@ -180,7 +180,7 @@ impl xwt_core::traits::OpenBiStream for Connection {
         let value =
             wasm_bindgen_futures::JsFuture::from(self.transport.create_bidirectional_stream())
                 .await?;
-        let value: web_sys::WebTransportBidirectionalStream = value.into();
+        let value: sys::WebTransportBidirectionalStream = value.into();
         let value = wrap_bi_stream(&self.transport, value);
         Ok(xwt_core::utils::dummy::OpeningBiStream(value))
     }
@@ -199,7 +199,7 @@ impl xwt_core::traits::AcceptBiStream for Connection {
         if read_result.is_done() {
             return Err(Error(JsError::new("xwt: accept bi reader is done").into()));
         }
-        let value: web_sys::WebTransportBidirectionalStream = read_result.value().into();
+        let value: sys::WebTransportBidirectionalStream = read_result.value().into();
         let value = wrap_bi_stream(&self.transport, value);
         Ok(value)
     }
@@ -214,7 +214,7 @@ impl xwt_core::traits::OpenUniStream for Connection {
         let value =
             wasm_bindgen_futures::JsFuture::from(self.transport.create_unidirectional_stream())
                 .await?;
-        let value: web_sys::WebTransportSendStream = value.into();
+        let value: sys::WebTransportSendStream = value.into();
         let send_stream = wrap_send_stream(&self.transport, value);
         Ok(xwt_core::utils::dummy::OpeningUniStream(send_stream))
     }
@@ -233,7 +233,7 @@ impl xwt_core::traits::AcceptUniStream for Connection {
         if read_result.is_done() {
             return Err(Error(JsError::new("xwt: accept uni reader is done").into()));
         }
-        let value: web_sys::WebTransportReceiveStream = read_result.value().into();
+        let value: sys::WebTransportReceiveStream = read_result.value().into();
         let recv_stream = wrap_recv_stream(&self.transport, value);
         Ok(recv_stream)
     }
