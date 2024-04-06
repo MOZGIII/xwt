@@ -14,9 +14,10 @@ use wasm_bindgen::JsError;
 use xwt_core::async_trait;
 
 mod error;
+mod options;
 pub mod sys;
 
-pub use error::*;
+pub use {error::*, options::*};
 
 /// An endpoint for the xwt.
 ///
