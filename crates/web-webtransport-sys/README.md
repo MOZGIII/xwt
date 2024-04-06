@@ -3,7 +3,7 @@
 ## Updaing the code generated from IDL
 
 ```shell
-$ cargo install wasm-bindgen-webidl
+$ bin/install-wasm-bindgen-webidl
 ...
 $ bin/codegen-webidl
 ...

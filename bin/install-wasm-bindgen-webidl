@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+exec cargo install wasm-bindgen-webidl \
+  --git https://github.com/rustwasm/wasm-bindgen \
+  --rev d25a68eaa778f339ea9deb147ddc76a1facfc625 \
+  "$@"
