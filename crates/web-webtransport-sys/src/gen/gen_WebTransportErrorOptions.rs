@@ -28,7 +28,7 @@ impl WebTransportErrorOptions {
         self
     }
     #[doc = "Change the `streamErrorCode` field of this object."]
-    pub fn stream_error_code(&mut self, val: Option<u32>) -> &mut Self {
+    pub fn stream_error_code(&mut self, val: Option<u8>) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
             self.as_ref(),

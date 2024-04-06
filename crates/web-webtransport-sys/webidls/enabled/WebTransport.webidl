@@ -1,11 +1,23 @@
+/* -*- Mode: IDL; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/.
+ *
+ * The origin of this IDL file is
+ * https://www.w3.org/TR/webtransport/
+ *
+ * © Copyright 2004-2011 Apple Computer, Inc., Mozilla Foundation, and Opera Software ASA.
+ * You are granted a license to use, reproduce and create derivative works of this document.
+ */
+
 [Exposed=(Window,Worker), SecureContext]
 interface WebTransportDatagramDuplexStream {
   readonly attribute ReadableStream readable;
   readonly attribute WritableStream writable;
 
   readonly attribute unsigned long maxDatagramSize;
-  attribute unrestricted double? incomingMaxAge;
-  attribute unrestricted double? outgoingMaxAge;
+  attribute unrestricted double incomingMaxAge;
+  attribute unrestricted double outgoingMaxAge;
   attribute unrestricted double incomingHighWaterMark;
   attribute unrestricted double outgoingHighWaterMark;
 };
@@ -14,7 +26,7 @@ interface WebTransportDatagramDuplexStream {
 interface WebTransport {
   constructor(USVString url, optional WebTransportOptions options = {});
 
-  Promise<WebTransportConnectionStats> getStats();
+  Promise<WebTransportStats> getStats();
   readonly attribute Promise<undefined> ready;
   readonly attribute WebTransportReliabilityMode reliability;
   readonly attribute WebTransportCongestionControl congestionControl;
@@ -33,9 +45,6 @@ interface WebTransport {
       optional WebTransportSendStreamOptions options = {});
   /* a ReadableStream of WebTransportReceiveStream objects */
   readonly attribute ReadableStream incomingUnidirectionalStreams;
-  WebTransportSendGroup createSendGroup();
-
-  static readonly attribute boolean supportsReliableOnly;
 };
 
 enum WebTransportReliabilityMode {
@@ -68,26 +77,26 @@ dictionary WebTransportCloseInfo {
 };
 
 dictionary WebTransportSendStreamOptions {
-  WebTransportSendGroup? sendGroup = null;
-  long long sendOrder = 0;
-  boolean waitUntilAvailable = false;
+  long long? sendOrder = null;
 };
 
-dictionary WebTransportConnectionStats {
+dictionary WebTransportStats {
+  DOMHighResTimeStamp timestamp;
   unsigned long long bytesSent;
   unsigned long long packetsSent;
-  unsigned long long bytesLost;
   unsigned long long packetsLost;
+  unsigned long numOutgoingStreamsCreated;
+  unsigned long numIncomingStreamsCreated;
   unsigned long long bytesReceived;
   unsigned long long packetsReceived;
   DOMHighResTimeStamp smoothedRtt;
   DOMHighResTimeStamp rttVariation;
   DOMHighResTimeStamp minRtt;
   WebTransportDatagramStats datagrams;
-  unsigned long long? estimatedSendRate;
 };
 
 dictionary WebTransportDatagramStats {
+  DOMHighResTimeStamp timestamp;
   unsigned long long expiredOutgoing;
   unsigned long long droppedIncoming;
   unsigned long long lostOutgoing;
@@ -95,20 +104,14 @@ dictionary WebTransportDatagramStats {
 
 [Exposed=(Window,Worker), SecureContext, Transferable]
 interface WebTransportSendStream : WritableStream {
-  attribute WebTransportSendGroup? sendGroup;
-  attribute long long sendOrder;
   Promise<WebTransportSendStreamStats> getStats();
 };
 
 dictionary WebTransportSendStreamStats {
+  DOMHighResTimeStamp timestamp;
   unsigned long long bytesWritten;
   unsigned long long bytesSent;
   unsigned long long bytesAcknowledged;
-};
-
-[Exposed=(Window,Worker), SecureContext]
-interface WebTransportSendGroup {
-  Promise<WebTransportSendStreamStats> getStats();
 };
 
 [Exposed=(Window,Worker), SecureContext, Transferable]
@@ -117,6 +120,7 @@ interface WebTransportReceiveStream : ReadableStream {
 };
 
 dictionary WebTransportReceiveStreamStats {
+  DOMHighResTimeStamp timestamp;
   unsigned long long bytesReceived;
   unsigned long long bytesRead;
 };
@@ -132,12 +136,12 @@ interface WebTransportError : DOMException {
   constructor(optional DOMString message = "", optional WebTransportErrorOptions options = {});
 
   readonly attribute WebTransportErrorSource source;
-  readonly attribute unsigned long? streamErrorCode;
+  readonly attribute octet? streamErrorCode;
 };
 
 dictionary WebTransportErrorOptions {
   WebTransportErrorSource source = "stream";
-  [Clamp] unsigned long? streamErrorCode = null;
+  [Clamp] octet? streamErrorCode = null;
 };
 
 enum WebTransportErrorSource {

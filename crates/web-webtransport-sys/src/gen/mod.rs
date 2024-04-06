@@ -15,10 +15,6 @@ mod gen_WebTransportCongestionControl;
 pub use gen_WebTransportCongestionControl::*;
 
 #[allow(non_snake_case)]
-mod gen_WebTransportConnectionStats;
-pub use gen_WebTransportConnectionStats::*;
-
-#[allow(non_snake_case)]
 mod gen_WebTransportDatagramDuplexStream;
 pub use gen_WebTransportDatagramDuplexStream::*;
 
@@ -59,10 +55,6 @@ mod gen_WebTransportReliabilityMode;
 pub use gen_WebTransportReliabilityMode::*;
 
 #[allow(non_snake_case)]
-mod gen_WebTransportSendGroup;
-pub use gen_WebTransportSendGroup::*;
-
-#[allow(non_snake_case)]
 mod gen_WebTransportSendStream;
 pub use gen_WebTransportSendStream::*;
 
@@ -73,3 +65,7 @@ pub use gen_WebTransportSendStreamOptions::*;
 #[allow(non_snake_case)]
 mod gen_WebTransportSendStreamStats;
 pub use gen_WebTransportSendStreamStats::*;
+
+#[allow(non_snake_case)]
+mod gen_WebTransportStats;
+pub use gen_WebTransportStats::*;

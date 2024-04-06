@@ -15,42 +15,12 @@ impl WebTransportSendStreamOptions {
         let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
         ret
     }
-    #[doc = "Change the `sendGroup` field of this object."]
-    pub fn send_group(&mut self, val: Option<&WebTransportSendGroup>) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(
-            self.as_ref(),
-            &JsValue::from("sendGroup"),
-            &JsValue::from(val),
-        );
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
-        self
-    }
     #[doc = "Change the `sendOrder` field of this object."]
-    pub fn send_order(&mut self, val: f64) -> &mut Self {
+    pub fn send_order(&mut self, val: Option<f64>) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
             self.as_ref(),
             &JsValue::from("sendOrder"),
-            &JsValue::from(val),
-        );
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
-        self
-    }
-    #[doc = "Change the `waitUntilAvailable` field of this object."]
-    pub fn wait_until_available(&mut self, val: bool) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(
-            self.as_ref(),
-            &JsValue::from("waitUntilAvailable"),
             &JsValue::from(val),
         );
         debug_assert!(

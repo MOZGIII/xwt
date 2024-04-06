@@ -3,32 +3,17 @@ use super::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
-    # [wasm_bindgen (extends = :: js_sys :: Object , js_name = WebTransportConnectionStats)]
+    # [wasm_bindgen (extends = :: js_sys :: Object , js_name = WebTransportStats)]
     #[derive(Debug, Clone, PartialEq, Eq)]
-    #[doc = "The `WebTransportConnectionStats` dictionary."]
-    pub type WebTransportConnectionStats;
+    #[doc = "The `WebTransportStats` dictionary."]
+    pub type WebTransportStats;
 }
-impl WebTransportConnectionStats {
-    #[doc = "Construct a new `WebTransportConnectionStats`."]
+impl WebTransportStats {
+    #[doc = "Construct a new `WebTransportStats`."]
     pub fn new() -> Self {
         #[allow(unused_mut)]
         let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
         ret
-    }
-    #[doc = "Change the `bytesLost` field of this object."]
-    pub fn bytes_lost(&mut self, val: f64) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(
-            self.as_ref(),
-            &JsValue::from("bytesLost"),
-            &JsValue::from(val),
-        );
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
-        self
     }
     #[doc = "Change the `bytesReceived` field of this object."]
     pub fn bytes_received(&mut self, val: f64) -> &mut Self {
@@ -75,12 +60,27 @@ impl WebTransportConnectionStats {
         let _ = r;
         self
     }
-    #[doc = "Change the `estimatedSendRate` field of this object."]
-    pub fn estimated_send_rate(&mut self, val: Option<f64>) -> &mut Self {
+    #[doc = "Change the `numIncomingStreamsCreated` field of this object."]
+    pub fn num_incoming_streams_created(&mut self, val: u32) -> &mut Self {
         use wasm_bindgen::JsValue;
         let r = ::js_sys::Reflect::set(
             self.as_ref(),
-            &JsValue::from("estimatedSendRate"),
+            &JsValue::from("numIncomingStreamsCreated"),
+            &JsValue::from(val),
+        );
+        debug_assert!(
+            r.is_ok(),
+            "setting properties should never fail on our dictionary objects"
+        );
+        let _ = r;
+        self
+    }
+    #[doc = "Change the `numOutgoingStreamsCreated` field of this object."]
+    pub fn num_outgoing_streams_created(&mut self, val: u32) -> &mut Self {
+        use wasm_bindgen::JsValue;
+        let r = ::js_sys::Reflect::set(
+            self.as_ref(),
+            &JsValue::from("numOutgoingStreamsCreated"),
             &JsValue::from(val),
         );
         debug_assert!(
@@ -136,7 +136,7 @@ impl WebTransportConnectionStats {
         self
     }
 }
-impl Default for WebTransportConnectionStats {
+impl Default for WebTransportStats {
     fn default() -> Self {
         Self::new()
     }

@@ -18,22 +18,22 @@ extern "C" {
     #[doc = "Getter for the `incomingMaxAge` field of this object."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportDatagramDuplexStream/incomingMaxAge)"]
-    pub fn incoming_max_age(this: &WebTransportDatagramDuplexStream) -> Option<f64>;
+    pub fn incoming_max_age(this: &WebTransportDatagramDuplexStream) -> f64;
     # [wasm_bindgen (structural , method , setter , js_class = "WebTransportDatagramDuplexStream" , js_name = incomingMaxAge)]
     #[doc = "Setter for the `incomingMaxAge` field of this object."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportDatagramDuplexStream/incomingMaxAge)"]
-    pub fn set_incoming_max_age(this: &WebTransportDatagramDuplexStream, value: Option<f64>);
+    pub fn set_incoming_max_age(this: &WebTransportDatagramDuplexStream, value: f64);
     # [wasm_bindgen (structural , method , getter , js_class = "WebTransportDatagramDuplexStream" , js_name = outgoingMaxAge)]
     #[doc = "Getter for the `outgoingMaxAge` field of this object."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportDatagramDuplexStream/outgoingMaxAge)"]
-    pub fn outgoing_max_age(this: &WebTransportDatagramDuplexStream) -> Option<f64>;
+    pub fn outgoing_max_age(this: &WebTransportDatagramDuplexStream) -> f64;
     # [wasm_bindgen (structural , method , setter , js_class = "WebTransportDatagramDuplexStream" , js_name = outgoingMaxAge)]
     #[doc = "Setter for the `outgoingMaxAge` field of this object."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportDatagramDuplexStream/outgoingMaxAge)"]
-    pub fn set_outgoing_max_age(this: &WebTransportDatagramDuplexStream, value: Option<f64>);
+    pub fn set_outgoing_max_age(this: &WebTransportDatagramDuplexStream, value: f64);
     # [wasm_bindgen (structural , method , getter , js_class = "WebTransportDatagramDuplexStream" , js_name = incomingHighWaterMark)]
     #[doc = "Getter for the `incomingHighWaterMark` field of this object."]
     #[doc = ""]

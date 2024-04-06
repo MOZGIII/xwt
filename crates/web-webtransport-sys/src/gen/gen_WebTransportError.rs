@@ -18,5 +18,5 @@ extern "C" {
     #[doc = "Getter for the `streamErrorCode` field of this object."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportError/streamErrorCode)"]
-    pub fn stream_error_code(this: &WebTransportError) -> Option<u32>;
+    pub fn stream_error_code(this: &WebTransportError) -> Option<u8>;
 }

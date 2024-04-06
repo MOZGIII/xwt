@@ -39,11 +39,6 @@ extern "C" {
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/datagrams)"]
     pub fn datagrams(this: &WebTransport) -> WebTransportDatagramDuplexStream;
-    # [wasm_bindgen (structural , static_method_of = WebTransport , getter , js_class = "WebTransport" , js_name = supportsReliableOnly)]
-    #[doc = "Getter for the `supportsReliableOnly` field of this object."]
-    #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/supportsReliableOnly)"]
-    pub fn supports_reliable_only() -> bool;
     # [wasm_bindgen (method , structural , js_class = "WebTransport" , js_name = close)]
     #[doc = "The `close()` method."]
     #[doc = ""]
@@ -67,11 +62,6 @@ extern "C" {
         this: &WebTransport,
         options: &WebTransportSendStreamOptions,
     ) -> ::js_sys::Promise;
-    # [wasm_bindgen (method , structural , js_class = "WebTransport" , js_name = createSendGroup)]
-    #[doc = "The `createSendGroup()` method."]
-    #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/createSendGroup)"]
-    pub fn create_send_group(this: &WebTransport) -> WebTransportSendGroup;
     # [wasm_bindgen (method , structural , js_class = "WebTransport" , js_name = createUnidirectionalStream)]
     #[doc = "The `createUnidirectionalStream()` method."]
     #[doc = ""]
