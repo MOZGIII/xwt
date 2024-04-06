@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(clippy::all)]
 use super::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -39,6 +40,19 @@ extern "C" {
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/datagrams)"]
     pub fn datagrams(this: &WebTransport) -> WebTransportDatagramDuplexStream;
+    #[wasm_bindgen(catch, constructor, js_class = "WebTransport")]
+    #[doc = "The `new WebTransport(..)` constructor, creating a new instance of `WebTransport`."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport)"]
+    pub fn new(url: &str) -> Result<WebTransport, JsValue>;
+    #[wasm_bindgen(catch, constructor, js_class = "WebTransport")]
+    #[doc = "The `new WebTransport(..)` constructor, creating a new instance of `WebTransport`."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport)"]
+    pub fn new_with_options(
+        url: &str,
+        options: &WebTransportOptions,
+    ) -> Result<WebTransport, JsValue>;
     # [wasm_bindgen (method , structural , js_class = "WebTransport" , js_name = close)]
     #[doc = "The `close()` method."]
     #[doc = ""]

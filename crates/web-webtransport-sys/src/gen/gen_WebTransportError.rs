@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(clippy::all)]
 use super::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -19,4 +20,22 @@ extern "C" {
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportError/streamErrorCode)"]
     pub fn stream_error_code(this: &WebTransportError) -> Option<u8>;
+    #[wasm_bindgen(catch, constructor, js_class = "WebTransportError")]
+    #[doc = "The `new WebTransportError(..)` constructor, creating a new instance of `WebTransportError`."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportError/WebTransportError)"]
+    pub fn new() -> Result<WebTransportError, JsValue>;
+    #[wasm_bindgen(catch, constructor, js_class = "WebTransportError")]
+    #[doc = "The `new WebTransportError(..)` constructor, creating a new instance of `WebTransportError`."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportError/WebTransportError)"]
+    pub fn new_with_message(message: &str) -> Result<WebTransportError, JsValue>;
+    #[wasm_bindgen(catch, constructor, js_class = "WebTransportError")]
+    #[doc = "The `new WebTransportError(..)` constructor, creating a new instance of `WebTransportError`."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebTransportError/WebTransportError)"]
+    pub fn new_with_message_and_options(
+        message: &str,
+        options: &WebTransportErrorOptions,
+    ) -> Result<WebTransportError, JsValue>;
 }

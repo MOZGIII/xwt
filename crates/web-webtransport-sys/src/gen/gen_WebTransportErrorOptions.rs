@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(clippy::all)]
 use super::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -7,6 +8,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     #[doc = "The `WebTransportErrorOptions` dictionary."]
     pub type WebTransportErrorOptions;
+    #[wasm_bindgen(method, setter = "source")]
+    fn source_shim(this: &WebTransportErrorOptions, val: WebTransportErrorSource);
+    #[wasm_bindgen(method, setter = "streamErrorCode")]
+    fn stream_error_code_shim(this: &WebTransportErrorOptions, val: Option<u8>);
 }
 impl WebTransportErrorOptions {
     #[doc = "Construct a new `WebTransportErrorOptions`."]
@@ -17,29 +22,12 @@ impl WebTransportErrorOptions {
     }
     #[doc = "Change the `source` field of this object."]
     pub fn source(&mut self, val: WebTransportErrorSource) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r =
-            ::js_sys::Reflect::set(self.as_ref(), &JsValue::from("source"), &JsValue::from(val));
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
+        self.source_shim(val);
         self
     }
     #[doc = "Change the `streamErrorCode` field of this object."]
     pub fn stream_error_code(&mut self, val: Option<u8>) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(
-            self.as_ref(),
-            &JsValue::from("streamErrorCode"),
-            &JsValue::from(val),
-        );
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
+        self.stream_error_code_shim(val);
         self
     }
 }

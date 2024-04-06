@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(clippy::all)]
 use super::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -7,6 +8,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     #[doc = "The `WebTransportCloseInfo` dictionary."]
     pub type WebTransportCloseInfo;
+    #[wasm_bindgen(method, setter = "closeCode")]
+    fn close_code_shim(this: &WebTransportCloseInfo, val: u32);
+    #[wasm_bindgen(method, setter = "reason")]
+    fn reason_shim(this: &WebTransportCloseInfo, val: &str);
 }
 impl WebTransportCloseInfo {
     #[doc = "Construct a new `WebTransportCloseInfo`."]
@@ -17,29 +22,12 @@ impl WebTransportCloseInfo {
     }
     #[doc = "Change the `closeCode` field of this object."]
     pub fn close_code(&mut self, val: u32) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(
-            self.as_ref(),
-            &JsValue::from("closeCode"),
-            &JsValue::from(val),
-        );
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
+        self.close_code_shim(val);
         self
     }
     #[doc = "Change the `reason` field of this object."]
     pub fn reason(&mut self, val: &str) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r =
-            ::js_sys::Reflect::set(self.as_ref(), &JsValue::from("reason"), &JsValue::from(val));
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
+        self.reason_shim(val);
         self
     }
 }

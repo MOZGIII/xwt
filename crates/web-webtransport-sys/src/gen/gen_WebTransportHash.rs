@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(clippy::all)]
 use super::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -7,6 +8,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     #[doc = "The `WebTransportHash` dictionary."]
     pub type WebTransportHash;
+    #[wasm_bindgen(method, setter = "algorithm")]
+    fn algorithm_shim(this: &WebTransportHash, val: &str);
+    #[wasm_bindgen(method, setter = "value")]
+    fn value_shim(this: &WebTransportHash, val: &::js_sys::Object);
 }
 impl WebTransportHash {
     #[doc = "Construct a new `WebTransportHash`."]
@@ -17,28 +22,12 @@ impl WebTransportHash {
     }
     #[doc = "Change the `algorithm` field of this object."]
     pub fn algorithm(&mut self, val: &str) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(
-            self.as_ref(),
-            &JsValue::from("algorithm"),
-            &JsValue::from(val),
-        );
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
+        self.algorithm_shim(val);
         self
     }
     #[doc = "Change the `value` field of this object."]
     pub fn value(&mut self, val: &::js_sys::Object) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(self.as_ref(), &JsValue::from("value"), &JsValue::from(val));
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
+        self.value_shim(val);
         self
     }
 }

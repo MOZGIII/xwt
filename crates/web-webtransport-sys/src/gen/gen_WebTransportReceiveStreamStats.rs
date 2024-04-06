@@ -1,4 +1,5 @@
 #![allow(unused_imports)]
+#![allow(clippy::all)]
 use super::*;
 use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
@@ -7,6 +8,10 @@ extern "C" {
     #[derive(Debug, Clone, PartialEq, Eq)]
     #[doc = "The `WebTransportReceiveStreamStats` dictionary."]
     pub type WebTransportReceiveStreamStats;
+    #[wasm_bindgen(method, setter = "bytesRead")]
+    fn bytes_read_shim(this: &WebTransportReceiveStreamStats, val: f64);
+    #[wasm_bindgen(method, setter = "bytesReceived")]
+    fn bytes_received_shim(this: &WebTransportReceiveStreamStats, val: f64);
 }
 impl WebTransportReceiveStreamStats {
     #[doc = "Construct a new `WebTransportReceiveStreamStats`."]
@@ -17,32 +22,12 @@ impl WebTransportReceiveStreamStats {
     }
     #[doc = "Change the `bytesRead` field of this object."]
     pub fn bytes_read(&mut self, val: f64) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(
-            self.as_ref(),
-            &JsValue::from("bytesRead"),
-            &JsValue::from(val),
-        );
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
+        self.bytes_read_shim(val);
         self
     }
     #[doc = "Change the `bytesReceived` field of this object."]
     pub fn bytes_received(&mut self, val: f64) -> &mut Self {
-        use wasm_bindgen::JsValue;
-        let r = ::js_sys::Reflect::set(
-            self.as_ref(),
-            &JsValue::from("bytesReceived"),
-            &JsValue::from(val),
-        );
-        debug_assert!(
-            r.is_ok(),
-            "setting properties should never fail on our dictionary objects"
-        );
-        let _ = r;
+        self.bytes_received_shim(val);
         self
     }
 }
