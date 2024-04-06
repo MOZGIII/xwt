@@ -1,0 +1,12 @@
+[package]
+name = "webapi-webtransport-sys"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+The low-level rust bindings for the WebTransport Web APIs.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[dependencies]
