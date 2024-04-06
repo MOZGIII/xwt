@@ -41,7 +41,7 @@ impl xwt_core::traits::EndpointConnect for Endpoint {
 }
 
 /// Connecting represents the transient connection state when
-/// the [`web_sys::WebTransport`] has been created but is not ready yet.
+/// the [`sys::WebTransport`] has been created but is not ready yet.
 #[derive(Debug)]
 pub struct Connecting {
     /// The WebTransport instance.
@@ -81,7 +81,7 @@ impl xwt_core::Connecting for Connecting {
     }
 }
 
-/// Connection holds the [`web_sys::WebTransport`] and is responsible for
+/// Connection holds the [`sys::WebTransport`] and is responsible for
 /// providing access to the Web API of WebTransport in a way that is portable.
 /// It also holds handles to the datagram reader and writer, as well as
 /// the datagram reader state.
