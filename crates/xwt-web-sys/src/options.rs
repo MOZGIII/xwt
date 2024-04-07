@@ -7,7 +7,7 @@ use crate::sys;
 /// See <https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport#options>.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct WebTransportOptions {
-    /// If `true``, the network connection for this WebTransport can be shared
+    /// If `true`, the network connection for this WebTransport can be shared
     /// with a pool of other HTTP/3 sessions.
     ///
     /// By default the value is false, and the connection cannot be shared.
@@ -16,7 +16,7 @@ pub struct WebTransportOptions {
     /// algorithm used when sending data over this connection be tuned for
     /// either throughput or low-latency.
     ///
-    /// his is a hint to the user agent.
+    /// This is a hint to the user agent.
     pub congestion_control: CongestionControl,
     /// If true, the connection cannot be established over HTTP/2 if an HTTP/3
     /// connection is not possible.
