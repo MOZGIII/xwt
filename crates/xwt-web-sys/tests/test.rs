@@ -1,5 +1,6 @@
 #![cfg(target_family = "wasm")]
 
+use wasm_bindgen::JsValue;
 use wasm_bindgen_test::*;
 
 wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
@@ -12,19 +13,20 @@ fn setup() {
 }
 
 fn test_endpoint() -> xwt_web_sys::Endpoint {
-    let mut options = web_sys::WebTransportOptions::new();
+    let mut options = xwt_web_sys::sys::WebTransportOptions::new();
 
     let digest = xwt_cert_utils::digest::sha256(xwt_test_assets::CERT);
     let digest = digest.as_ref();
     console_log!("certificate sha256 digest: {digest:02X?}");
 
-    xwt_web_utils::cert::assign(
-        &mut options,
-        [xwt_web_utils::cert::CertHashRef {
-            algorithm: "sha-256",
-            value: digest,
-        }],
-    );
+    let mut hash = xwt_web_sys::sys::WebTransportHash::new();
+    hash.algorithm("sha-256");
+    hash.value(&js_sys::Uint8Array::from(digest));
+    let hashes_array = [hash]
+        .into_iter()
+        .map(JsValue::from)
+        .collect::<js_sys::Array>();
+    options.server_certificate_hashes(&hashes_array);
 
     web_sys::console::log_1(&js_sys::JSON::stringify(options.as_ref()).unwrap());
 

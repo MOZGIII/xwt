@@ -23,22 +23,11 @@ tokio = { version = "1", default-features = false, features = ["sync"] }
 wasm-bindgen-futures = { version = "0.4" }
 wasm-bindgen = { version = "0.2" }
 js-sys = "0.3"
-web-sys = { version = "0.3", features = [
-  "WebTransport",
-  "WebTransportOptions",
-  "WebTransportBidirectionalStream",
-  "WebTransportSendStream",
-  "WebTransportReceiveStream",
-  "ReadableStreamDefaultReader",
-  "ReadableStreamByobReader",
-  "WritableStreamDefaultWriter",
-  "WebTransportDatagramDuplexStream",
-] }
+web-sys = { version = "0.3", features = ["ReadableStream", "WritableStream"] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 xwt-tests = { version = "0.4.2", path = "../xwt-tests" }
 xwt-test-assets = { version = "0.1", path = "../xwt-test-assets" }
-xwt-web-utils = { version = "0.1", path = "../xwt-web-utils" }
 xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
 
 tracing-wasm = "0.2"

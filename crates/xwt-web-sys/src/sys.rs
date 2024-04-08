@@ -1,20 +1,18 @@
-//! Additional wasm bindings.
+//! WASM bindings.
+//!
+//! Since WebTransport bindings in [`web_sys`] are currently locked behind
+//! `--cfg=web_sys_unstable_apis`, the bindings that we use are copied in
+//! directly from [`web_sys`], so that we can use them without the `cfg`.
+//! This also means that downstream dependents don't have to specify this `cfg`
+//! flag when building.
+//!
+//! When/if the [`web_sys`] WebTransport bindings stabilize, these bindings will
+//! be removed.
 
-use wasm_bindgen::prelude::*;
+mod bidirectional_stream;
+mod datagram;
+mod options;
+mod stream;
+mod webtransport;
 
-#[wasm_bindgen]
-extern "C" {
-    /// A result returned by [`ReadableStreamDefaultReader.read`][1] or
-    /// [`ReadableStreamBYOBReader.read`][2].
-    ///
-    /// [1]: https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read
-    /// [2]: https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamBYOBReader/read
-    #[derive(Clone, Debug)]
-    pub type ReadableStreamReadResult;
-
-    #[wasm_bindgen(method, getter, js_name = done)]
-    pub fn is_done(this: &ReadableStreamReadResult) -> bool;
-
-    #[wasm_bindgen(method, getter, js_name = value)]
-    pub fn value(this: &ReadableStreamReadResult) -> JsValue;
-}
+pub use {bidirectional_stream::*, datagram::*, options::*, stream::*, webtransport::*};

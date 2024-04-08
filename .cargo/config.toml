@@ -1,7 +1,5 @@
 [target.'cfg(all())']
 rustflags = [
-  "--cfg=web_sys_unstable_apis",
-
   "-Dunsafe_code",
   "-Wclippy::all",
   "-Wclippy::cargo",
