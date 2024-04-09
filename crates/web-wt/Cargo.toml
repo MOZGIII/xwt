@@ -1,0 +1,15 @@
+[package]
+name = "web-wt"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+High-level Rust bindndings to WebTransport Web API for WebAssembly.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[package.metadata.docs.rs]
+default-target = "wasm32-unknown-unknown"
+
+[target.'cfg(target_family = "wasm")'.dependencies]
