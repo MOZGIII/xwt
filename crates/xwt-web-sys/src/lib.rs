@@ -289,11 +289,17 @@ impl xwt_core::io::Read for RecvStream {
     type Error = Error;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
+        let requested_size = buf.len().try_into().unwrap();
         let internal_buf = self
             .reader
             .internal_buf
             .take()
-            .unwrap_or_else(|| js_sys::ArrayBuffer::new(buf.len().try_into().unwrap()));
+            .filter(|internal_buf| {
+                let actual_size = internal_buf.byte_length();
+                debug_assert!(actual_size > 0);
+                actual_size >= requested_size
+            })
+            .unwrap_or_else(|| js_sys::ArrayBuffer::new(requested_size));
         let internal_buf_view = js_sys::Uint8Array::new(&internal_buf);
         let maybe_internal_buf_view =
             web_sys_stream_utils::read_byob(&self.reader.inner, internal_buf_view).await?;
