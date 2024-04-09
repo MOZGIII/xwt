@@ -4,3 +4,7 @@ allow-osi-fsf-free = "either"
 
 [bans]
 multiple-versions = "allow"
+
+[[bans.deny]]
+crate = "rcgen"
+reason = "Pulls in too many dependencies that cause trouble"
