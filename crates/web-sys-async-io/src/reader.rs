@@ -75,9 +75,16 @@ impl tokio::io::AsyncRead for Reader {
                 Poll::Ready(Ok(()))
             }
             Op::Idle => {
-                let internal_buf = self.internal_buf.take().unwrap_or_else(|| {
-                    js_sys::ArrayBuffer::new(buf.capacity().try_into().unwrap())
-                });
+                let requested_size = buf.capacity().try_into().unwrap();
+                let internal_buf = self
+                    .internal_buf
+                    .take()
+                    .filter(|internal_buf| {
+                        let actual_size = internal_buf.byte_length();
+                        debug_assert!(actual_size > 0);
+                        actual_size >= requested_size
+                    })
+                    .unwrap_or_else(|| js_sys::ArrayBuffer::new(requested_size));
                 let internal_buf_view = js_sys::Uint8Array::new(&internal_buf);
                 // Despite this not being properly indicated at the type system,
                 // the `read_with_array_buffer_view` fn is actually supposed
