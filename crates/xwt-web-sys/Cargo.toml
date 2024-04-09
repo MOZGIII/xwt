@@ -12,7 +12,6 @@ repository = "https://github.com/MOZGIII/xwt"
 
 [package.metadata.docs.rs]
 default-target = "wasm32-unknown-unknown"
-rustc-args = ["--cfg=web_sys_unstable_apis"]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwt-core = { version = "0.2.2", path = "../xwt-core", default-features = false }
