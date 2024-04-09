@@ -85,6 +85,17 @@ async fn read_small_buf() -> color_eyre::eyre::Result<()> {
 }
 
 #[tokio::test]
+async fn read_resize_buf() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::read_resize_buf::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL).await?;
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn connection_drop() -> color_eyre::eyre::Result<()> {
     setup()?;
 
