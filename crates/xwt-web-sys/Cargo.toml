@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-sys"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -15,7 +15,7 @@ default-target = "wasm32-unknown-unknown"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 xwt-core = { version = "0.2.2", path = "../xwt-core", default-features = false }
-web-sys-async-io = { version = "0.3", path = "../web-sys-async-io" }
+web-sys-async-io = { version = "0.4", path = "../web-sys-async-io" }
 web-sys-stream-utils = { version = "0.2", path = "../web-sys-stream-utils" }
 
 tokio = { version = "1", default-features = false, features = ["sync"] }
@@ -25,7 +25,7 @@ js-sys = "0.3"
 web-sys = { version = "0.3", features = ["ReadableStream", "WritableStream"] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwt-tests = { version = "0.4.2", path = "../xwt-tests" }
+xwt-tests = { version = "0.4.3", path = "../xwt-tests" }
 xwt-test-assets = { version = "0.1", path = "../xwt-test-assets" }
 xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
 
