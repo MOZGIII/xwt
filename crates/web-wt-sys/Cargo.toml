@@ -1,0 +1,32 @@
+[package]
+name = "web-wt-sys"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+Hand-crafted low-level Rust bindndings to WebTransport Web API for WebAssembly.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[package.metadata.docs.rs]
+default-target = "wasm32-unknown-unknown"
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+js-sys = "0.3.69"
+paste = "1"
+wasm-bindgen = { version = "0.2.92" }
+wasm-bindgen-futures = { version = "0.4.42" }
+web-sys = { version = "0.3.69", features = [
+  "ReadableStream",
+  "WritableStream",
+  "WritableStreamDefaultWriter",
+  "DomException",
+  "ReadableStreamReadResult",
+] }
+
+[target.'cfg(target_family = "wasm")'.dev-dependencies]
+tracing = "0.1"
+tracing-wasm = "0.2"
+wasm-bindgen-test = "0.3"
+web-sys = { version = "0.3", features = ["console"] }
