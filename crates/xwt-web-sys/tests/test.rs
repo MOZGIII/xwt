@@ -75,6 +75,17 @@ async fn read_small_buf() {
 }
 
 #[wasm_bindgen_test]
+async fn read_resize_buf() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::read_resize_buf::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
 async fn tokio_io() {
     setup();
 
@@ -92,6 +103,17 @@ async fn tokio_io_read_small_buf() {
     let endpoint = test_endpoint();
 
     xwt_tests::tests::tokio_io_read_small_buf::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn tokio_io_read_buf_resize() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::tokio_io_read_buf_resize::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
         .await
         .unwrap();
 }
