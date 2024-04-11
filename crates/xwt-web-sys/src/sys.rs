@@ -9,10 +9,4 @@
 //! When/if the [`web_sys`] WebTransport bindings stabilize, these bindings will
 //! be removed.
 
-mod bidirectional_stream;
-mod datagram;
-mod options;
-mod stream;
-mod webtransport;
-
-pub use {bidirectional_stream::*, datagram::*, options::*, stream::*, webtransport::*};
+pub use web_wt_sys::*;

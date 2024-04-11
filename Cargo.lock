@@ -2033,6 +2033,7 @@ dependencies = [
  "web-sys",
  "web-sys-async-io",
  "web-sys-stream-utils",
+ "web-wt-sys",
  "xwt-cert-fingerprint",
  "xwt-core",
  "xwt-test-assets",
