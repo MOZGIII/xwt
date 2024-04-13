@@ -10,22 +10,26 @@ pub mod echo_open_bi;
 #[derive(Default)]
 pub struct EndpointParams {
     pub addr: Option<std::net::SocketAddr>,
-    pub cert: Option<wtransport::tls::Certificate>,
+    pub identity: Option<wtransport::tls::Identity>,
 }
 
 pub async fn endpoint(
     params: EndpointParams,
 ) -> Result<wtransport::Endpoint<wtransport::endpoint::endpoint_side::Server>, std::io::Error> {
-    let EndpointParams { addr, cert } = params;
+    let EndpointParams { addr, identity } = params;
 
-    let cert = cert.unwrap_or_else(|| {
-        wtransport::tls::Certificate::new(vec![xwt_test_assets::CERT], xwt_test_assets::KEY)
-            .unwrap()
+    let identity = identity.unwrap_or_else(|| {
+        wtransport::tls::Identity::new(
+            wtransport::tls::CertificateChain::single(
+                wtransport::tls::Certificate::from_der(xwt_test_assets::CERT.to_vec()).unwrap(),
+            ),
+            wtransport::tls::PrivateKey::from_der_pkcs8(xwt_test_assets::KEY.to_vec()),
+        )
     });
 
-    match cert.certificates().first() {
+    match identity.certificate_chain().first() {
         Some(cert) => {
-            let sha256_fingerpint = xwt_cert_fingerprint::Sha256::compute_for_der(cert);
+            let sha256_fingerpint = xwt_cert_fingerprint::Sha256::compute_for_der(cert.der());
             tracing::info!(message = "using tls certificate", %sha256_fingerpint);
         }
         None => tracing::info!(message = "not using tls certificate"),
@@ -36,7 +40,7 @@ pub async fn endpoint(
             .with_bind_address(addr.unwrap_or(std::net::SocketAddr::V4(
                 std::net::SocketAddrV4::new(std::net::Ipv4Addr::new(127, 0, 0, 1), 0),
             )))
-            .with_certificate(cert)
+            .with_identity(&identity)
             .build();
 
     let endpoint = wtransport::Endpoint::server(server_config)?;

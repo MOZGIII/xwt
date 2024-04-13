@@ -13,7 +13,7 @@ async fn main() -> color_eyre::eyre::Result<()> {
     let addr = envfury::or_parse("ADDR", "127.0.0.1:8080")?;
     let endpoint = xwt_test_server::endpoint(xwt_test_server::EndpointParams {
         addr: Some(addr),
-        cert: None,
+        identity: None,
     })
     .await?;
     xwt_test_server::serve_endpoint(endpoint).await?;
