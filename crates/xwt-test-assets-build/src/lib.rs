@@ -8,17 +8,22 @@ use std::{
     path::{Path, PathBuf},
 };
 
-pub fn generate() -> rcgen::Certificate {
-    let params = xwt_cert_utils::gen::Params {
-        common_name: "xwt test certificate",
-        subject_alt_names: &["localhost", "127.0.0.1", "::1"],
-        valid_days_before: 0,
-        valid_days_after: 14,
-    };
+use p256::pkcs8::der::Encode;
 
-    let alg = &rcgen::PKCS_ECDSA_P256_SHA256;
-    let key = rcgen::KeyPair::generate(alg).unwrap();
-    params.into_rcgen_cert(key)
+/// A pair of a key and a certificate.
+type KeyCert = (p256::SecretKey, xwt_cert_gen::x509_cert::Certificate);
+
+pub fn generate() -> KeyCert {
+    let params =
+        xwt_cert_gen::Params::new("xwt-test-certificate", &["localhost", "127.0.0.1", "::1"]);
+
+    let key = p256::SecretKey::random(&mut rand::thread_rng());
+    let key = p256::ecdsa::SigningKey::from(key);
+    let cert = params
+        .self_signed::<_, p256::ecdsa::DerSignature>(&key)
+        .unwrap();
+
+    (key.into(), cert)
 }
 
 pub fn env_dir(key: &str) -> PathBuf {
@@ -26,7 +31,7 @@ pub fn env_dir(key: &str) -> PathBuf {
 }
 
 #[cfg(feature = "tokio")]
-pub async fn save_tokio(certificate: rcgen::Certificate, dir: impl AsRef<Path>) {
+pub async fn save_tokio((key, cert): KeyCert, dir: impl AsRef<Path>) {
     use tokio::io::AsyncWriteExt;
 
     let dir = dir.as_ref();
@@ -48,12 +53,9 @@ pub async fn save_tokio(certificate: rcgen::Certificate, dir: impl AsRef<Path>) 
 
     match results {
         (Ok(mut cert_file), Ok(mut key_file)) => {
-            cert_file
-                .write_all(&certificate.serialize_der().unwrap())
-                .await
-                .unwrap();
+            cert_file.write_all(&cert.to_der().unwrap()).await.unwrap();
             key_file
-                .write_all(&certificate.serialize_private_key_der())
+                .write_all(&key.to_sec1_der().unwrap())
                 .await
                 .unwrap();
             cert_file.flush().await.unwrap();
@@ -69,7 +71,7 @@ pub async fn save_tokio(certificate: rcgen::Certificate, dir: impl AsRef<Path>) 
     }
 }
 
-pub fn save(certificate: rcgen::Certificate, dir: impl AsRef<Path>) {
+pub fn save((key, cert): KeyCert, dir: impl AsRef<Path>) {
     use std::io::Write;
 
     let dir = dir.as_ref();
@@ -87,12 +89,8 @@ pub fn save(certificate: rcgen::Certificate, dir: impl AsRef<Path>) {
 
     match results {
         (Ok(mut cert_file), Ok(mut key_file)) => {
-            cert_file
-                .write_all(&certificate.serialize_der().unwrap())
-                .unwrap();
-            key_file
-                .write_all(&certificate.serialize_private_key_der())
-                .unwrap();
+            cert_file.write_all(&cert.to_der().unwrap()).unwrap();
+            key_file.write_all(&key.to_sec1_der().unwrap()).unwrap();
             cert_file.flush().unwrap();
             key_file.flush().unwrap();
         }

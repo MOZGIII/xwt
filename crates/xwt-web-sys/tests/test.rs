@@ -13,14 +13,13 @@ fn setup() {
 }
 
 fn test_endpoint() -> xwt_web_sys::Endpoint {
-    let digest = xwt_cert_utils::digest::sha256(xwt_test_assets::CERT);
-    let digest = digest.as_ref();
-    console_log!("certificate sha256 digest: {digest:02X?}");
+    let digest = xwt_cert_fingerprint::Sha256::compute_for_der(xwt_test_assets::CERT);
+    console_log!("certificate sha256 digest: {digest}");
 
     let options = WebTransportOptions {
         server_certificate_hashes: vec![CertificateHash {
             algorithm: HashAlgorithm::Sha256,
-            value: digest.to_vec(),
+            value: digest.into_inner().to_vec(),
         }],
         ..Default::default()
     };

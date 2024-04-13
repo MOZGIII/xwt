@@ -17,9 +17,8 @@ fn test_endpoint() -> xwt_wtransport::Endpoint<wtransport::endpoint::endpoint_si
     let mut root_store = wtransport::tls::rustls::RootCertStore::empty();
     root_store.add_parsable_certificates(&[xwt_test_assets::CERT]);
 
-    let digest = xwt_cert_utils::digest::sha256(xwt_test_assets::CERT);
-    let digest = digest.as_ref();
-    tracing::info!("certificate sha256 digest: {digest:02X?}");
+    let digest = xwt_cert_fingerprint::Sha256::compute_for_der(xwt_test_assets::CERT);
+    tracing::info!("certificate sha256 digest: {digest}");
 
     let mut tls_config = wtransport::tls::rustls::ClientConfig::builder()
         .with_safe_defaults()

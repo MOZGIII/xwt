@@ -1,0 +1,23 @@
+[package]
+name = "xwt-cert-fingerprint"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+Certificate fingerprint computation algoritms related to WebTransport.
+Not directly required to use xwt, but can be helpful. Also usable without xwt.
+Inteded to work with both wasm and native.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[dependencies]
+base64 = { version = "0.22", optional = true, default-features = false, features = ["alloc"] }
+rustls-pki-types = { version = "1", optional = true, default-features = false }
+sha2 = { version = "0.10", default-features = false }
+x509-cert = { version = "0.2", optional = true, default-features = false }
+
+[features]
+default = ["alloc", "x509-cert", "rustls-pki-types"]
+
+alloc = ["base64"]
