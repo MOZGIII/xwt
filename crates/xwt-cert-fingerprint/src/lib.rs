@@ -44,8 +44,10 @@ impl Rfc7469 {
 }
 
 /// Alloc-free writer of a der encoded data into the digest.
+#[cfg(feature = "x509-cert")]
 struct DigestDerWriter<T>(pub T);
 
+#[cfg(feature = "x509-cert")]
 impl<T> x509_cert::der::Writer for DigestDerWriter<T>
 where
     T: sha2::Digest,
