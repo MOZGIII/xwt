@@ -25,7 +25,7 @@ pub async fn endpoint(
 
     match cert.certificates().first() {
         Some(cert) => {
-            let sha256_fingerpint = xwt_cert_utils::fingerprint::sha256(cert);
+            let sha256_fingerpint = xwt_cert_fingerprint::Sha256::compute_for_der(cert);
             tracing::info!(message = "using tls certificate", %sha256_fingerpint);
         }
         None => tracing::info!(message = "not using tls certificate"),

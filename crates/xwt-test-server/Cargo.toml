@@ -17,7 +17,7 @@ path = "src/main.rs"
 required-features = ["bin"]
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
+xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint" }
 xwt-test-assets = { version = "0.1", path = "../xwt-test-assets" }
 
 color-eyre = { version = "0.6", optional = true }

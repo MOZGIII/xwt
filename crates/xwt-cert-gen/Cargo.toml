@@ -1,0 +1,27 @@
+[package]
+name = "xwt-cert-gen"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+Certificate generation factilities, provided by and for xwt.
+Useful for generating certificate. Also usable without xwt.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[package.metadata.cargo-machete]
+ignored = ["sha2"]
+
+[dependencies]
+der = { version = "0.7", default-features = false, features = ["alloc"] }
+getrandom = { version = "0.2", features = ["js"] }
+sha2 = { version = "0.10", default-features = false, features = ["oid"] }
+signature = { version = "2.2", default-features = false, features = ["alloc"] }
+spki = { version = "0.7", default-features = false, features = ["alloc", "fingerprint"] }
+thiserror = "1"
+x509-cert = { version = "0.2", default-features = false, features = ["pem", "builder"] }
+
+[dev-dependencies]
+p256 = { version = "0.13", features = ["ecdsa"] }
+rand = { version = "0.8" }
