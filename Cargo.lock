@@ -1762,7 +1762,7 @@ dependencies = [
 
 [[package]]
 name = "xwt"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "xwt-web-sys",
  "xwt-wtransport",
@@ -1810,14 +1810,14 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-assets"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "xwt-test-assets-build",
 ]
 
 [[package]]
 name = "xwt-test-assets-build"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "p256",
  "rand",
@@ -1827,7 +1827,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-server"
-version = "0.2.2"
+version = "0.3.0"
 dependencies = [
  "color-eyre",
  "envfury",
@@ -1853,7 +1853,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-sys"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "js-sys",
  "tokio",
@@ -1873,7 +1873,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "anyhow",
  "color-eyre",
