@@ -12,7 +12,7 @@ repository = "https://github.com/MOZGIII/xwt"
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwt-cert-utils = { version = "0.1", path = "../xwt-cert-utils" }
 
-rcgen = "0.12"
+rcgen = "0.13"
 tokio = { version = "1", default-features = false, features = [
   "macros",
   "rt-multi-thread",

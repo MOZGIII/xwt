@@ -14,7 +14,7 @@ repository = "https://github.com/MOZGIII/xwt"
 [dependencies]
 base64 = { version = "0.22", optional = true }
 pem = "3"
-rcgen = { version = "0.12", optional = true }
+rcgen = { version = "0.13", optional = true }
 ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"], optional = true }
 time = "0.3"
 
