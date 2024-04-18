@@ -16,6 +16,8 @@ mod error;
 mod options;
 pub mod sys;
 
+pub use web_sys;
+
 pub use {error::*, options::*};
 
 /// An endpoint for the xwt.
