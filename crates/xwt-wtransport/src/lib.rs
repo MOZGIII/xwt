@@ -8,13 +8,10 @@
 )]
 #![cfg(not(target_family = "wasm"))]
 
-use xwt_core::async_trait;
-
 mod types;
 
 pub use self::types::*;
 
-#[async_trait]
 impl xwt_core::traits::EndpointConnect for Endpoint<wtransport::endpoint::endpoint_side::Client> {
     type Connecting = xwt_core::utils::dummy::Connecting<Connection>;
     type Error = wtransport::error::ConnectingError;
@@ -25,7 +22,6 @@ impl xwt_core::traits::EndpointConnect for Endpoint<wtransport::endpoint::endpoi
     }
 }
 
-#[async_trait]
 impl xwt_core::traits::EndpointAccept for Endpoint<wtransport::endpoint::endpoint_side::Server> {
     type Accepting = IncomingSession;
     type Error = std::convert::Infallible;
@@ -37,7 +33,6 @@ impl xwt_core::traits::EndpointAccept for Endpoint<wtransport::endpoint::endpoin
     }
 }
 
-#[async_trait]
 impl xwt_core::traits::Accepting for IncomingSession {
     type Request = SessionRequest;
     type Error = wtransport::error::ConnectionError;
@@ -47,7 +42,6 @@ impl xwt_core::traits::Accepting for IncomingSession {
     }
 }
 
-#[async_trait]
 impl xwt_core::traits::Request for SessionRequest {
     type Connection = Connection;
     type OkError = wtransport::error::ConnectionError;
@@ -80,7 +74,6 @@ fn map_streams(
     (SendStream(send), RecvStream(recv))
 }
 
-#[async_trait]
 impl xwt_core::traits::OpeningBiStream for OpeningBiStream {
     type Streams = Connection;
     type Error = wtransport::error::StreamOpeningError;
@@ -90,7 +83,6 @@ impl xwt_core::traits::OpeningBiStream for OpeningBiStream {
     }
 }
 
-#[async_trait]
 impl xwt_core::traits::OpenBiStream for Connection {
     type Opening = OpeningBiStream;
     type Error = wtransport::error::ConnectionError;
@@ -100,7 +92,6 @@ impl xwt_core::traits::OpenBiStream for Connection {
     }
 }
 
-#[async_trait]
 impl xwt_core::traits::AcceptBiStream for Connection {
     type Error = wtransport::error::ConnectionError;
 
@@ -109,7 +100,6 @@ impl xwt_core::traits::AcceptBiStream for Connection {
     }
 }
 
-#[async_trait]
 impl xwt_core::traits::OpeningUniStream for OpeningUniStream {
     type Streams = Connection;
     type Error = wtransport::error::StreamOpeningError;
@@ -121,7 +111,6 @@ impl xwt_core::traits::OpeningUniStream for OpeningUniStream {
     }
 }
 
-#[async_trait]
 impl xwt_core::traits::OpenUniStream for Connection {
     type Opening = OpeningUniStream;
     type Error = wtransport::error::ConnectionError;
@@ -131,7 +120,6 @@ impl xwt_core::traits::OpenUniStream for Connection {
     }
 }
 
-#[async_trait]
 impl xwt_core::traits::AcceptUniStream for Connection {
     type Error = wtransport::error::ConnectionError;
 
@@ -140,7 +128,6 @@ impl xwt_core::traits::AcceptUniStream for Connection {
     }
 }
 
-#[async_trait]
 impl xwt_core::io::Read for RecvStream {
     type Error = wtransport::error::StreamReadError;
 
@@ -149,7 +136,6 @@ impl xwt_core::io::Read for RecvStream {
     }
 }
 
-#[async_trait]
 impl xwt_core::io::Write for SendStream {
     type Error = wtransport::error::StreamWriteError;
 
@@ -158,16 +144,14 @@ impl xwt_core::io::Write for SendStream {
     }
 }
 
-#[async_trait]
 impl xwt_core::io::WriteChunk<xwt_core::io::chunk::U8> for SendStream {
     type Error = wtransport::error::StreamWriteError;
 
-    async fn write_chunk(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
+    async fn write_chunk<'a>(&'a mut self, buf: &'a [u8]) -> Result<(), Self::Error> {
         self.0.write_all(buf).await
     }
 }
 
-#[async_trait]
 impl xwt_core::datagram::Receive for Connection {
     type Datagram = Datagram;
     type Error = wtransport::error::ConnectionError;
@@ -183,7 +167,6 @@ impl AsRef<[u8]> for Datagram {
     }
 }
 
-#[async_trait]
 impl xwt_core::datagram::ReceiveInto for Connection {
     type Error = wtransport::error::ConnectionError;
 
@@ -195,7 +178,6 @@ impl xwt_core::datagram::ReceiveInto for Connection {
     }
 }
 
-#[async_trait]
 impl xwt_core::datagram::Send for Connection {
     type Error = wtransport::error::SendDatagramError;
 

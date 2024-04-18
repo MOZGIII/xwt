@@ -5,6 +5,13 @@
 //! flexibility at the type level.
 
 #![allow(missing_docs, clippy::missing_docs_in_private_items)]
+#![no_std]
+
+#[cfg(feature = "std")]
+extern crate std;
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
 pub mod datagram;
 pub mod datagram_utils;
@@ -16,9 +23,10 @@ pub mod traits;
 pub mod utils {
     pub mod dummy;
     pub mod maybe;
-}
 
-pub use async_trait::async_trait;
+    mod error;
+    pub use error::Error;
+}
 
 pub use io::*;
 pub use traits::*;

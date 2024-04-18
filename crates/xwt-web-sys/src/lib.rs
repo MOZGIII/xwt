@@ -11,7 +11,6 @@
 use std::rc::Rc;
 
 use wasm_bindgen::JsError;
-use xwt_core::async_trait;
 
 mod error;
 mod options;
@@ -29,7 +28,6 @@ pub struct Endpoint {
     pub options: sys::WebTransportOptions,
 }
 
-#[async_trait(?Send)]
 impl xwt_core::traits::EndpointConnect for Endpoint {
     type Error = Error;
     type Connecting = Connecting;
@@ -51,7 +49,6 @@ pub struct Connecting {
     pub ready: js_sys::Promise,
 }
 
-#[async_trait(?Send)]
 impl xwt_core::Connecting for Connecting {
     type Connection = Connection;
     type Error = Error;
@@ -171,7 +168,6 @@ fn wrap_bi_stream(
     (send_stream, recv_stream)
 }
 
-#[async_trait(?Send)]
 impl xwt_core::traits::OpenBiStream for Connection {
     type Opening = xwt_core::utils::dummy::OpeningBiStream<Connection>;
 
@@ -187,7 +183,6 @@ impl xwt_core::traits::OpenBiStream for Connection {
     }
 }
 
-#[async_trait(?Send)]
 impl xwt_core::traits::AcceptBiStream for Connection {
     type Error = Error;
 
@@ -206,7 +201,6 @@ impl xwt_core::traits::AcceptBiStream for Connection {
     }
 }
 
-#[async_trait(?Send)]
 impl xwt_core::traits::OpenUniStream for Connection {
     type Opening = xwt_core::utils::dummy::OpeningUniStream<Connection>;
     type Error = Error;
@@ -221,7 +215,6 @@ impl xwt_core::traits::OpenUniStream for Connection {
     }
 }
 
-#[async_trait(?Send)]
 impl xwt_core::traits::AcceptUniStream for Connection {
     type Error = Error;
 
@@ -274,7 +267,6 @@ impl tokio::io::AsyncRead for RecvStream {
     }
 }
 
-#[async_trait(?Send)]
 impl xwt_core::io::Write for SendStream {
     type Error = Error;
 
@@ -284,7 +276,6 @@ impl xwt_core::io::Write for SendStream {
     }
 }
 
-#[async_trait(?Send)]
 impl xwt_core::io::Read for RecvStream {
     type Error = Error;
 
@@ -350,7 +341,6 @@ impl Connection {
     }
 }
 
-#[async_trait(?Send)]
 impl xwt_core::datagram::Receive for Connection {
     type Datagram = Vec<u8>;
     type Error = Error;
@@ -360,7 +350,6 @@ impl xwt_core::datagram::Receive for Connection {
     }
 }
 
-#[async_trait(?Send)]
 impl xwt_core::datagram::ReceiveInto for Connection {
     type Error = Error;
 
@@ -374,7 +363,6 @@ impl xwt_core::datagram::ReceiveInto for Connection {
     }
 }
 
-#[async_trait(?Send)]
 impl xwt_core::datagram::Send for Connection {
     type Error = Error;
 
