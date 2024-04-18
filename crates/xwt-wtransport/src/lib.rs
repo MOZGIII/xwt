@@ -10,6 +10,8 @@
 
 mod types;
 
+pub use wtransport;
+
 pub use self::types::*;
 
 impl xwt_core::traits::EndpointConnect for Endpoint<wtransport::endpoint::endpoint_side::Client> {
