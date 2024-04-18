@@ -11,4 +11,10 @@ Write once, run anywhere.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-async-trait = "0.1"
+
+[features]
+default = ["std"]
+
+alloc = []
+error-in-core = []
+std = ["alloc"]

@@ -1,21 +1,23 @@
-use async_trait::async_trait;
+use core::future::Future;
 
-use crate::utils::maybe;
+use crate::utils::{maybe, Error};
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait Read: maybe::Send {
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error>;
+    fn read(
+        &mut self,
+        buf: &mut [u8],
+    ) -> impl Future<Output = Result<Option<usize>, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait Write: maybe::Send {
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error>;
+    fn write(
+        &mut self,
+        buf: &[u8],
+    ) -> impl Future<Output = Result<usize, Self::Error>> + maybe::Send;
 }
 
 #[derive(Debug)]
@@ -24,46 +26,41 @@ pub struct Chunk<Data> {
     pub data: Data,
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait ReadChunk<ChunkType: ?Sized + ReadableChunk>: maybe::Send {
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn read_chunk(
+    fn read_chunk(
         &mut self,
         max_length: usize,
         ordered: bool,
-    ) -> Result<Option<Chunk<<ChunkType as ReadableChunk>::Data<'_>>>, Self::Error>;
+    ) -> impl Future<
+        Output = Result<Option<Chunk<<ChunkType as ReadableChunk>::Data<'_>>>, Self::Error>,
+    > + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait WriteChunk<ChunkType: ?Sized + WriteableChunk>: maybe::Send {
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn write_chunk(
-        &mut self,
-        buf: <ChunkType as WriteableChunk>::Data<'_>,
-    ) -> Result<(), Self::Error>;
+    fn write_chunk<'a>(
+        &'a mut self,
+        buf: <ChunkType as WriteableChunk>::Data<'a>,
+    ) -> impl Future<Output = Result<(), Self::Error>> + 'a + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait ReadableChunk: maybe::Send {
     type Data<'a>: AsRef<[u8]>;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait WriteableChunk: maybe::Send {
     type Data<'a>: From<&'a [u8]>;
 }
 
+#[cfg(feature = "alloc")]
 pub mod chunk {
     use super::*;
 
     /// A chunk type that represents operations that carry the data as [`u8`]
-    /// [`slice`]s or [`Vec`]s
+    /// [`slice`]s or [`alloc::vec::Vec`]s
     #[derive(Debug)]
     pub struct U8;
 
@@ -72,6 +69,6 @@ pub mod chunk {
     }
 
     impl ReadableChunk for U8 {
-        type Data<'b> = Vec<u8>;
+        type Data<'b> = alloc::vec::Vec<u8>;
     }
 }

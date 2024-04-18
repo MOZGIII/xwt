@@ -1,9 +1,9 @@
-use async_trait::async_trait;
+use core::future::Future;
 
 use crate::{
     datagram,
     io::{Read, Write},
-    utils::maybe,
+    utils::{maybe, Error},
 };
 
 pub trait Streams: maybe::Send {
@@ -13,103 +13,98 @@ pub trait Streams: maybe::Send {
 
 pub type BiStreamsFor<T> = (<T as Streams>::SendStream, <T as Streams>::RecvStream);
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait OpeningBiStream: maybe::Send {
     type Streams: Streams;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn wait_bi(self) -> Result<BiStreamsFor<Self::Streams>, Self::Error>;
+    fn wait_bi(
+        self,
+    ) -> impl Future<Output = Result<BiStreamsFor<Self::Streams>, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait OpenBiStream: Streams {
     type Opening: OpeningBiStream<Streams = Self>;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn open_bi(&self) -> Result<Self::Opening, Self::Error>;
+    fn open_bi(&self) -> impl Future<Output = Result<Self::Opening, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait AcceptBiStream: Streams {
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn accept_bi(&self) -> Result<BiStreamsFor<Self>, Self::Error>;
+    fn accept_bi(
+        &self,
+    ) -> impl Future<Output = Result<BiStreamsFor<Self>, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait OpeningUniStream: maybe::Send {
     type Streams: Streams;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn wait_uni(self) -> Result<<Self::Streams as Streams>::SendStream, Self::Error>;
+    fn wait_uni(
+        self,
+    ) -> impl Future<Output = Result<<Self::Streams as Streams>::SendStream, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait OpenUniStream: Streams {
     type Opening: OpeningUniStream;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn open_uni(&self) -> Result<Self::Opening, Self::Error>;
+    fn open_uni(&self) -> impl Future<Output = Result<Self::Opening, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait AcceptUniStream: Streams {
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn accept_uni(&self) -> Result<Self::RecvStream, Self::Error>;
+    fn accept_uni(
+        &self,
+    ) -> impl Future<Output = Result<Self::RecvStream, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait EndpointConnect: Sized + maybe::Send {
     type Connecting: Connecting;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn connect(&self, url: &str) -> Result<Self::Connecting, Self::Error>;
+    fn connect(
+        &self,
+        url: &str,
+    ) -> impl Future<Output = Result<Self::Connecting, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait Connecting: maybe::Send {
     type Connection: maybe::Send;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn wait_connect(self) -> Result<Self::Connection, Self::Error>;
+    fn wait_connect(
+        self,
+    ) -> impl Future<Output = Result<Self::Connection, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait EndpointAccept: Sized + maybe::Send {
     type Accepting: Accepting;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn accept(&self) -> Result<Option<Self::Accepting>, Self::Error>;
+    fn accept(
+        &self,
+    ) -> impl Future<Output = Result<Option<Self::Accepting>, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait Accepting: maybe::Send {
     type Request: Request;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn wait_accept(self) -> Result<Self::Request, Self::Error>;
+    fn wait_accept(self) -> impl Future<Output = Result<Self::Request, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait Request: maybe::Send {
     type Connection: maybe::Send;
-    type OkError: std::error::Error + maybe::Send + maybe::Sync + 'static;
-    type CloseError: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type OkError: Error + maybe::Send + maybe::Sync + 'static;
+    type CloseError: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn ok(self) -> Result<Self::Connection, Self::OkError>;
-    async fn close(self, status: u16) -> Result<(), Self::CloseError>;
+    fn ok(self) -> impl Future<Output = Result<Self::Connection, Self::OkError>> + maybe::Send;
+
+    fn close(self, status: u16)
+        -> impl Future<Output = Result<(), Self::CloseError>> + maybe::Send;
 }
 
 pub trait Connection:

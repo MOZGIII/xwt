@@ -1,30 +1,32 @@
-use async_trait::async_trait;
+use core::future::Future;
 
-use crate::utils::maybe;
+use crate::utils::{maybe, Error};
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait Receive: maybe::Send {
     type Datagram: maybe::Send + AsRef<[u8]>;
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error>;
+    fn receive_datagram(
+        &self,
+    ) -> impl Future<Output = Result<Self::Datagram, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait ReceiveInto: maybe::Send {
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, Self::Error>;
+    fn receive_datagram_into(
+        &self,
+        buf: &mut [u8],
+    ) -> impl Future<Output = Result<usize, Self::Error>> + maybe::Send;
 }
 
-#[cfg_attr(not(target_family = "wasm"), async_trait)]
-#[cfg_attr(target_family = "wasm", async_trait(?Send))]
 pub trait Send: maybe::Send {
-    type Error: std::error::Error + maybe::Send + maybe::Sync + 'static;
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    async fn send_datagram<D>(&self, payload: D) -> Result<(), Self::Error>
+    fn send_datagram<D>(
+        &self,
+        payload: D,
+    ) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send
     where
         D: maybe::Send + AsRef<[u8]>;
 }
