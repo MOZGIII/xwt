@@ -1777,11 +1777,11 @@ dependencies = [
 
 [[package]]
 name = "xwt-core"
-version = "0.3.0"
+version = "0.3.1"
 
 [[package]]
 name = "xwt-error"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "xwt-core",
 ]
