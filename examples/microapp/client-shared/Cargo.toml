@@ -1,0 +1,12 @@
+[package]
+name = "xwt-example-client-shared"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+xwt-core = { path = "../../../crates/xwt-core" }
+
+async-timer = { version = "1.0.0-beta.13", features = ["tokio1"] }
+futures-util = "0.3"
+rand = "0.8"
