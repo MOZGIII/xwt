@@ -21,7 +21,7 @@ targets = [
 ]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-xwt-web-sys = { version = "0.9", path = "../xwt-web-sys", default-features = false }
+xwt-web-sys = { version = "0.10", path = "../xwt-web-sys", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-wtransport = { version = "0.5", path = "../xwt-wtransport", default-features = false }
+xwt-wtransport = { version = "0.6", path = "../xwt-wtransport", default-features = false }

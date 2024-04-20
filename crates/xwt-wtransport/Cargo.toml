@@ -1,6 +1,6 @@
 [package]
 name = "xwt-wtransport"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -10,14 +10,14 @@ An implementation of the xwt that runs natively via wtransport crate.
 repository = "https://github.com/MOZGIII/xwt"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-core = { version = "0.2.2", path = "../xwt-core", default-features = false }
+xwt-core = { version = "0.3", path = "../xwt-core", default-features = false }
 
 wtransport = { version = "0.1.12", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint" }
 xwt-test-assets = { version = "0.1.2", path = "../xwt-test-assets" }
-xwt-tests = { version = "0.4.3", path = "../xwt-tests" }
+xwt-tests = { version = "0.5", path = "../xwt-tests" }
 
 anyhow = "1"
 color-eyre = "0.6"
