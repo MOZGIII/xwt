@@ -1,11 +1,29 @@
 //! The ╳-platform WebTransport implementation.
+//!
+//! Cross-platform interface for working with WebTransport.
 
-#[cfg(target_family = "wasm")]
-pub use xwt_web_sys as web_sys;
-#[cfg(not(target_family = "wasm"))]
-pub use xwt_wtransport as wtransport;
+#![no_std]
 
-#[cfg(target_family = "wasm")]
-pub use self::web_sys as current;
-#[cfg(not(target_family = "wasm"))]
-pub use self::wtransport as current;
+mod impls;
+mod macros;
+mod types;
+
+pub use types::*;
+
+pub use xwt_core as core;
+
+/// Commonly used types and traits.
+///
+/// # Usage
+///
+/// ```
+/// use xwt::prelude::*;
+/// ```
+///
+/// Note that `use xwt::prelude::*;` is different
+/// from `use xwt::prelude::{a, c, c};` in that unnamable yet exported items
+/// can't be imported by enumrating them, while `::*` *will* load them into
+/// scope.
+pub mod prelude {
+    pub use xwt_core::prelude::*;
+}

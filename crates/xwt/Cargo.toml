@@ -20,8 +20,5 @@ targets = [
   "wasm32-unknown-unknown",
 ]
 
-[target.'cfg(target_family = "wasm")'.dependencies]
-xwt-web-sys = { version = "0.10", path = "../xwt-web-sys", default-features = false }
-
-[target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-wtransport = { version = "0.6", path = "../xwt-wtransport", default-features = false }
+[dependencies]
+xwt-core = { version = "0.3", path = "../xwt-core", default-features = false }
