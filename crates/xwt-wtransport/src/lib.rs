@@ -11,6 +11,7 @@
 mod types;
 
 pub use wtransport;
+pub use xwt_core as core;
 
 pub use self::types::*;
 
