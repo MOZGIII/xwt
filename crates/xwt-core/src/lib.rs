@@ -6,6 +6,7 @@
 
 #![allow(missing_docs, clippy::missing_docs_in_private_items)]
 #![no_std]
+#![cfg_attr(feature = "error-in-core", feature(error_in_core))]
 
 #[cfg(feature = "std")]
 extern crate std;
