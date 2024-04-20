@@ -63,6 +63,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-timer"
+version = "1.0.0-beta.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "54a18932baa05100f01c9980d03e330f95a8f2dee1a7576969fa507bdce3b568"
+dependencies = [
+ "error-code",
+ "libc",
+ "tokio",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -359,6 +371,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "error-code"
+version = "3.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0474425d51df81997e2f90a21591180b38eccf27292d755f3e30750225c175b"
+
+[[package]]
 name = "eyre"
 version = "0.6.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -391,6 +409,43 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e13624c2627564efccf4934284bdd98cbaa14e79b0b5a141218e507b3a823456"
 dependencies = [
  "percent-encoding",
+]
+
+[[package]]
+name = "futures-core"
+version = "0.3.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dfc6580bb841c5a68e9ef15c77ccc837b40a7504914d52e47b8b0e9bbda25a1d"
+
+[[package]]
+name = "futures-macro"
+version = "0.3.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "87750cf4b7a4c0625b1529e4c543c2182106e4dedc60a2a6455e00d212c489ac"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "futures-task"
+version = "0.3.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38d84fa142264698cdce1a9f9172cf383a0c82de1bddcf3092901442c4097004"
+
+[[package]]
+name = "futures-util"
+version = "0.3.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3d6401deb83407ab3da39eba7e33987a73c3df0c82b4bb5813ee871c19c41d48"
+dependencies = [
+ "futures-core",
+ "futures-macro",
+ "futures-task",
+ "pin-project-lite",
+ "pin-utils",
+ "slab",
 ]
 
 [[package]]
@@ -663,6 +718,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pem"
+version = "3.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e459365e590736a54c3fa561947c84837534b8e9af6fc5bf781307e82658fae"
+dependencies = [
+ "base64 0.22.0",
+ "serde",
+]
+
+[[package]]
 name = "pem-rfc7468"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -682,6 +747,12 @@ name = "pin-project-lite"
 version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8afb450f006bf6385ca15ef45d71d2288452bc3683ce2e2cacc0d18e4be60b58"
+
+[[package]]
+name = "pin-utils"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pkcs8"
@@ -808,6 +879,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
+]
+
+[[package]]
+name = "rcgen"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "48406db8ac1f3cbc7dcdb56ec355343817958a356ff430259bb07baf7607e1e1"
+dependencies = [
+ "pem",
+ "ring 0.17.8",
+ "time",
+ "yasna",
 ]
 
 [[package]]
@@ -1686,12 +1769,15 @@ checksum = "358eb4bb09681342ab5284da0a4a2443183509874e8417e85391850786d08f33"
 dependencies = [
  "bytes",
  "quinn",
+ "rcgen",
+ "ring 0.17.8",
  "rustls",
  "rustls-native-certs",
  "rustls-pemfile 2.1.2",
  "rustls-pki-types",
  "socket2",
  "thiserror",
+ "time",
  "tokio",
  "tracing",
  "url",
@@ -1787,6 +1873,90 @@ dependencies = [
 ]
 
 [[package]]
+name = "xwt-example-client"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "console_error_panic_hook",
+ "tokio",
+ "wasm-bindgen-futures",
+ "xwt-example-client-native",
+ "xwt-example-client-web",
+]
+
+[[package]]
+name = "xwt-example-client-native"
+version = "0.1.0"
+dependencies = [
+ "rand",
+ "tokio",
+ "wtransport",
+ "xwt-cert-fingerprint",
+ "xwt-core",
+ "xwt-example-client-shared",
+ "xwt-test-assets",
+ "xwt-wtransport",
+]
+
+[[package]]
+name = "xwt-example-client-shared"
+version = "0.1.0"
+dependencies = [
+ "async-timer",
+ "futures-util",
+ "rand",
+ "xwt-core",
+]
+
+[[package]]
+name = "xwt-example-client-web"
+version = "0.1.0"
+dependencies = [
+ "getrandom",
+ "rand",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "xwt-cert-fingerprint",
+ "xwt-core",
+ "xwt-example-client-shared",
+ "xwt-test-assets",
+ "xwt-web-sys",
+]
+
+[[package]]
+name = "xwt-example-server"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "tokio",
+ "xwt-example-server-native",
+]
+
+[[package]]
+name = "xwt-example-server-native"
+version = "0.1.0"
+dependencies = [
+ "tokio",
+ "wtransport",
+ "xwt-cert-fingerprint",
+ "xwt-core",
+ "xwt-example-server-shared",
+ "xwt-test-assets",
+ "xwt-wtransport",
+]
+
+[[package]]
+name = "xwt-example-server-shared"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "rand",
+ "tokio",
+ "xwt-core",
+]
+
+[[package]]
 name = "xwt-test-assets"
 version = "0.1.2"
 dependencies = [
@@ -1863,6 +2033,15 @@ dependencies = [
  "xwt-core",
  "xwt-test-assets",
  "xwt-tests",
+]
+
+[[package]]
+name = "yasna"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e17bb3549cc1321ae1296b9cdc2698e2b6cb1992adfa19a8c72e5b7a738f44cd"
+dependencies = [
+ "time",
 ]
 
 [[package]]

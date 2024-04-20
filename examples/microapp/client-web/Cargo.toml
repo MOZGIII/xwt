@@ -1,0 +1,25 @@
+[package]
+name = "xwt-example-client-web"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+# Shared code between native and web examples.
+xwt-example-client-shared = { version = "0.1", path = "../client-shared", default-features = false }
+
+# Core xwt primitives and driver.
+xwt-cert-fingerprint = { version = "0.1", path = "../../../crates/xwt-cert-fingerprint", default-features = false }
+xwt-core = { version = "0.3", path = "../../../crates/xwt-core", default-features = false }
+xwt-web-sys = { version = "0.10", path = "../../../crates/xwt-web-sys", default-features = false }
+
+# The dependency specific to this being an xwt example that is designed to
+# work with an xwt test server.
+xwt-test-assets = { version = "0.1", path = "../../../crates/xwt-test-assets", default-features = false }
+
+# The rest of the dependencies.
+getrandom = { version = "0.2", features = ["js"] }
+rand = "0.8"
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = ["Window", "Document", "HtmlElement"] }
