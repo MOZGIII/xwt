@@ -1874,6 +1874,13 @@ name = "xwt-core"
 version = "0.3.1"
 
 [[package]]
+name = "xwt-core-utils"
+version = "0.1.0"
+dependencies = [
+ "xwt-core",
+]
+
+[[package]]
 name = "xwt-error"
 version = "0.3.1"
 dependencies = [
@@ -1977,7 +1984,6 @@ version = "0.3.0"
 dependencies = [
  "p256",
  "rand",
- "tokio",
  "xwt-cert-gen",
 ]
 
