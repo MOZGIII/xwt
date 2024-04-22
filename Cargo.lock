@@ -1837,6 +1837,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "xwt-anchor"
+version = "0.1.0"
+dependencies = [
+ "xwt-core",
+]
+
+[[package]]
 name = "xwt-cert-fingerprint"
 version = "0.1.0"
 dependencies = [

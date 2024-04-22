@@ -1,0 +1,14 @@
+[package]
+name = "xwt-anchor"
+version = "0.1.0"
+edition = "2021"
+resolver = "2"
+license = "MIT"
+description = """
+Anchor types for xwt.
+Useful to overcome foreign type implementation limitations.
+"""
+repository = "https://github.com/MOZGIII/xwt"
+
+[dependencies]
+xwt-core = { version = "0.3", path = "../xwt-core", default-features = false }
