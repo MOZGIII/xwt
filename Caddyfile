@@ -1,0 +1,6 @@
+# A simple caddy config file to server the TLS certificate from the test assets
+# crate.
+
+https://localhost:8080
+
+tls crates/xwt-test-assets/target/cert.pem crates/xwt-test-assets/target/key-pkcs8.pem
