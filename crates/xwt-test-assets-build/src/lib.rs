@@ -5,15 +5,18 @@
 
 use std::{
     io::ErrorKind,
+    matches,
     path::{Path, PathBuf},
 };
 
-use p256::pkcs8::der::Encode;
+use p256::pkcs8::{
+    der::{Encode, EncodePem},
+    EncodePrivateKey,
+};
 
-/// A pair of a key and a certificate.
-type KeyCert = (p256::SecretKey, xwt_cert_gen::x509_cert::Certificate);
+pub type AnyBytes = Box<dyn AsRef<[u8]>>;
 
-pub fn generate() -> KeyCert {
+pub fn generate() -> Vec<(&'static str, AnyBytes)> {
     let params =
         xwt_cert_gen::Params::new("xwt-test-certificate", &["localhost", "127.0.0.1", "::1"]);
 
@@ -23,55 +26,40 @@ pub fn generate() -> KeyCert {
         .self_signed::<_, p256::ecdsa::DerSignature>(&key)
         .unwrap();
 
-    (key.into(), cert)
+    let key: p256::SecretKey = key.into();
+
+    let line_ending = p256::pkcs8::LineEnding::LF;
+
+    vec![
+        ("cert.der", Box::new(cert.to_der().unwrap())),
+        ("cert.pem", Box::new(cert.to_pem(line_ending).unwrap())),
+        ("key-sec1.der", Box::new(key.to_sec1_der().unwrap())),
+        (
+            "key-sec1.pem",
+            Box::new(key.to_sec1_pem(line_ending).unwrap()),
+        ),
+        (
+            "key-pkcs8.der",
+            Box::new(key.to_pkcs8_der().unwrap().to_bytes()),
+        ),
+        (
+            "key-pkcs8.pem",
+            Box::new(key.to_pkcs8_pem(line_ending).unwrap()),
+        ),
+    ]
 }
 
 pub fn env_dir(key: &str) -> PathBuf {
     PathBuf::from(std::env::var_os(key).unwrap())
 }
 
-#[cfg(feature = "tokio")]
-pub async fn save_tokio((key, cert): KeyCert, dir: impl AsRef<Path>) {
-    use tokio::io::AsyncWriteExt;
-
-    let dir = dir.as_ref();
-
-    tokio::fs::create_dir_all(dir).await.unwrap();
-
-    let open = |file| async move {
-        tokio::fs::OpenOptions::new()
-            .create_new(true)
-            .write(true)
-            .open(file)
-            .await
-    };
-
-    let results = (
-        open(dir.join("cert.der")).await,
-        open(dir.join("key.der")).await,
-    );
-
-    match results {
-        (Ok(mut cert_file), Ok(mut key_file)) => {
-            cert_file.write_all(&cert.to_der().unwrap()).await.unwrap();
-            key_file
-                .write_all(&key.to_sec1_der().unwrap())
-                .await
-                .unwrap();
-            cert_file.flush().await.unwrap();
-            key_file.flush().await.unwrap();
-        }
-        (Err(cert_err), Err(key_err))
-            if cert_err.kind() == ErrorKind::AlreadyExists
-                && key_err.kind() == ErrorKind::AlreadyExists => {}
-        (cert_res, key_res) => {
-            let _ = cert_res.unwrap();
-            let _ = key_res.unwrap();
-        }
-    }
+#[derive(Debug)]
+pub enum SaveOutcome {
+    AllFilesWerePresent,
+    AllFilesWereWritten,
 }
 
-pub fn save((key, cert): KeyCert, dir: impl AsRef<Path>) {
+pub fn save(dir: impl AsRef<Path>, files: Vec<(&'static str, AnyBytes)>) -> SaveOutcome {
     use std::io::Write;
 
     let dir = dir.as_ref();
@@ -85,21 +73,27 @@ pub fn save((key, cert): KeyCert, dir: impl AsRef<Path>) {
             .open(file)
     };
 
-    let results = (open(dir.join("cert.der")), open(dir.join("key.der")));
+    let results: Vec<_> = files
+        .iter()
+        .map(|(file_name, _)| open(dir.join(file_name)))
+        .collect();
 
-    match results {
-        (Ok(mut cert_file), Ok(mut key_file)) => {
-            cert_file.write_all(&cert.to_der().unwrap()).unwrap();
-            key_file.write_all(&key.to_sec1_der().unwrap()).unwrap();
-            cert_file.flush().unwrap();
-            key_file.flush().unwrap();
-        }
-        (Err(cert_err), Err(key_err))
-            if cert_err.kind() == ErrorKind::AlreadyExists
-                && key_err.kind() == ErrorKind::AlreadyExists => {}
-        (cert_res, key_res) => {
-            let _ = cert_res.unwrap();
-            let _ = key_res.unwrap();
-        }
+    // *Before* writing the files, check if all the files are in valid state -
+    // as maybe we don't need to do anything.
+    if results
+        .iter()
+        .all(|result| matches!(result, Err(err) if err.kind() == ErrorKind::AlreadyExists))
+    {
+        // We should check if the files are expired here and force-replace
+        // them if needed - but I'll skip this for now.
+        return SaveOutcome::AllFilesWerePresent;
     }
+
+    for (result, (_, data)) in results.into_iter().zip(files.into_iter()) {
+        let mut file = result.unwrap();
+        file.write_all((*data).as_ref()).unwrap();
+        file.flush().unwrap();
+    }
+
+    SaveOutcome::AllFilesWereWritten
 }

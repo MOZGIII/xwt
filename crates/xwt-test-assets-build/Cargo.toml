@@ -12,15 +12,5 @@ repository = "https://github.com/MOZGIII/xwt"
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwt-cert-gen = { version = "0.1", path = "../xwt-cert-gen" }
 
-p256 = { version = "0.13", features = ["ecdsa"] }
+p256 = { version = "0.13", features = ["ecdsa", "pkcs8"] }
 rand = "0.8"
-tokio = { version = "1", default-features = false, features = [
-  "macros",
-  "rt-multi-thread",
-  "fs",
-  "io-util",
-], optional = true }
-
-[features]
-default = ["tokio"]
-tokio = ["dep:tokio"]
