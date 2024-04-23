@@ -1,3 +1,5 @@
+//! Operations that have the individual streams as the subject.
+
 use core::future::Future;
 
 use crate::utils::{maybe, Error};

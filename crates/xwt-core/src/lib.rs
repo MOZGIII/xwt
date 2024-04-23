@@ -14,12 +14,11 @@ extern crate std;
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
-pub mod datagram;
-pub mod datagram_utils;
-pub mod io;
-pub mod io_utils;
-pub mod trait_utils;
-pub mod traits;
+pub mod base;
+pub mod endpoint;
+pub mod session;
+pub mod stream;
+pub mod stream_utils;
 
 pub mod utils {
     pub mod dummy;
@@ -29,19 +28,26 @@ pub mod utils {
     pub use error::Error;
 }
 
-pub use io::*;
-pub use traits::*;
-
 pub mod prelude {
-    pub use crate::datagram::{Receive as _, Send as _};
-    pub use crate::io::{Read as _, ReadChunk as _, Write as _, WriteChunk as _};
-    pub use crate::traits::{
-        AcceptBiStream as _, AcceptUniStream as _, Accepting as _, Connecting as _,
-        Connection as _, EndpointAccept as _, EndpointConnect as _, OpenBiStream as _,
-        OpenUniStream as _, OpeningBiStream as _, OpeningUniStream as _, Request as _,
+    pub use crate::base::Session as _;
+    pub use crate::endpoint::accept::{Accept as _, Accepting as _, Request as _};
+    pub use crate::endpoint::connect::{Connect as _, Connecting as _};
+    pub use crate::session::base::{DatagramOps as _, StreamOps as _};
+    pub use crate::session::datagram::{Receive as _, ReceiveInto as _, Send as _};
+    pub use crate::session::stream::{
+        AcceptBi as _, AcceptUni as _, OpenBi as _, OpenUni as _, OpeningBi as _, OpeningUni as _,
     };
+    pub use crate::stream::{Read as _, ReadChunk as _, Write as _, WriteChunk as _};
 
-    pub use crate::datagram_utils::*;
-    pub use crate::io_utils::*;
-    pub use crate::trait_utils::*;
+    pub use crate::endpoint::accept_utils::*;
+    pub use crate::endpoint::connect_utils::*;
+    pub use crate::session::datagram_utils::*;
+    pub use crate::session::stream_utils::*;
+    pub use crate::stream_utils::*;
 }
+
+#[deprecated = "use base::Session instead"]
+pub trait Connection: base::Session {}
+
+#[allow(deprecated)]
+impl<T> Connection for T where T: base::Session {}

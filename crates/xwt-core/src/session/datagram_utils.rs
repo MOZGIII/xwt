@@ -1,4 +1,4 @@
-use crate::datagram;
+use super::datagram;
 
 pub type SendErrorFor<T> = <T as datagram::Send>::Error;
 
