@@ -3,53 +3,50 @@ use xwt_core::prelude::*;
 pub async fn connect<Endpoint>(
     endpoint: &Endpoint,
     url: &str,
-) -> Result<EndpointConnectConnectionFor<Endpoint>, xwt_error::Connect<Endpoint>>
+) -> Result<ConnectSessionFor<Endpoint>, xwt_error::Connect<Endpoint>>
 where
-    Endpoint: xwt_core::EndpointConnect,
+    Endpoint: xwt_core::endpoint::Connect,
 {
     let connecting = endpoint
         .connect(url)
         .await
         .map_err(xwt_error::Connect::Connect)?;
 
-    let connection = connecting
+    let session = connecting
         .wait_connect()
         .await
         .map_err(xwt_error::Connect::Connecting)?;
 
-    Ok(connection)
+    Ok(session)
 }
 
 pub async fn ok_accepting<Accepting>(
     accepting: Accepting,
-) -> Result<AcceptingConnectionFor<Accepting>, xwt_error::Accepting<Accepting>>
+) -> Result<AcceptingSessionFor<Accepting>, xwt_error::Accepting<Accepting>>
 where
-    Accepting: xwt_core::Accepting,
-    AcceptingConnectionFor<Accepting>: xwt_core::Connection,
+    Accepting: xwt_core::endpoint::accept::Accepting,
+    AcceptingSessionFor<Accepting>: xwt_core::base::Session,
 {
     let request = accepting
         .wait_accept()
         .await
         .map_err(xwt_error::Accepting::Accepting)?;
 
-    let connection = request
+    let session = request
         .ok()
         .await
         .map_err(xwt_error::Accepting::RequestOk)?;
 
-    Ok(connection)
+    Ok(session)
 }
 
-pub async fn open_bi<Connection>(
-    connection: &Connection,
-) -> Result<BiStreamsFor<Connection>, xwt_error::OpenBi<Connection>>
+pub async fn open_bi<Session>(
+    session: &Session,
+) -> Result<BiStreamsFor<Session>, xwt_error::OpenBi<Session>>
 where
-    Connection: xwt_core::OpenBiStream,
+    Session: xwt_core::session::stream::OpenBi,
 {
-    let opening = connection
-        .open_bi()
-        .await
-        .map_err(xwt_error::OpenBi::Open)?;
+    let opening = session.open_bi().await.map_err(xwt_error::OpenBi::Open)?;
     let streams = opening
         .wait_bi()
         .await
@@ -58,16 +55,13 @@ where
     Ok(streams)
 }
 
-pub async fn open_uni<Connection>(
-    connection: &Connection,
-) -> Result<SendUniStreamFor<Connection>, xwt_error::OpenUni<Connection>>
+pub async fn open_uni<Session>(
+    session: &Session,
+) -> Result<SendUniStreamFor<Session>, xwt_error::OpenUni<Session>>
 where
-    Connection: xwt_core::OpenUniStream,
+    Session: xwt_core::session::stream::OpenUni,
 {
-    let opening = connection
-        .open_uni()
-        .await
-        .map_err(xwt_error::OpenUni::Open)?;
+    let opening = session.open_uni().await.map_err(xwt_error::OpenUni::Open)?;
     let stream = opening
         .wait_uni()
         .await
