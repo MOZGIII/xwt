@@ -4,7 +4,6 @@
 //! Users should utilise the traits from this crate directly for the most
 //! flexibility at the type level.
 
-#![allow(missing_docs, clippy::missing_docs_in_private_items)]
 #![no_std]
 #![cfg_attr(feature = "error-in-core", feature(error_in_core))]
 
@@ -21,6 +20,8 @@ pub mod stream;
 pub mod stream_utils;
 
 pub mod utils {
+    //! Useful utilities.
+
     pub mod dummy;
     pub mod maybe;
 
@@ -29,6 +30,8 @@ pub mod utils {
 }
 
 pub mod prelude {
+    //! A prelude of the ferquently used types.
+
     pub use crate::base::Session as _;
     pub use crate::endpoint::accept::{Accept as _, Accepting as _, Request as _};
     pub use crate::endpoint::connect::{Connect as _, Connecting as _};
@@ -46,6 +49,7 @@ pub mod prelude {
     pub use crate::stream_utils::*;
 }
 
+/// An backward-compat [`Connection`] trait.
 #[deprecated = "use base::Session instead"]
 pub trait Connection: base::Session {}
 

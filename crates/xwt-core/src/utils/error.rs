@@ -1,3 +1,11 @@
+//! An adapter for the error type.
+//!
+//! Experimental, and likely temporary.
+//!
+//! Required to specify the associated error type at trait requirements in
+//! the `no_std` context, while the `Error` trait it still not stablilized
+//! to be accessible from the [`core`].
+
 #[cfg(feature = "std")]
 pub use std::error::Error;
 
