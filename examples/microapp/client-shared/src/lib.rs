@@ -5,31 +5,31 @@ use xwt_core::prelude::*;
 
 /// An example client that showcases the use of [`xwt_core`] to abstract
 /// around the WebTransport driver and execution environment.
-pub struct ExampleClient<Connection>
+pub struct ExampleClient<Session>
 where
-    // Require that the connection implements full capabilities of the
+    // Require that the session implements full capabilities of the
     // WebTransport specification.
     // Depending on the driver this may not be case, and for some use cases
     // only specific capabilities (like only streams or datagrams)
     // are necessary.
-    Connection: xwt_core::Connection,
+    Session: xwt_core::base::Session,
 {
-    /// The connection to use.
-    pub connection: Connection,
+    /// The WebTransport session to use.
+    pub session: Session,
     /// The name of this user.
     pub nickname: String,
     /// Function for writing the chat text to the display.
     pub chat_write: fn(&str),
 }
 
-impl<Connection: xwt_core::Connection> ExampleClient<Connection> {
+impl<Session: xwt_core::base::Session> ExampleClient<Session> {
     /// Run the client.
     pub async fn run(&mut self) {
         // Inform user that we are connected.
         (self.chat_write)(&format!("connected as {}\n", self.nickname));
 
         // Open a chat stream.
-        let opening = self.connection.open_bi().await.unwrap();
+        let opening = self.session.open_bi().await.unwrap();
         let (chat_send, chat_read) = opening.wait_bi().await.unwrap();
 
         // Set up the loops.
@@ -50,7 +50,7 @@ impl<Connection: xwt_core::Connection> ExampleClient<Connection> {
             let movement_input = moves.choose(&mut thread_rng()).unwrap();
 
             // Send it to the connection as a datagram.
-            self.connection.send_datagram(movement_input).await.unwrap();
+            self.session.send_datagram(movement_input).await.unwrap();
 
             // Wait for 1 second before sending the next move.
             async_timer::new_timer(std::time::Duration::from_secs(1)).await;
@@ -58,7 +58,7 @@ impl<Connection: xwt_core::Connection> ExampleClient<Connection> {
     }
 
     /// Create random chat messages and sent them via to the chat stream.
-    pub async fn chat_outbound_loop(&self, mut chat_stream: Connection::SendStream) {
+    pub async fn chat_outbound_loop(&self, mut chat_stream: Session::SendStream) {
         let chat_messages = ["ggwp", "nice work team", "plz help", "go!"];
 
         loop {
@@ -78,7 +78,7 @@ impl<Connection: xwt_core::Connection> ExampleClient<Connection> {
     }
 
     /// Print the chat messages we get from the server on screen.
-    pub async fn chat_inbound_loop(&self, mut chat_stream: Connection::RecvStream) {
+    pub async fn chat_inbound_loop(&self, mut chat_stream: Session::RecvStream) {
         let mut read_buf = [0u8; 1024];
         loop {
             // Read the message from the chat stream, and stop if the stream
