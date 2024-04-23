@@ -57,3 +57,8 @@ newtype!(OpeningUniStream => wtransport::stream::OpeningUniStream);
 newtype!(SendStream => wtransport::SendStream);
 newtype!(RecvStream => wtransport::RecvStream);
 newtype!(Datagram => wtransport::datagram::Datagram);
+
+/// Expose the [`Session`] as a type alias for [`Connection`], as `wtransport`
+/// does not use the session terminology but it might be convenient for
+/// the `xwt` users.
+pub type Session = Connection;
