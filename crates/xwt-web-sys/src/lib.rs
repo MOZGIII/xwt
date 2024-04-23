@@ -31,7 +31,7 @@ pub struct Endpoint {
     pub options: sys::WebTransportOptions,
 }
 
-impl xwt_core::traits::EndpointConnect for Endpoint {
+impl xwt_core::endpoint::Connect for Endpoint {
     type Error = Error;
     type Connecting = Connecting;
 
@@ -52,11 +52,11 @@ pub struct Connecting {
     pub ready: js_sys::Promise,
 }
 
-impl xwt_core::Connecting for Connecting {
-    type Connection = Connection;
+impl xwt_core::endpoint::connect::Connecting for Connecting {
+    type Session = Session;
     type Error = Error;
 
-    async fn wait_connect(self) -> Result<Self::Connection, Self::Error> {
+    async fn wait_connect(self) -> Result<Self::Session, Self::Error> {
         let Connecting { transport, ready } = self;
         let _ = wasm_bindgen_futures::JsFuture::from(ready).await?;
 
@@ -71,23 +71,23 @@ impl xwt_core::Connecting for Connecting {
         let datagram_read_buffer = js_sys::ArrayBuffer::new(datagram_read_buffer_size);
         let datagram_read_buffer = tokio::sync::Mutex::new(Some(datagram_read_buffer));
 
-        let connection = Connection {
+        let session = Session {
             transport: Rc::new(transport),
             datagram_readable_stream_reader,
             datagram_writable_stream_writer,
             datagram_read_buffer_size,
             datagram_read_buffer,
         };
-        Ok(connection)
+        Ok(session)
     }
 }
 
-/// Connection holds the [`sys::WebTransport`] and is responsible for
+/// Session holds the [`sys::WebTransport`] and is responsible for
 /// providing access to the Web API of WebTransport in a way that is portable.
 /// It also holds handles to the datagram reader and writer, as well as
 /// the datagram reader state.
 #[derive(Debug)]
-pub struct Connection {
+pub struct Session {
     /// The WebTransport instance.
     pub transport: Rc<sys::WebTransport>,
     /// The datagram reader.
@@ -101,8 +101,11 @@ pub struct Connection {
     pub datagram_read_buffer: tokio::sync::Mutex<Option<js_sys::ArrayBuffer>>,
 }
 
-impl xwt_core::traits::Streams for Connection {
+impl xwt_core::session::stream::SendSpec for Session {
     type SendStream = SendStream;
+}
+
+impl xwt_core::session::stream::RecvSpec for Session {
     type RecvStream = RecvStream;
 }
 
@@ -171,8 +174,8 @@ fn wrap_bi_stream(
     (send_stream, recv_stream)
 }
 
-impl xwt_core::traits::OpenBiStream for Connection {
-    type Opening = xwt_core::utils::dummy::OpeningBiStream<Connection>;
+impl xwt_core::session::stream::OpenBi for Session {
+    type Opening = xwt_core::utils::dummy::OpeningBiStream<Session>;
 
     type Error = Error;
 
@@ -186,7 +189,7 @@ impl xwt_core::traits::OpenBiStream for Connection {
     }
 }
 
-impl xwt_core::traits::AcceptBiStream for Connection {
+impl xwt_core::session::stream::AcceptBi for Session {
     type Error = Error;
 
     async fn accept_bi(&self) -> Result<(Self::SendStream, Self::RecvStream), Self::Error> {
@@ -204,8 +207,8 @@ impl xwt_core::traits::AcceptBiStream for Connection {
     }
 }
 
-impl xwt_core::traits::OpenUniStream for Connection {
-    type Opening = xwt_core::utils::dummy::OpeningUniStream<Connection>;
+impl xwt_core::session::stream::OpenUni for Session {
+    type Opening = xwt_core::utils::dummy::OpeningUniStream<Session>;
     type Error = Error;
 
     async fn open_uni(&self) -> Result<Self::Opening, Self::Error> {
@@ -218,7 +221,7 @@ impl xwt_core::traits::OpenUniStream for Connection {
     }
 }
 
-impl xwt_core::traits::AcceptUniStream for Connection {
+impl xwt_core::session::stream::AcceptUni for Session {
     type Error = Error;
 
     async fn accept_uni(&self) -> Result<Self::RecvStream, Self::Error> {
@@ -270,7 +273,7 @@ impl tokio::io::AsyncRead for RecvStream {
     }
 }
 
-impl xwt_core::io::Write for SendStream {
+impl xwt_core::stream::Write for SendStream {
     type Error = Error;
 
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
@@ -279,7 +282,7 @@ impl xwt_core::io::Write for SendStream {
     }
 }
 
-impl xwt_core::io::Read for RecvStream {
+impl xwt_core::stream::Read for RecvStream {
     type Error = Error;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
@@ -312,7 +315,7 @@ impl xwt_core::io::Read for RecvStream {
     }
 }
 
-impl Connection {
+impl Session {
     /// Receive the datagram and handle the buffer with the given function.
     ///
     /// Cloning the buffer in the `f` will result in the undefined behaviour,
@@ -344,7 +347,7 @@ impl Connection {
     }
 }
 
-impl xwt_core::datagram::Receive for Connection {
+impl xwt_core::session::datagram::Receive for Session {
     type Datagram = Vec<u8>;
     type Error = Error;
 
@@ -353,7 +356,7 @@ impl xwt_core::datagram::Receive for Connection {
     }
 }
 
-impl xwt_core::datagram::ReceiveInto for Connection {
+impl xwt_core::session::datagram::ReceiveInto for Session {
     type Error = Error;
 
     async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, Self::Error> {
@@ -366,7 +369,7 @@ impl xwt_core::datagram::ReceiveInto for Connection {
     }
 }
 
-impl xwt_core::datagram::Send for Connection {
+impl xwt_core::session::datagram::Send for Session {
     type Error = Error;
 
     async fn send_datagram<D>(&self, payload: D) -> Result<(), Self::Error>
@@ -379,7 +382,7 @@ impl xwt_core::datagram::Send for Connection {
     }
 }
 
-impl Drop for Connection {
+impl Drop for Session {
     fn drop(&mut self) {
         self.transport.close();
     }

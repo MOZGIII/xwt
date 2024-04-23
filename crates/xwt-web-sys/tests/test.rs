@@ -118,12 +118,12 @@ async fn tokio_io_read_buf_resize() {
 }
 
 #[wasm_bindgen_test]
-async fn connection_drop() {
+async fn session_drop() {
     setup();
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::connection_drop::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL, |error| {
+    xwt_tests::tests::session_drop::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL, |error| {
         let known_bad_errors = ["Connection lost."];
         let known_good_errors = ["WebTransportError: The session is closed."];
         let actual_error = error.to_string();
