@@ -1830,7 +1830,7 @@ dependencies = [
 
 [[package]]
 name = "xwt"
-version = "0.12.0"
+version = "0.13.0"
 dependencies = [
  "cfg-if",
  "xwt-web-sys",
@@ -1839,7 +1839,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-anchor"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "xwt-core",
 ]
@@ -1871,11 +1871,11 @@ dependencies = [
 
 [[package]]
 name = "xwt-core"
-version = "0.3.1"
+version = "0.4.0"
 
 [[package]]
 name = "xwt-error"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "xwt-core",
 ]
@@ -1997,7 +1997,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "thiserror",
  "tokio",
@@ -2008,7 +2008,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-sys"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "js-sys",
  "tokio",
@@ -2028,7 +2028,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "color-eyre",
