@@ -1,11 +1,17 @@
 use crate::*;
 
-impl<Endpoint> std::error::Error for Connect<Endpoint> where Endpoint: xwt_core::EndpointConnect {}
+impl<Endpoint> std::error::Error for Connect<Endpoint> where Endpoint: xwt_core::endpoint::Connect {}
 
-impl<Endpoint> std::error::Error for Accept<Endpoint> where Endpoint: xwt_core::EndpointAccept {}
+impl<Endpoint> std::error::Error for Accept<Endpoint> where Endpoint: xwt_core::endpoint::Accept {}
 
-impl<TAccepting> std::error::Error for Accepting<TAccepting> where TAccepting: xwt_core::Accepting {}
+impl<TAccepting> std::error::Error for Accepting<TAccepting> where
+    TAccepting: xwt_core::endpoint::accept::Accepting
+{
+}
 
-impl<Connect> std::error::Error for OpenBi<Connect> where Connect: xwt_core::OpenBiStream {}
+impl<Session> std::error::Error for OpenBi<Session> where Session: xwt_core::session::stream::OpenBi {}
 
-impl<Connect> std::error::Error for OpenUni<Connect> where Connect: xwt_core::OpenUniStream {}
+impl<Session> std::error::Error for OpenUni<Session> where
+    Session: xwt_core::session::stream::OpenUni
+{
+}

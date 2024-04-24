@@ -3,30 +3,24 @@ use xwt_core::prelude::*;
 #[derive(Debug, thiserror::Error)]
 pub enum Error<Endpoint, WriteChunk, ReadChunk>
 where
-    Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
+    Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
-    EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
+    ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
 
     WriteChunk: xwt_core::WriteableChunk + std::fmt::Debug,
     ReadChunk: xwt_core::ReadableChunk + std::fmt::Debug,
 
-    SendStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,
-    RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::ReadChunk<ReadChunk>,
+    SendStreamFor<ConnectSessionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,
+    RecvStreamFor<ConnectSessionFor<Endpoint>>: xwt_core::ReadChunk<ReadChunk>,
 {
     #[error("connect: {0}")]
     Connect(#[source] xwt_error::Connect<Endpoint>),
     #[error("open: {0}")]
-    Open(#[source] xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
+    Open(#[source] xwt_error::OpenBi<ConnectSessionFor<Endpoint>>),
     #[error("send: {0}")]
-    Send(
-        #[source]
-        WriteChunkErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>, WriteChunk>,
-    ),
+    Send(#[source] WriteChunkErrorFor<SendStreamFor<ConnectSessionFor<Endpoint>>, WriteChunk>),
     #[error("recv: {0}")]
-    Recv(
-        #[source]
-        ReadChunkErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>, ReadChunk>,
-    ),
+    Recv(#[source] ReadChunkErrorFor<RecvStreamFor<ConnectSessionFor<Endpoint>>, ReadChunk>),
     #[error("no response")]
     NoResponse,
     #[error("bad data")]
@@ -38,9 +32,9 @@ pub async fn run<Endpoint, WriteChunk, ReadChunk>(
     url: &str,
 ) -> Result<(), Error<Endpoint, WriteChunk, ReadChunk>>
 where
-    Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
+    Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
-    EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
+    ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
 
     WriteChunk: xwt_core::WriteableChunk + std::fmt::Debug,
     ReadChunk: xwt_core::ReadableChunk + std::fmt::Debug,
@@ -48,16 +42,15 @@ where
     <WriteChunk as xwt_core::WriteableChunk>::Data<'static>: From<&'static [u8]>,
     for<'a> <ReadChunk as xwt_core::ReadableChunk>::Data<'a>: AsRef<[u8]>,
 
-    SendStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,
-    RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>: xwt_core::ReadChunk<ReadChunk>,
+    SendStreamFor<ConnectSessionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,
+    RecvStreamFor<ConnectSessionFor<Endpoint>>: xwt_core::ReadChunk<ReadChunk>,
 {
-    let connection = crate::utils::connect(&endpoint, url)
+    let session = crate::utils::connect(&endpoint, url)
         .await
         .map_err(Error::Connect)?;
 
-    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(&connection)
-        .await
-        .map_err(Error::Open)?;
+    let (mut send_stream, mut recv_stream) =
+        crate::utils::open_bi(&session).await.map_err(Error::Open)?;
 
     let write_data: WriteChunk::Data<'static> = (&b"hello"[..]).into();
     send_stream

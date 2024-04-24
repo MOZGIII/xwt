@@ -10,7 +10,7 @@ macro_rules! for_all_material_types {
             Endpoint<T>,
             Connecting<T>,
             Accepting<T>,
-            Connection<T>,
+            Session<T>,
             Request<T>,
             OpeningBiStream<T>,
             OpeningUniStream<T>,

@@ -2,9 +2,9 @@
 
 use crate::types::*;
 
-impl<T> xwt_core::io::Write for SendStream<T>
+impl<T> xwt_core::stream::Write for SendStream<T>
 where
-    T: xwt_core::io::Write,
+    T: xwt_core::stream::Write,
 {
     type Error = T::Error;
 
@@ -13,9 +13,9 @@ where
     }
 }
 
-impl<T> xwt_core::io::Read for RecvStream<T>
+impl<T> xwt_core::stream::Read for RecvStream<T>
 where
-    T: xwt_core::io::Read,
+    T: xwt_core::stream::Read,
 {
     type Error = T::Error;
 

@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use core::future::Future;
 
 use crate::utils::{maybe, Error};
@@ -30,7 +32,3 @@ pub trait Send: maybe::Send {
     where
         D: maybe::Send + AsRef<[u8]>;
 }
-
-pub trait Datagrams: Send + Receive + ReceiveInto {}
-
-impl<T> Datagrams for T where T: Send + Receive + ReceiveInto {}

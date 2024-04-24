@@ -25,12 +25,12 @@ pub async fn main() -> Result<(), JsValue> {
         .await
         .expect("make sure to run the example server before running the examples");
 
-    let connection = connecting.wait_connect().await.unwrap();
+    let session = connecting.wait_connect().await.unwrap();
 
     setup_chat();
 
     let mut client = xwt_example_client_shared::ExampleClient {
-        connection,
+        session,
         nickname: format!("web-{}", rand::random::<u16>()),
         chat_write,
     };

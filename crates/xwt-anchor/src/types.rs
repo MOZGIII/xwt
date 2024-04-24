@@ -7,11 +7,11 @@
 #[repr(transparent)]
 pub struct Endpoint<T>(pub T);
 
-/// A state of a connecting WebTransport connection.
+/// A state of a connecting WebTransport session.
 #[repr(transparent)]
 pub struct Connecting<T>(pub T);
 
-/// A state of a accepting WebTransport connection.
+/// A state of a accepting WebTransport session.
 #[repr(transparent)]
 pub struct Accepting<T>(pub T);
 
@@ -19,9 +19,9 @@ pub struct Accepting<T>(pub T);
 #[repr(transparent)]
 pub struct Request<T>(pub T);
 
-/// A WebTransport connection.
+/// A WebTransport session.
 #[repr(transparent)]
-pub struct Connection<T>(pub T);
+pub struct Session<T>(pub T);
 
 /// An state for an opening bidirectional WebTransport stream.
 #[repr(transparent)]

@@ -5,44 +5,44 @@
 
 mod impls;
 
-use xwt_core::{prelude::*, traits};
+use xwt_core::prelude::*;
 
 pub enum Connect<Endpoint>
 where
-    Endpoint: traits::EndpointConnect,
+    Endpoint: xwt_core::endpoint::Connect,
 {
     Connect(Endpoint::Error),
-    Connecting(<Endpoint::Connecting as traits::Connecting>::Error),
+    Connecting(<Endpoint::Connecting as xwt_core::endpoint::connect::Connecting>::Error),
 }
 
 pub enum Accept<Endpoint>
 where
-    Endpoint: traits::EndpointAccept,
+    Endpoint: xwt_core::endpoint::Accept,
 {
     Accept(Endpoint::Error),
 }
 
 pub enum Accepting<TAccepting>
 where
-    TAccepting: traits::Accepting,
+    TAccepting: xwt_core::endpoint::accept::Accepting,
 {
     Accepting(TAccepting::Error),
-    RequestOk(<TAccepting::Request as traits::Request>::OkError),
-    RequestClose(<TAccepting::Request as traits::Request>::CloseError),
+    RequestOk(<TAccepting::Request as xwt_core::endpoint::accept::Request>::OkError),
+    RequestClose(<TAccepting::Request as xwt_core::endpoint::accept::Request>::CloseError),
 }
 
-pub enum OpenBi<Connection>
+pub enum OpenBi<Session>
 where
-    Connection: traits::OpenBiStream,
+    Session: xwt_core::session::stream::OpenBi,
 {
-    Open(<Connection as traits::OpenBiStream>::Error),
-    Opening(BiStreamOpeningErrorFor<Connection>),
+    Open(<Session as xwt_core::session::stream::OpenBi>::Error),
+    Opening(BiStreamOpeningErrorFor<Session>),
 }
 
-pub enum OpenUni<Connection>
+pub enum OpenUni<Session>
 where
-    Connection: traits::OpenUniStream,
+    Session: xwt_core::session::stream::OpenUni,
 {
-    Open(<Connection as traits::OpenUniStream>::Error),
-    Opening(UniStreamOpeningErrorFor<Connection>),
+    Open(<Session as xwt_core::session::stream::OpenUni>::Error),
+    Opening(UniStreamOpeningErrorFor<Session>),
 }
