@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use super::stream;
 
 pub type BiStreamOpeningErrorFor<T> = <<T as stream::OpenBi>::Opening as stream::OpeningBi>::Error;

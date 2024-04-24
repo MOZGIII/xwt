@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use super::datagram;
 
 pub type SendErrorFor<T> = <T as datagram::Send>::Error;

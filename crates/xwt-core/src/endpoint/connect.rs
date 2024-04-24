@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use core::future::Future;
 
 use crate::utils::{maybe, Error};

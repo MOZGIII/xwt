@@ -1,3 +1,5 @@
+#![allow(missing_docs)]
+
 use super::accept;
 
 pub type AcceptSessionFor<T> = RequestSessionFor<AcceptRequestFor<T>>;
