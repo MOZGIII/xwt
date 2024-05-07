@@ -10,7 +10,7 @@
 
 use std::rc::Rc;
 
-use wasm_bindgen::JsError;
+use wasm_bindgen::prelude::*;
 
 mod error;
 mod options;
@@ -135,7 +135,7 @@ fn wrap_recv_stream(
     stream: sys::WebTransportReceiveStream,
 ) -> RecvStream {
     let reader = web_sys_stream_utils::get_reader_byob(stream.clone());
-    let reader: wasm_bindgen::JsValue = reader.into();
+    let reader: JsValue = reader.into();
     let reader = reader.into();
     let reader = web_sys_async_io::Reader::new(reader);
 
@@ -194,7 +194,7 @@ impl xwt_core::session::stream::AcceptBi for Session {
 
     async fn accept_bi(&self) -> Result<(Self::SendStream, Self::RecvStream), Self::Error> {
         let incoming: web_sys::ReadableStream = self.transport.incoming_bidirectional_streams();
-        let reader: wasm_bindgen::JsValue = incoming.get_reader().into();
+        let reader: JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
         let read_result: crate::sys::ReadableStreamReadResult = read_result.into();
@@ -226,7 +226,7 @@ impl xwt_core::session::stream::AcceptUni for Session {
 
     async fn accept_uni(&self) -> Result<Self::RecvStream, Self::Error> {
         let incoming: web_sys::ReadableStream = self.transport.incoming_unidirectional_streams();
-        let reader: wasm_bindgen::JsValue = incoming.get_reader().into();
+        let reader: JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
         let read_result: crate::sys::ReadableStreamReadResult = read_result.into();
@@ -282,6 +282,41 @@ impl xwt_core::stream::Write for SendStream {
     }
 }
 
+impl xwt_core::stream::Finish for SendStream {
+    type Error = Error;
+
+    async fn finish(self) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.writer.inner.close())
+            .await
+            .map(|_| ())
+            .map_err(Error::from)
+    }
+}
+
+impl xwt_core::stream::Reset for SendStream {
+    type Reason = JsValue;
+    type Error = Error;
+
+    async fn reset(&mut self, reason: Self::Reason) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.writer.inner.abort_with_reason(&reason))
+            .await
+            .map(|_| ())
+            .map_err(Error::from)
+    }
+}
+
+impl xwt_core::stream::Stopped for SendStream {
+    type ErrorCode = u64;
+    type Error = Error;
+
+    async fn stopped(self) -> Result<Self::ErrorCode, Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.writer.inner.closed())
+            .await
+            .map(|_| 0) // TODO: there should be a way to get this value somehow
+            .map_err(Error::from)
+    }
+}
+
 impl xwt_core::stream::Read for RecvStream {
     type Error = Error;
 
@@ -312,6 +347,22 @@ impl xwt_core::stream::Read for RecvStream {
         self.reader.internal_buf = Some(internal_buf_view.buffer());
 
         Ok(Some(len))
+    }
+}
+
+impl xwt_core::stream::Stop for RecvStream {
+    type ErrorCode = f64;
+    type Error = Error;
+
+    async fn stop(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(
+            self.reader
+                .inner
+                .cancel_with_reason(&JsValue::from_f64(error_code)),
+        )
+        .await
+        .map(|_| ())
+        .map_err(Error::from)
     }
 }
 
