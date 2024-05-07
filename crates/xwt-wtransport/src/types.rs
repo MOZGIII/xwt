@@ -45,6 +45,20 @@ macro_rules! newtype {
                 value.0
             }
         }
+
+        impl<$($generics)*> std::ops::Deref for $name<$($generics)*> {
+            type Target = $wrapped_type;
+
+            fn deref(&self) -> &Self::Target {
+                &self.0
+            }
+        }
+
+        impl<$($generics)*> std::ops::DerefMut for $name<$($generics)*> {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                &mut self.0
+            }
+        }
     };
 }
 
