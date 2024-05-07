@@ -145,6 +145,16 @@ impl xwt_core::stream::Read for RecvStream {
     }
 }
 
+impl xwt_core::stream::Stop for RecvStream {
+    type ErrorCode = wtransport::VarInt;
+    type Error = std::convert::Infallible;
+
+    async fn stop(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        self.0.stop(error_code);
+        Ok(())
+    }
+}
+
 impl xwt_core::stream::Write for SendStream {
     type Error = wtransport::error::StreamWriteError;
 
@@ -158,6 +168,36 @@ impl xwt_core::stream::WriteChunk<xwt_core::stream::chunk::U8> for SendStream {
 
     async fn write_chunk<'a>(&'a mut self, buf: &'a [u8]) -> Result<(), Self::Error> {
         self.0.write_all(buf).await
+    }
+}
+
+impl xwt_core::stream::Finish for SendStream {
+    type Error = wtransport::error::StreamWriteError;
+
+    async fn finish(mut self) -> Result<(), Self::Error> {
+        self.0.finish().await
+    }
+}
+
+impl xwt_core::stream::Reset for SendStream {
+    type Reason = wtransport::VarInt;
+    type Error = wtransport::error::StreamWriteError;
+
+    async fn reset(self, reason: Self::Reason) -> Result<(), Self::Error> {
+        self.0.reset(reason);
+        Ok(())
+    }
+}
+
+impl xwt_core::stream::Stopped for SendStream {
+    type ErrorCode = wtransport::VarInt;
+    type Error = wtransport::error::StreamWriteError;
+
+    async fn stopped(self) -> Result<Self::ErrorCode, Self::Error> {
+        match self.0.stopped().await {
+            wtransport::error::StreamWriteError::Stopped(val) => Ok(val),
+            err => Err(err),
+        }
     }
 }
 
