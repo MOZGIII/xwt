@@ -883,12 +883,13 @@ dependencies = [
 
 [[package]]
 name = "rcgen"
-version = "0.12.1"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48406db8ac1f3cbc7dcdb56ec355343817958a356ff430259bb07baf7607e1e1"
+checksum = "54077e1872c46788540de1ea3d7f4ccb1983d12f9aa909b234468676c1a36779"
 dependencies = [
  "pem",
  "ring 0.17.8",
+ "rustls-pki-types",
  "time",
  "yasna",
 ]
@@ -1763,18 +1764,19 @@ checksum = "dff9641d1cd4be8d1a070daf9e3773c5f67e78b4d9d42263020c057706765c04"
 
 [[package]]
 name = "wtransport"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "358eb4bb09681342ab5284da0a4a2443183509874e8417e85391850786d08f33"
+checksum = "3367f124e6272c52b83a8e7c9aaea274782b3f32a8997ed0b33776b540a9a1d2"
 dependencies = [
  "bytes",
+ "pem",
  "quinn",
  "rcgen",
- "ring 0.17.8",
  "rustls",
  "rustls-native-certs",
  "rustls-pemfile 2.1.2",
  "rustls-pki-types",
+ "sha2",
  "socket2",
  "thiserror",
  "time",
@@ -1787,9 +1789,9 @@ dependencies = [
 
 [[package]]
 name = "wtransport-proto"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "394b6588219ddc2ad6bd4ffd2a94d5ad6858ecf02acdd7d39680ba8933103eb9"
+checksum = "78ac9905446911e950a38598640b63c4a6b401e704b6273935dff33f560977c6"
 dependencies = [
  "httlib-huffman",
  "octets",

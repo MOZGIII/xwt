@@ -12,7 +12,7 @@ repository = "https://github.com/MOZGIII/xwt"
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwt-core = { version = "0.4", path = "../xwt-core", default-features = false, features = ["std"] }
 
-wtransport = { version = "0.1.12", default-features = false }
+wtransport = { version = "0.1.13", default-features = false, features = ["self-signed"] }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint" }
