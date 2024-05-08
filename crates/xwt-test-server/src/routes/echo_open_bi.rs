@@ -35,7 +35,7 @@ pub enum OpeningBiStreamError {
     #[error("opening: {0}")]
     Opening(wtransport::error::StreamOpeningError),
     #[error("serving: {0}")]
-    Serving(crate::echo::StreamError),
+    Serving(super::echo::StreamError),
 }
 
 pub async fn serve_opening_bi_stream(
@@ -44,7 +44,7 @@ pub async fn serve_opening_bi_stream(
     let stream = opening_bi_stream
         .await
         .map_err(OpeningBiStreamError::Opening)?;
-    crate::echo::serve_stream(stream)
+    super::echo::serve_stream(stream)
         .await
         .map_err(OpeningBiStreamError::Serving)
 }

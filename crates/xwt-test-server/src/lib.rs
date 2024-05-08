@@ -4,9 +4,8 @@
 #![allow(missing_docs)]
 #![cfg(not(target_family = "wasm"))]
 
-pub mod echo;
-pub mod echo_open_bi;
 pub mod handling;
+pub mod routes;
 
 #[derive(Default)]
 pub struct EndpointParams {
@@ -65,13 +64,10 @@ pub async fn serve_endpoint(
     }
 }
 
-/// All server routes.
-type Routes = (echo::Route, echo_open_bi::Route);
-
 pub async fn serve_incoming_session(
     incoming_session: wtransport::endpoint::IncomingSession,
 ) -> Result<(), wtransport::error::ConnectionError> {
     tracing::info!(message = "got an incoming session");
     let session_request = incoming_session.await?;
-    handling::route::<Routes>(session_request).await
+    handling::route::<routes::Routes>(session_request).await
 }
