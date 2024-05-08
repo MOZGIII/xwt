@@ -129,6 +129,9 @@ pub struct RecvStream {
     pub reader: web_sys_async_io::Reader,
 }
 
+/// The stream error code.
+pub struct StreamErrorCode(pub JsValue);
+
 /// Open a reader for the given stream and create a [`RecvStream`].
 fn wrap_recv_stream(
     transport: &Rc<sys::WebTransport>,
@@ -282,37 +285,41 @@ impl xwt_core::stream::Write for SendStream {
     }
 }
 
+impl xwt_core::stream::WriteAbort for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = Error;
+
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.writer.inner.abort_with_reason(&error_code.0))
+            .await
+            .map(|val| {
+                debug_assert!(val.is_undefined());
+            })
+            .map_err(Error::from)
+    }
+}
+
+impl xwt_core::stream::WriteAborted for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = Error;
+
+    async fn aborted(self) -> Result<Self::ErrorCode, Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.writer.inner.closed())
+            .await
+            .map(StreamErrorCode) // TODO: check that this is correct, most likely not
+            .map_err(Error::from)
+    }
+}
+
 impl xwt_core::stream::Finish for SendStream {
     type Error = Error;
 
     async fn finish(self) -> Result<(), Self::Error> {
         wasm_bindgen_futures::JsFuture::from(self.writer.inner.close())
             .await
-            .map(|_| ())
-            .map_err(Error::from)
-    }
-}
-
-impl xwt_core::stream::Reset for SendStream {
-    type Reason = JsValue;
-    type Error = Error;
-
-    async fn reset(&mut self, reason: Self::Reason) -> Result<(), Self::Error> {
-        wasm_bindgen_futures::JsFuture::from(self.writer.inner.abort_with_reason(&reason))
-            .await
-            .map(|_| ())
-            .map_err(Error::from)
-    }
-}
-
-impl xwt_core::stream::Stopped for SendStream {
-    type ErrorCode = u64;
-    type Error = Error;
-
-    async fn stopped(self) -> Result<Self::ErrorCode, Self::Error> {
-        wasm_bindgen_futures::JsFuture::from(self.writer.inner.closed())
-            .await
-            .map(|_| 0) // TODO: there should be a way to get this value somehow
+            .map(|val| {
+                debug_assert!(val.is_undefined());
+            })
             .map_err(Error::from)
     }
 }
@@ -350,19 +357,30 @@ impl xwt_core::stream::Read for RecvStream {
     }
 }
 
-impl xwt_core::stream::Stop for RecvStream {
-    type ErrorCode = f64;
+impl xwt_core::stream::ReadAbort for RecvStream {
+    type ErrorCode = StreamErrorCode;
     type Error = Error;
 
-    async fn stop(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
-        wasm_bindgen_futures::JsFuture::from(
-            self.reader
-                .inner
-                .cancel_with_reason(&JsValue::from_f64(error_code)),
-        )
-        .await
-        .map(|_| ())
-        .map_err(Error::from)
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.reader.inner.cancel_with_reason(&error_code.0))
+            .await
+            .map(|_| ())
+            .map_err(Error::from)
+    }
+}
+
+impl From<u8> for StreamErrorCode {
+    fn from(value: u8) -> Self {
+        StreamErrorCode(value.into())
+    }
+}
+
+impl TryFrom<StreamErrorCode> for u8 {
+    type Error = Error;
+
+    fn try_from(value: StreamErrorCode) -> Result<Self, Self::Error> {
+        let value = value.0.as_f64().ok_or_else(|| Error(value.0))?;
+        Ok(value as _)
     }
 }
 

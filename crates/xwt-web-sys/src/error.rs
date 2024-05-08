@@ -24,3 +24,9 @@ impl From<wasm_bindgen::JsError> for Error {
         wasm_bindgen::JsValue::from(value).into()
     }
 }
+
+impl From<String> for Error {
+    fn from(value: String) -> Self {
+        wasm_bindgen::JsValue::from(value).into()
+    }
+}
