@@ -6,13 +6,13 @@ use crate::utils::{maybe, Error};
 
 pub trait SendSpec: maybe::Send {
     type SendStream: crate::stream::Write
-        + crate::stream::Finish
-        + crate::stream::Reset
-        + crate::stream::Stopped;
+        + crate::stream::WriteAbort
+        + crate::stream::WriteAborted
+        + crate::stream::Finish;
 }
 
 pub trait RecvSpec: maybe::Send {
-    type RecvStream: crate::stream::Read + crate::stream::Stop;
+    type RecvStream: crate::stream::Read + crate::stream::ReadAbort;
 }
 
 pub trait PairSpec: maybe::Send + SendSpec + RecvSpec {}

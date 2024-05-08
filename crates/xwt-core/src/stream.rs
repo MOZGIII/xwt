@@ -18,20 +18,6 @@ pub trait Read: maybe::Send {
     ) -> impl Future<Output = Result<Option<usize>, Self::Error>> + maybe::Send;
 }
 
-/// Stop the read stream.
-pub trait Stop: maybe::Send {
-    /// An error code to stop the stream with.
-    type ErrorCode: From<u32> + maybe::Send + maybe::Sync;
-    /// An error that can occur while stopping the stream.
-    type Error: Error + maybe::Send + maybe::Sync + 'static;
-
-    /// Stop the stream.
-    fn stop(
-        self,
-        error_code: Self::ErrorCode,
-    ) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send;
-}
-
 /// Write the data to a stream.
 pub trait Write: maybe::Send {
     /// An error that can occur while writing to the stream.
@@ -47,39 +33,79 @@ pub trait Write: maybe::Send {
     ) -> impl Future<Output = Result<usize, Self::Error>> + maybe::Send;
 }
 
+/// Abort the read stream.
+///
+/// Sends a signal to the peer that the read side of the stream has been
+/// aborted.
+/// Discards the receive buffer; the peer is typically expected to abort
+/// the corresponding send side in response.
+///
+/// An unsigned 8-bit error code can be supplied as a part of the signal
+/// to the peer.
+pub trait ReadAbort: maybe::Send {
+    /// An error code to abort the stream with.
+    ///
+    /// Pass `0` for default.
+    type ErrorCode: From<u8> + maybe::Send + maybe::Sync;
+
+    /// An error that can occur while stopping the stream.
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
+
+    /// Abort the stream.
+    fn abort(
+        self,
+        error_code: Self::ErrorCode,
+    ) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send;
+}
+
+/// Abort the write stream.
+///
+/// Sends a signal to the peer that the write side of the stream has been
+/// aborted.
+/// Discards the send buffer; if possible, no currently outstanding data
+/// is transmitted or retransmitted.
+///
+/// An unsigned 8-bit error code can be supplied as a part of the signal to
+/// the peer; if omitted, the error code is presumed to be 0.
+pub trait WriteAbort: maybe::Send {
+    /// An error code to abort the stream with.
+    ///
+    /// Pass `0` for default.
+    type ErrorCode: From<u8> + maybe::Send + maybe::Sync;
+
+    /// An error that can occur while stopping the stream.
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
+
+    /// Abort the stream.
+    fn abort(
+        self,
+        error_code: Self::ErrorCode,
+    ) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send;
+}
+
+/// Wait for the write stream to abort.
+///
+/// This can happen when the "read" part aborts the stream.
+pub trait WriteAborted: maybe::Send {
+    /// An error code the stream is aborted with.
+    type ErrorCode: TryInto<u8> + maybe::Send + maybe::Sync;
+
+    /// An error that can occur while waiting for a stream to be aborted.
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
+
+    /// Wait for a stream to abort.
+    fn aborted(self) -> impl Future<Output = Result<Self::ErrorCode, Self::Error>> + maybe::Send;
+}
+
 /// Finish the write stream.
+///
+/// Call when all data has been submitted and no further data will be written.
 pub trait Finish: maybe::Send {
-    /// An error that can occur while closing the stream.
+    /// An error that can occur while finishing the stream.
     type Error: Error + maybe::Send + maybe::Sync + 'static;
 
     /// Finish the stream.
     fn finish(self) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send;
-}
-
-/// Reset the write stream.
-pub trait Reset: maybe::Send {
-    /// An error that can occur while reseting the stream.
-    type Reason: From<u32> + maybe::Send + maybe::Sync + 'static;
-    /// An error that can occur while reseting the stream.
-    type Error: Error + maybe::Send + maybe::Sync + 'static;
-
-    /// Reset the stream.
-    fn reset(
-        self,
-        reason: Self::Reason,
-    ) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send;
-}
-
-/// Wait for the write stream to stop.
-/// This can happen when the read part stops the stream.
-pub trait Stopped: maybe::Send {
-    /// An error code the stream stopped with.
-    type ErrorCode: Into<u64> + maybe::Send + maybe::Sync;
-    /// An error that can occur while waiting for a stream to stop.
-    type Error: Error + maybe::Send + maybe::Sync + 'static;
-
-    /// Wait for a stream to stop.
-    fn stopped(self) -> impl Future<Output = Result<Self::ErrorCode, Self::Error>> + maybe::Send;
 }
 
 /// An chunk of data with an explicit offset in the stream.
