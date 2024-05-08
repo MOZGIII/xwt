@@ -27,7 +27,7 @@ pub async fn endpoint(
         )
     });
 
-    match identity.certificate_chain().first() {
+    match identity.certificate_chain().as_ref().first() {
         Some(cert) => {
             let sha256_fingerpint = xwt_cert_fingerprint::Sha256::compute_for_der(cert.der());
             tracing::info!(message = "using tls certificate", %sha256_fingerpint);
