@@ -145,12 +145,12 @@ impl xwt_core::stream::Read for RecvStream {
     }
 }
 
-impl xwt_core::stream::Stop for RecvStream {
-    type ErrorCode = wtransport::VarInt;
+impl xwt_core::stream::ReadAbort for RecvStream {
+    type ErrorCode = StreamErrorCode;
     type Error = std::convert::Infallible;
 
-    async fn stop(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
-        self.0.stop(error_code);
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        self.0.stop(error_code.into());
         Ok(())
     }
 }
@@ -171,6 +171,28 @@ impl xwt_core::stream::WriteChunk<xwt_core::stream::chunk::U8> for SendStream {
     }
 }
 
+impl xwt_core::stream::WriteAbort for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = std::convert::Infallible;
+
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        self.0.reset(error_code.into());
+        Ok(())
+    }
+}
+
+impl xwt_core::stream::WriteAborted for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = wtransport::error::StreamWriteError;
+
+    async fn aborted(self) -> Result<Self::ErrorCode, Self::Error> {
+        match self.0.stopped().await {
+            wtransport::error::StreamWriteError::Stopped(val) => Ok(val.into()),
+            err => Err(err),
+        }
+    }
+}
+
 impl xwt_core::stream::Finish for SendStream {
     type Error = wtransport::error::StreamWriteError;
 
@@ -179,25 +201,18 @@ impl xwt_core::stream::Finish for SendStream {
     }
 }
 
-impl xwt_core::stream::Reset for SendStream {
-    type Reason = wtransport::VarInt;
-    type Error = wtransport::error::StreamWriteError;
-
-    async fn reset(self, reason: Self::Reason) -> Result<(), Self::Error> {
-        self.0.reset(reason);
-        Ok(())
+impl From<u8> for StreamErrorCode {
+    fn from(value: u8) -> Self {
+        Self(value.into())
     }
 }
 
-impl xwt_core::stream::Stopped for SendStream {
-    type ErrorCode = wtransport::VarInt;
-    type Error = wtransport::error::StreamWriteError;
+impl TryFrom<StreamErrorCode> for u8 {
+    type Error = <u8 as TryFrom<u64>>::Error;
 
-    async fn stopped(self) -> Result<Self::ErrorCode, Self::Error> {
-        match self.0.stopped().await {
-            wtransport::error::StreamWriteError::Stopped(val) => Ok(val),
-            err => Err(err),
-        }
+    fn try_from(value: StreamErrorCode) -> Result<Self, Self::Error> {
+        let value: u64 = value.0.into();
+        value.try_into()
     }
 }
 
