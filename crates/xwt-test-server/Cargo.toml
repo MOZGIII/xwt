@@ -26,7 +26,8 @@ thiserror = "1"
 tokio = { version = "1", default-features = false, features = ["rt-multi-thread"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", optional = true }
-wtransport = { version = "0.1.13", default-features = false, features = ["self-signed"] }
+typle = "0.10"
+wtransport = { version = "0.1.13", default-features = false, features = ["self-signed", "quinn"] }
 
 [features]
 bin = ["dep:color-eyre", "dep:envfury", "dep:tracing-subscriber", "tokio/macros"]

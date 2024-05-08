@@ -1424,6 +1424,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
+name = "typle"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81269a460d5637912ad758078bff0056129e68f6a84c9ec4f837ae5ee6dfb3d6"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "zip_clone",
+]
+
+[[package]]
 name = "unicode-bidi"
 version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1992,6 +2004,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "typle",
  "wtransport",
  "xwt-cert-fingerprint",
  "xwt-test-assets",
@@ -2072,3 +2085,9 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "zip_clone"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a370fc1fa7531b16def7a211177ae2c3dd56246e6f6109d7855d85338bafe834"

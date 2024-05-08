@@ -1,43 +1,15 @@
 //! The handler that will open a bidi stream.
 
-use std::sync::Arc;
+use crate::handling::{AcceptSessionRequestWith, RouteSession};
 
-pub async fn serve_session_request(
-    session_request: wtransport::endpoint::SessionRequest,
-) -> Result<(), wtransport::error::ConnectionError> {
-    tracing::info!(message = "accepting incoming session");
-    let connection = session_request.accept().await?;
+pub struct Route;
 
-    tracing::info!(message = "new connection accepted");
+impl RouteSession for Route {
+    const PATH: &'static str = "/echo-open-bi";
 
-    let connection = Arc::new(connection);
-
-    let mut joinset = tokio::task::JoinSet::new();
-
-    {
-        let connection = Arc::clone(&connection);
-        joinset.spawn(async move {
-            tracing::info!(message = "opening bidi stream");
-            if let Err(error) = open_bi_stream(connection).await {
-                tracing::error!(message = "error while  opening bidi stream", %error);
-            }
-            tracing::info!(message = "done opening bidi stream");
-        });
+    fn handler() -> impl crate::handling::HandleSessionRequest {
+        AcceptSessionRequestWith((open_bi_stream,))
     }
-
-    connection.closed().await;
-
-    tracing::info!(message = "connection is closing");
-
-    while let Some(result) = joinset.join_next().await {
-        if let Err(panic) = result {
-            tracing::error!(message = "panic in the connection task", %panic);
-        }
-    }
-
-    tracing::info!(message = "connection tasks are finished");
-
-    Ok(())
 }
 
 pub async fn open_bi_stream(
