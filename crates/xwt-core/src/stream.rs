@@ -46,7 +46,7 @@ pub trait ReadAbort: maybe::Send {
     /// An error code to abort the stream with.
     ///
     /// Pass `0` for default.
-    type ErrorCode: From<u8> + maybe::Send + maybe::Sync;
+    type ErrorCode: From<u32> + maybe::Send + maybe::Sync;
 
     /// An error that can occur while stopping the stream.
     type Error: Error + maybe::Send + maybe::Sync + 'static;
@@ -71,7 +71,7 @@ pub trait WriteAbort: maybe::Send {
     /// An error code to abort the stream with.
     ///
     /// Pass `0` for default.
-    type ErrorCode: From<u8> + maybe::Send + maybe::Sync;
+    type ErrorCode: From<u32> + maybe::Send + maybe::Sync;
 
     /// An error that can occur while stopping the stream.
     type Error: Error + maybe::Send + maybe::Sync + 'static;
@@ -88,7 +88,7 @@ pub trait WriteAbort: maybe::Send {
 /// This can happen when the "read" part aborts the stream.
 pub trait WriteAborted: maybe::Send {
     /// An error code the stream is aborted with.
-    type ErrorCode: TryInto<u8> + maybe::Send + maybe::Sync;
+    type ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync;
 
     /// An error that can occur while waiting for a stream to be aborted.
     type Error: Error + maybe::Send + maybe::Sync + 'static;

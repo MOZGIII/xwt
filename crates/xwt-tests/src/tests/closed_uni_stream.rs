@@ -15,16 +15,16 @@ where
     OpeningUniStream(#[source] UniStreamOpeningErrorFor<ConnectSessionFor<Endpoint>>),
     #[error("write stream aborted: {0}")]
     WriteStreamAborted(#[source] WriteAbortedErrorFor<SendStreamFor<ConnectSessionFor<Endpoint>>>),
-    #[error("error code conversion to u8 failed")]
+    #[error("error code conversion to u32 failed")]
     ErrorCodeConversion,
     #[error("error code mismatch: got code {0}")]
-    ErrorCodeMismatch(u8),
+    ErrorCodeMismatch(u32),
 }
 
 pub async fn run<Endpoint>(
     endpoint: Endpoint,
     url: &str,
-    expected_error_code: u8,
+    expected_error_code: u32,
 ) -> Result<(), Error<Endpoint>>
 where
     Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
@@ -44,7 +44,7 @@ where
         .await
         .map_err(Error::WriteStreamAborted)?;
 
-    let error_code: u8 = error_code
+    let error_code: u32 = error_code
         .try_into()
         .map_err(|_| Error::ErrorCodeConversion)?;
 

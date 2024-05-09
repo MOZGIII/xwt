@@ -218,21 +218,6 @@ impl xwt_core::stream::Finish for SendStream {
     }
 }
 
-impl From<u8> for StreamErrorCode {
-    fn from(value: u8) -> Self {
-        Self(value.into())
-    }
-}
-
-impl TryFrom<StreamErrorCode> for u8 {
-    type Error = <u8 as TryFrom<u64>>::Error;
-
-    fn try_from(value: StreamErrorCode) -> Result<Self, Self::Error> {
-        let value: u64 = value.0.into();
-        value.try_into()
-    }
-}
-
 impl xwt_core::session::datagram::Receive for Connection {
     type Datagram = Datagram;
     type Error = wtransport::error::ConnectionError;

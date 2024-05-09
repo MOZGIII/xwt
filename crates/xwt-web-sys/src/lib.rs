@@ -320,7 +320,7 @@ impl xwt_core::stream::WriteAborted for SendStream {
                     return Err(Error(error.into()));
                 }
                 let code = error.stream_error_code().unwrap_or(0);
-                Ok((code as u8).into())
+                Ok(StreamErrorCode(code.into()))
             }
         }
     }
@@ -384,13 +384,13 @@ impl xwt_core::stream::ReadAbort for RecvStream {
     }
 }
 
-impl From<u8> for StreamErrorCode {
-    fn from(value: u8) -> Self {
+impl From<u32> for StreamErrorCode {
+    fn from(value: u32) -> Self {
         StreamErrorCode(value.into())
     }
 }
 
-impl TryFrom<StreamErrorCode> for u8 {
+impl TryFrom<StreamErrorCode> for u32 {
     type Error = Error;
 
     fn try_from(value: StreamErrorCode) -> Result<Self, Self::Error> {
