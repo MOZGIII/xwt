@@ -153,3 +153,33 @@ async fn accept_bi_stream() {
         .await
         .unwrap();
 }
+
+#[wasm_bindgen_test]
+async fn closed_uni_stream() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_uni_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni"),
+        0,
+    )
+    .await
+    .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn closed_uni_stream_with_error() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_uni_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni/error"),
+        123,
+    )
+    .await
+    .unwrap();
+}
