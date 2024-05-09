@@ -165,7 +165,7 @@ where
             }
         }
 
-        tracing::info!(message = "rejecting incoming session due to path mismatch");
+        tracing::info!(message = "rejecting incoming session due to path mismatch", %path);
         session_request.not_found().await;
         Ok(())
     }
