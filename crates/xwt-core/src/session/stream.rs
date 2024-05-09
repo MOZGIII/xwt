@@ -50,7 +50,7 @@ pub trait OpeningUni: maybe::Send {
 }
 
 pub trait OpenUni: SendSpec {
-    type Opening: OpeningUni;
+    type Opening: OpeningUni<Streams = Self>;
     type Error: Error + maybe::Send + maybe::Sync + 'static;
 
     fn open_uni(&self) -> impl Future<Output = Result<Self::Opening, Self::Error>> + maybe::Send;
