@@ -70,7 +70,7 @@ newtype!(OpeningBiStream => wtransport::stream::OpeningBiStream);
 newtype!(OpeningUniStream => wtransport::stream::OpeningUniStream);
 newtype!(SendStream => wtransport::SendStream);
 newtype!(RecvStream => wtransport::RecvStream);
-newtype!(StreamErrorCode => wtransport::VarInt);
+newtype!(StreamErrorCode => u32);
 newtype!(Datagram => wtransport::datagram::Datagram);
 
 /// Expose the [`Session`] as a type alias for [`Connection`], as `wtransport`

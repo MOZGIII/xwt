@@ -2053,6 +2053,7 @@ version = "0.7.1"
 dependencies = [
  "anyhow",
  "color-eyre",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-subscriber",
