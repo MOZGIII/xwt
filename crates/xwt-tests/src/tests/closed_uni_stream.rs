@@ -13,8 +13,8 @@ where
     OpenUniStream(#[source] UniStreamOpenErrorFor<ConnectSessionFor<Endpoint>>),
     #[error("opening uni stream: {0}")]
     OpeningUniStream(#[source] UniStreamOpeningErrorFor<ConnectSessionFor<Endpoint>>),
-    #[error("stream aborted: {0}")]
-    StreamAborted(#[source] WriteAbortedErrorFor<SendStreamFor<ConnectSessionFor<Endpoint>>>),
+    #[error("write stream aborted: {0}")]
+    WriteStreamAborted(#[source] WriteAbortedErrorFor<SendStreamFor<ConnectSessionFor<Endpoint>>>),
     #[error("error code conversion to u8 failed")]
     ErrorCodeConversion,
     #[error("error code mismatch: got code {0}")]
@@ -39,7 +39,10 @@ where
     let opening = session.open_uni().await.map_err(Error::OpenUniStream)?;
     let send_stream = opening.wait_uni().await.map_err(Error::OpeningUniStream)?;
 
-    let error_code = send_stream.aborted().await.map_err(Error::StreamAborted)?;
+    let error_code = send_stream
+        .aborted()
+        .await
+        .map_err(Error::WriteStreamAborted)?;
 
     let error_code: u8 = error_code
         .try_into()
