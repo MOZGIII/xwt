@@ -38,7 +38,7 @@ pub async fn accept_and_close_uni_streams_with_error_code(
     let session = session.as_ref();
     loop {
         let stream = session.accept_uni().await?;
-        stream.stop(123u8.into());
+        stream.stop(webtransport_code_to_http_code(123));
     }
 }
 
@@ -78,7 +78,7 @@ pub async fn accept_and_close_bi_recv_streams_with_error_code(
     let session = session.as_ref();
     loop {
         let (_send_stream, recv_stream) = session.accept_bi().await?;
-        recv_stream.stop(123u8.into());
+        recv_stream.stop(webtransport_code_to_http_code(123u8.into()));
     }
 }
 
@@ -132,6 +132,16 @@ pub async fn accept_and_close_bi_send_streams_with_error_code(
     let session = session.as_ref();
     loop {
         let (send_stream, _recv_stream) = session.accept_bi().await?;
-        send_stream.reset(123u8.into());
+        send_stream.reset(webtransport_code_to_http_code(123));
     }
+}
+
+/// Convert the WebTransport error code into the HTTP3 error code.
+///
+/// We need this because wtransport does not convert error codes at all.
+fn webtransport_code_to_http_code(n: u32) -> wtransport::VarInt {
+    let first: u64 = 0x52e4a40fa8db;
+    let n: u64 = n.into();
+    let val: u64 = first + n + (n / 0x1e);
+    val.try_into().unwrap()
 }
