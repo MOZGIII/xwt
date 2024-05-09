@@ -119,3 +119,35 @@ async fn accept_bi_stream() -> color_eyre::eyre::Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn closed_uni_stream() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_uni_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni"),
+        0,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn closed_uni_stream_with_error() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_uni_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni/error"),
+        123,
+    )
+    .await?;
+
+    Ok(())
+}
