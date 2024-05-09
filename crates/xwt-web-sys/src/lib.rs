@@ -10,6 +10,7 @@
 
 use std::rc::Rc;
 
+use sys::WebTransportErrorSource;
 use wasm_bindgen::prelude::*;
 
 mod error;
@@ -18,6 +19,8 @@ pub mod sys;
 
 pub use web_sys;
 pub use xwt_core as core;
+
+use crate::sys::WebTransportError;
 
 pub use {error::*, options::*};
 
@@ -304,10 +307,22 @@ impl xwt_core::stream::WriteAborted for SendStream {
     type Error = Error;
 
     async fn aborted(self) -> Result<Self::ErrorCode, Self::Error> {
-        wasm_bindgen_futures::JsFuture::from(self.writer.inner.closed())
-            .await
-            .map(StreamErrorCode) // TODO: check that this is correct, most likely not
-            .map_err(Error::from)
+        // Hack our way through...
+        let result = wasm_bindgen_futures::JsFuture::from(self.writer.inner.closed()).await;
+        match result {
+            Ok(value) => {
+                debug_assert!(value.is_undefined());
+                Ok(StreamErrorCode(0u8.into()))
+            }
+            Err(value) => {
+                let error: WebTransportError = value.dyn_into().unwrap();
+                if error.source() != WebTransportErrorSource::Stream {
+                    return Err(Error(error.into()));
+                }
+                let code = error.stream_error_code().unwrap_or(0);
+                Ok((code as u8).into())
+            }
+        }
     }
 }
 

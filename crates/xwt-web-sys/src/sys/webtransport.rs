@@ -1,8 +1,9 @@
 //! Bindings for the transport itself.
 #![allow(missing_docs)]
 
+use js_sys::Object;
 use wasm_bindgen::prelude::*;
-use web_sys::ReadableStream;
+use web_sys::{DomException, ReadableStream};
 
 use super::*;
 
@@ -205,4 +206,50 @@ impl Default for WebTransportSendStreamOptions {
     fn default() -> Self {
         Self::new()
     }
+}
+
+#[wasm_bindgen]
+extern "C" {
+    ///The `WebTransportError` interface.
+    ///
+    /// <https://w3c.github.io/webtransport/#webtransporterror>
+    #[wasm_bindgen(extends = DomException, extends = Object)]
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub type WebTransportError;
+
+    /// ```webidl
+    /// constructor(optional DOMString message = "", optional WebTransportErrorOptions options = {});
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransporterror-webtransporterror>
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> WebTransportError;
+
+    /// ```webidl
+    /// readonly attribute WebTransportErrorSource source;
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransporterror-source>
+    #[wasm_bindgen(method, getter)]
+    pub fn source(this: &WebTransportError) -> WebTransportErrorSource;
+
+    /// ```webidl
+    /// readonly attribute unsigned long? streamErrorCode;
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransporterror-streamerrorcode>
+    #[wasm_bindgen(method, getter = streamErrorCode)]
+    pub fn stream_error_code(this: &WebTransportError) -> Option<u32>;
+}
+
+/// The `WebTransportErrorSource` enum.
+///
+/// <https://w3c.github.io/webtransport/#enumdef-webtransporterrorsource>
+#[wasm_bindgen]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WebTransportErrorSource {
+    /// Error originated from the stream.
+    Stream = "stream",
+    /// Error originated from the session.
+    Session = "session",
 }
