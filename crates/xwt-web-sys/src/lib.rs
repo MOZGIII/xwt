@@ -319,9 +319,9 @@ impl Session {
     /// Receive the datagram and handle the buffer with the given function.
     ///
     /// Cloning the buffer in the `f` will result in the undefined behaviour,
-    /// becaue it will create a second reference to an object that is inteded
+    /// because it will create a second reference to an object that is intended
     /// to be under a `mut ref`.
-    /// Althoug is would not teachnically be unsafe, it would violate
+    /// Although is would not teachnically be unsafe, it would violate
     /// the borrow checker rules.
     pub async fn receive_datagram_with<R>(
         &self,

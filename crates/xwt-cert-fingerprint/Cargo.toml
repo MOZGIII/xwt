@@ -5,9 +5,9 @@ edition = "2021"
 resolver = "2"
 license = "MIT"
 description = """
-Certificate fingerprint computation algoritms related to WebTransport.
+Certificate fingerprint computation algorithms related to WebTransport.
 Not directly required to use xwt, but can be helpful. Also usable without xwt.
-Inteded to work with both wasm and native.
+Intended to work with both wasm and native.
 """
 repository = "https://github.com/MOZGIII/xwt"
 

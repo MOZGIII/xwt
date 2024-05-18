@@ -1,6 +1,6 @@
 //! This crate's types.
 //!
-//! These types are generic around the underlying implementaion that is
+//! These types are generic around the underlying implementation that is
 //! typically required to implement corresponding [`xwt_core`] traits.
 
 /// A WebTransport endpoint.

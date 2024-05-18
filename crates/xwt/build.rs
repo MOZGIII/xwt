@@ -3,7 +3,7 @@
 /// The deprecation message to print during build.
 const DEPRECATION_MESSAGE: &str = "\
 This crate provides a simple mapping to one of the drivers depending on \
-the current build traget (native vs wasm). For better portability, \
+the current build target (native vs wasm). For better portability, \
 the `xwt-core` crate should be used instead, and the drivers should \
 be hand-picked for each of the targets instead of using  a crate like this one. \
 We will be removing the `xwt` crate soon, and you are  free to import \

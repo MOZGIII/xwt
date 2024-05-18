@@ -26,7 +26,7 @@ pub trait Write: maybe::Send {
     /// Write the data from the given buffer into the stream, returning
     /// the amount of of bytes that were successfully written into the stream.
     /// If the returned amount is smaller than the size of the data that was
-    /// being written, the user should try writing the remainig data again.
+    /// being written, the user should try writing the remaining data again.
     fn write(
         &mut self,
         buf: &[u8],

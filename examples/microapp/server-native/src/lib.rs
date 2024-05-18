@@ -50,9 +50,9 @@ async fn handle(
     // Run the handshake on the incoming socket.
     let request = accepting.wait_accept().await?;
 
-    // Verify some of the `wtransport`-sepecific details on the incoming
+    // Verify some of the `wtransport`-specific details on the incoming
     // connection.
-    // We have access to it here becasue this function specifies concrete
+    // We have access to it here because this function specifies concrete
     // type for the `accepting` argument; if it was generic, we would have
     // to require additional trait bounds.
     // Access underlying [`wtransport::endpoint::SessionRequest`] from

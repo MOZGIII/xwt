@@ -71,7 +71,7 @@ impl<Session: xwt_core::base::Session> ExampleClient<Session> {
             // Send it to the stream.
             chat_stream.write(chat_message.as_bytes()).await.unwrap();
 
-            // Wait for 3 to 5 second before sending the next chat messsage.
+            // Wait for 3 to 5 second before sending the next chat message.
             let seconds = thread_rng().gen_range(3..=5);
             async_timer::new_timer(std::time::Duration::from_secs(seconds)).await;
         }
