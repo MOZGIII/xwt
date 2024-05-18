@@ -198,14 +198,22 @@ impl xwt_core::stream::WriteAborted for SendStream {
     type ErrorCode = StreamErrorCode;
     type Error = WriteAbortedError;
 
-    async fn aborted(self) -> Result<Self::ErrorCode, Self::Error> {
-        match self.0.stopped().await {
-            wtransport::error::StreamWriteError::Stopped(val) => {
-                let code = error_codes::from_http(val.into_inner())
+    async fn aborted(mut self) -> Result<Self::ErrorCode, Self::Error> {
+        match self.0.quic_stream_mut().stopped().await {
+            Ok(error_code) => {
+                let code = error_codes::from_http(error_code.into_inner())
                     .map_err(WriteAbortedError::ErrorCodeConversion)?;
                 Ok(StreamErrorCode(code))
             }
-            err => Err(WriteAbortedError::StreamWrite(err)),
+            Err(wtransport::quinn::StoppedError::ConnectionLost(_)) => Err(
+                WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::NotConnected),
+            ),
+            Err(wtransport::quinn::StoppedError::UnknownStream) => Err(
+                WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::QuicProto),
+            ),
+            Err(wtransport::quinn::StoppedError::ZeroRttRejected) => Err(
+                WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::QuicProto),
+            ),
         }
     }
 }
