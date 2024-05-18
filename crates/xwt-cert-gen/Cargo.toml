@@ -11,7 +11,7 @@ Useful for generating certificate. Also usable without xwt.
 repository = "https://github.com/MOZGIII/xwt"
 
 [package.metadata.cargo-machete]
-ignored = ["sha2"]
+ignored = ["sha2", "getrandom"]
 
 [dependencies]
 der = { version = "0.7", default-features = false, features = ["alloc"] }
