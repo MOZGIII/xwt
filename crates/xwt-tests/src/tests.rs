@@ -1,4 +1,5 @@
 pub mod accept_bi_stream;
+pub mod closed_bi_read_stream;
 pub mod closed_uni_stream;
 pub mod datagrams;
 pub mod datagrams_read_into;

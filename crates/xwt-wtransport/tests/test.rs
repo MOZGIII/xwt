@@ -151,3 +151,35 @@ async fn closed_uni_stream_with_error() -> color_eyre::eyre::Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn closed_bi_read_stream() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_bi_read_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/recv"),
+        0,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn closed_bi_read_stream_with_error() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_bi_read_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/recv/error"),
+        123,
+    )
+    .await?;
+
+    Ok(())
+}

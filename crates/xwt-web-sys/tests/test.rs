@@ -183,3 +183,33 @@ async fn closed_uni_stream_with_error() {
     .await
     .unwrap();
 }
+
+#[wasm_bindgen_test]
+async fn closed_bi_read_stream() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_bi_read_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/recv"),
+        0,
+    )
+    .await
+    .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn closed_bi_read_stream_with_error() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_bi_read_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/recv/error"),
+        123,
+    )
+    .await
+    .unwrap();
+}
