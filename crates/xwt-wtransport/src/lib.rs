@@ -186,7 +186,7 @@ impl xwt_core::stream::WriteAbort for SendStream {
 /// An error that can occur while waiting for the write stream being aborted.
 #[derive(Debug, thiserror::Error)]
 pub enum WriteAbortedError {
-    /// An unexpected stream write error has occured.
+    /// An unexpected stream write error has occurred.
     #[error("stream write: {0}")]
     StreamWrite(wtransport::error::StreamWriteError),
     /// An error code failed to convert.
