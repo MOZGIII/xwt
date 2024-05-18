@@ -13,5 +13,5 @@ pub type Routes = (
     close::CloseBiRecv,
     close::CloseBiRecvError,
     close::CloseBiSend,
-    close::CloseUniError,
+    close::CloseBiSendError,
 );
