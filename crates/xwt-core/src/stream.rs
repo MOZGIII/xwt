@@ -108,6 +108,21 @@ pub trait Finish: maybe::Send {
     fn finish(self) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send;
 }
 
+/// A way to represent a stream operation error as an error code.
+pub trait AsErrorCode: maybe::Send {
+    /// An error code the stream is aborted with.
+    type ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync;
+
+    /// Represent the error as an error code.
+    fn as_error_code(&self) -> Option<Self::ErrorCode>;
+}
+
+/// An extension to the [`Read`] trait that enables reading the error code
+/// from a stream reading error.
+pub trait AbortableRead: Read<Error: AsErrorCode> {}
+
+impl<T> AbortableRead for T where T: Read<Error: AsErrorCode> {}
+
 /// An chunk of data with an explicit offset in the stream.
 #[derive(Debug)]
 pub struct Chunk<Data> {
