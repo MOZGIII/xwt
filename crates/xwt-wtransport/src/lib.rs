@@ -138,10 +138,24 @@ impl xwt_core::session::stream::AcceptUni for Connection {
 }
 
 impl xwt_core::stream::Read for RecvStream {
-    type Error = wtransport::error::StreamReadError;
+    type Error = StreamReadError;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
-        self.0.read(buf).await
+        self.0.read(buf).await.map_err(StreamReadError)
+    }
+}
+
+impl xwt_core::stream::AsErrorCode for StreamReadError {
+    type ErrorCode = StreamErrorCode;
+
+    fn as_error_code(&self) -> Option<Self::ErrorCode> {
+        match self.0 {
+            wtransport::error::StreamReadError::Reset(error_code) => {
+                let code = error_codes::from_http(error_code.into_inner()).ok()?;
+                Some(StreamErrorCode(code))
+            }
+            _ => None,
+        }
     }
 }
 

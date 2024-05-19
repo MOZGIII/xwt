@@ -72,8 +72,21 @@ newtype!(SendStream => wtransport::SendStream);
 newtype!(RecvStream => wtransport::RecvStream);
 newtype!(StreamErrorCode => u32);
 newtype!(Datagram => wtransport::datagram::Datagram);
+newtype!(StreamReadError => wtransport::error::StreamReadError);
 
 /// Expose the [`Session`] as a type alias for [`Connection`], as `wtransport`
 /// does not use the session terminology but it might be convenient for
 /// the `xwt` users.
 pub type Session = Connection;
+
+impl std::fmt::Display for StreamReadError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+impl std::error::Error for StreamReadError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        Some(&self.0)
+    }
+}

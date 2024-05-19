@@ -101,7 +101,10 @@ async fn session_drop() -> color_eyre::eyre::Result<()> {
     let endpoint = test_endpoint();
 
     xwt_tests::tests::session_drop::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL, |error| {
-        matches!(error, wtransport::error::StreamReadError::NotConnected)
+        matches!(
+            error,
+            xwt_wtransport::StreamReadError(wtransport::error::StreamReadError::NotConnected)
+        )
     })
     .await?;
 
