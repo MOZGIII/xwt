@@ -16,9 +16,7 @@ where
     #[error("read stream: {0}")]
     ReadStream(#[source] ReadErrorFor<RecvStreamFor<ConnectSessionFor<Endpoint>>>),
     #[error("a read was successful while we expected it to abort")]
-    ReadSuccessful,
-    #[error("a read has successfully finished sending while we expected it to abort")]
-    FinishSuccessful,
+    ReadDidNotFail,
     #[error("error code conversion to u32 failed")]
     ErrorCodeConversion,
     #[error("error code mismatch: got code {0}")]
@@ -34,7 +32,7 @@ where
     Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
     ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
-    RecvStreamFor<ConnectSessionFor<Endpoint>>: xwt_core::stream::Read,
+    RecvStreamFor<ConnectSessionFor<Endpoint>>: xwt_core::stream::AbortableRead,
 {
     let session = crate::utils::connect(&endpoint, url)
         .await
@@ -47,14 +45,15 @@ where
     let mut buf = [0u8; 1];
 
     let error_code = match recv_stream.read(&mut buf).await {
-        Ok(Some(_len)) => return Err(Error::ReadSuccessful),
+        Ok(Some(_len)) => return Err(Error::ReadDidNotFail),
         Ok(None) => 0,
-        Err(_err) => 1337,
+        Err(err) => match err.as_error_code() {
+            Some(error_code) => error_code
+                .try_into()
+                .map_err(|_| Error::ErrorCodeConversion)?,
+            None => return Err(Error::ReadStream(err)),
+        },
     };
-
-    let error_code: u32 = error_code
-        .try_into()
-        .map_err(|_| Error::ErrorCodeConversion)?;
 
     if error_code != expected_error_code {
         return Err(Error::ErrorCodeMismatch(error_code));
