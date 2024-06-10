@@ -471,3 +471,16 @@ impl Drop for Session {
         self.transport.close();
     }
 }
+
+impl xwt_core::stream::AsErrorCode for Error {
+    type ErrorCode = StreamErrorCode;
+
+    fn as_error_code(&self) -> Option<Self::ErrorCode> {
+        let error: &WebTransportError = self.0.dyn_ref()?;
+        if error.source() != WebTransportErrorSource::Stream {
+            return None;
+        }
+        let code = error.stream_error_code().unwrap_or(0);
+        Some(StreamErrorCode(code.into()))
+    }
+}
