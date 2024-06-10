@@ -138,10 +138,35 @@ impl xwt_core::session::stream::AcceptUni for Connection {
 }
 
 impl xwt_core::stream::Read for RecvStream {
-    type Error = wtransport::error::StreamReadError;
+    type Error = StreamReadError;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
-        self.0.read(buf).await
+        self.0.read(buf).await.map_err(StreamReadError)
+    }
+}
+
+impl xwt_core::stream::AsErrorCode for StreamReadError {
+    type ErrorCode = StreamErrorCode;
+
+    fn as_error_code(&self) -> Option<Self::ErrorCode> {
+        match self.0 {
+            wtransport::error::StreamReadError::Reset(error_code) => {
+                let code = error_codes::from_http(error_code.into_inner()).ok()?;
+                Some(StreamErrorCode(code))
+            }
+            _ => None,
+        }
+    }
+}
+
+impl xwt_core::stream::ReadAbort for RecvStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = std::convert::Infallible;
+
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        let code = error_codes::to_http(error_code.0).try_into().unwrap();
+        self.0.stop(code);
+        Ok(())
     }
 }
 
@@ -158,6 +183,60 @@ impl xwt_core::stream::WriteChunk<xwt_core::stream::chunk::U8> for SendStream {
 
     async fn write_chunk<'a>(&'a mut self, buf: &'a [u8]) -> Result<(), Self::Error> {
         self.0.write_all(buf).await
+    }
+}
+
+impl xwt_core::stream::WriteAbort for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = std::convert::Infallible;
+
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        let code = error_codes::to_http(error_code.0).try_into().unwrap();
+        self.0.reset(code);
+        Ok(())
+    }
+}
+
+/// An error that can occur while waiting for the write stream being aborted.
+#[derive(Debug, thiserror::Error)]
+pub enum WriteAbortedError {
+    /// An unexpected stream write error has occurred.
+    #[error("stream write: {0}")]
+    StreamWrite(wtransport::error::StreamWriteError),
+    /// An error code failed to convert.
+    #[error("error code conversion: {0}")]
+    ErrorCodeConversion(error_codes::FromHttpError),
+}
+
+impl xwt_core::stream::WriteAborted for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = WriteAbortedError;
+
+    async fn aborted(mut self) -> Result<Self::ErrorCode, Self::Error> {
+        match self.0.quic_stream_mut().stopped().await {
+            Ok(error_code) => {
+                let code = error_codes::from_http(error_code.into_inner())
+                    .map_err(WriteAbortedError::ErrorCodeConversion)?;
+                Ok(StreamErrorCode(code))
+            }
+            Err(wtransport::quinn::StoppedError::ConnectionLost(_)) => Err(
+                WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::NotConnected),
+            ),
+            Err(wtransport::quinn::StoppedError::UnknownStream) => Err(
+                WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::QuicProto),
+            ),
+            Err(wtransport::quinn::StoppedError::ZeroRttRejected) => Err(
+                WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::QuicProto),
+            ),
+        }
+    }
+}
+
+impl xwt_core::stream::Finish for SendStream {
+    type Error = wtransport::error::StreamWriteError;
+
+    async fn finish(mut self) -> Result<(), Self::Error> {
+        self.0.finish().await
     }
 }
 
@@ -195,5 +274,46 @@ impl xwt_core::session::datagram::Send for Connection {
         D: Send + AsRef<[u8]>,
     {
         self.0.send_datagram(payload)
+    }
+}
+
+/// Conversions of the WebTransport error codes from and to the HTTP3 error
+/// codes.
+///
+/// We need this because [`wtransport`] does not convert error codes at all.
+pub mod error_codes {
+    /// Lower end of the WebTransport HTTP codes.
+    const FIRST: u64 = 0x52e4a40fa8db;
+    /// Higher end of the WebTransport HTTP codes.
+    const LAST: u64 = 0x52e5ac983162;
+
+    /// Convert the WebTransport code value to HTTP3 code.
+    pub fn to_http(n: u32) -> u64 {
+        if n == 0 {
+            return 0;
+        }
+
+        let n: u64 = n.into();
+        FIRST + n + (n / 0x1e)
+    }
+
+    /// An error that occurs when converting the HTTP error code to
+    /// WebTransport error code.
+    #[derive(Debug, thiserror::Error)]
+    #[error("unable to convert HTTP error code to WebTransport error code: {0}")]
+    pub struct FromHttpError(u64);
+
+    /// Convert the HTTP3 code value to WebTransport code.
+    pub fn from_http(h: u64) -> Result<u32, FromHttpError> {
+        if h == 0 {
+            return Ok(0);
+        }
+
+        if !((FIRST..=LAST).contains(&h) && (h - 0x21) % 0x1f != 0) {
+            return Err(FromHttpError(h));
+        }
+        let shifted = h - FIRST;
+        let val = shifted - (shifted / 0x1f);
+        Ok(val.try_into().unwrap())
     }
 }

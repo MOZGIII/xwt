@@ -57,7 +57,7 @@ where
     }
 }
 
-#[typle(Tuple for 1..=5)]
+#[typle(Tuple for 1..=32)]
 impl<T> SpawnHandleSession for T
 where
     T: Tuple,
@@ -146,7 +146,7 @@ pub trait RouteSession: Send {
     fn handler() -> impl HandleSessionRequest;
 }
 
-#[typle(Tuple for 1..=5)]
+#[typle(Tuple for 1..=32)]
 impl<T> StaticHandleSessionRequest for T
 where
     T: Tuple,
@@ -165,7 +165,7 @@ where
             }
         }
 
-        tracing::info!(message = "rejecting incoming session due to path mismatch");
+        tracing::info!(message = "rejecting incoming session due to path mismatch", %path);
         session_request.not_found().await;
         Ok(())
     }
