@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CHROMEDRIVER_PATH=$(find chromedriver -mindepth 2 -maxdepth 2)
+CHROME_PATH=$(pwd)/$(find chrome -mindepth 2 -maxdepth 2)
+
+export PATH="$CHROME_PATH:$PATH"
+export CHROMEDRIVER="$CHROMEDRIVER_PATH/chromedriver"
+
+exec cargo test --target wasm32-unknown-unknown
