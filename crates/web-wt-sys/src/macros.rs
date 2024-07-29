@@ -84,7 +84,7 @@ macro_rules! dictionary_type {
                 $(
                     #[doc = "Get `" $js_name "` field value, if set."]
                     #[wasm_bindgen(method, getter = $js_name)]
-                    pub fn $attr(this: &$name) -> $crate::_dictionary_erase_type_option_jsvalue!(Option<$value_type>);
+                    pub fn [<get_ $attr>](this: &$name) -> $crate::_dictionary_erase_type_option_jsvalue!(Option<$value_type>);
 
                     #[doc = "Set `" $js_name "` field to the given value or unset it."]
                     #[wasm_bindgen(method, setter = $js_name)]

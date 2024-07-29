@@ -18,14 +18,14 @@ async fn dictionary_macro_rw() {
 
     let opts = WebTransportOptions::new();
 
-    assert!(opts.allow_pooling().is_none());
+    assert!(opts.get_allow_pooling().is_none());
 
     opts.set_allow_pooling(true);
-    assert!(opts.allow_pooling().unwrap());
+    assert!(opts.get_allow_pooling().unwrap());
 
     opts.set_allow_pooling(false);
-    assert!(!opts.allow_pooling().unwrap());
+    assert!(!opts.get_allow_pooling().unwrap());
 
     opts.unset_allow_pooling();
-    assert!(opts.allow_pooling().is_none());
+    assert!(opts.get_allow_pooling().is_none());
 }

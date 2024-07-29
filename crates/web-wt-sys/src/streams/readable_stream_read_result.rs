@@ -32,6 +32,6 @@ impl From<ReadableStreamReadResult> for web_sys::ReadableStreamReadResult {
 impl ReadableStreamReadResult {
     /// Returns `true` if `done` field exists and set to `true`.
     pub fn is_done(&self) -> bool {
-        self.done().unwrap_or(false)
+        self.get_done().unwrap_or(false)
     }
 }
