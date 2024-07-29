@@ -3,14 +3,14 @@ use xwt_core::prelude::*;
 #[derive(Debug, thiserror::Error)]
 pub enum Error<Endpoint>
 where
-    Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
+    Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
-    EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
+    ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
 {
     #[error("connect: {0}")]
     Connect(#[source] xwt_error::Connect<Endpoint>),
     #[error("open: {0}")]
-    Open(#[source] xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
+    Open(#[source] xwt_error::OpenBi<ConnectSessionFor<Endpoint>>),
     #[error("write: {0}")]
     Write(#[source] std::io::Error),
     #[error("read: {0}")]
@@ -23,19 +23,17 @@ where
 
 pub async fn run<Endpoint>(endpoint: Endpoint, url: &str) -> Result<(), Error<Endpoint>>
 where
-    Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
+    Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
-    EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
-    SendStreamFor<EndpointConnectConnectionFor<Endpoint>>: tokio::io::AsyncWrite,
-    RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>: tokio::io::AsyncRead,
+    ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
+    SendStreamFor<ConnectSessionFor<Endpoint>>: tokio::io::AsyncWrite,
+    RecvStreamFor<ConnectSessionFor<Endpoint>>: tokio::io::AsyncRead,
 {
-    let connection = crate::utils::connect(&endpoint, url)
+    let session = crate::utils::connect(&endpoint, url)
         .await
         .map_err(Error::Connect)?;
 
-    let (send_stream, recv_stream) = crate::utils::open_bi(&connection)
-        .await
-        .map_err(Error::Open)?;
+    let (send_stream, recv_stream) = crate::utils::open_bi(&session).await.map_err(Error::Open)?;
 
     tokio::pin!(send_stream);
 

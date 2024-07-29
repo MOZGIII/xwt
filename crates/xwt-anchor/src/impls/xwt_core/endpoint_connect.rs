@@ -4,9 +4,9 @@ use xwt_core::utils::maybe;
 
 use crate::types::*;
 
-impl<T> xwt_core::EndpointConnect for Endpoint<T>
+impl<T> xwt_core::endpoint::Connect for Endpoint<T>
 where
-    T: xwt_core::EndpointConnect + maybe::Send + maybe::Sync,
+    T: xwt_core::endpoint::Connect + maybe::Send + maybe::Sync,
 {
     type Connecting = Connecting<T::Connecting>;
     type Error = T::Error;
@@ -16,14 +16,14 @@ where
     }
 }
 
-impl<T> xwt_core::Connecting for Connecting<T>
+impl<T> xwt_core::endpoint::connect::Connecting for Connecting<T>
 where
-    T: xwt_core::Connecting,
+    T: xwt_core::endpoint::connect::Connecting,
 {
-    type Connection = Connection<T::Connection>;
+    type Session = Session<T::Session>;
     type Error = T::Error;
 
-    async fn wait_connect(self) -> Result<Self::Connection, Self::Error> {
-        T::wait_connect(self.0).await.map(Connection)
+    async fn wait_connect(self) -> Result<Self::Session, Self::Error> {
+        T::wait_connect(self.0).await.map(Session)
     }
 }

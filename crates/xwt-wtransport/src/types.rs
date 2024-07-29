@@ -45,6 +45,20 @@ macro_rules! newtype {
                 value.0
             }
         }
+
+        impl<$($generics)*> std::ops::Deref for $name<$($generics)*> {
+            type Target = $wrapped_type;
+
+            fn deref(&self) -> &Self::Target {
+                &self.0
+            }
+        }
+
+        impl<$($generics)*> std::ops::DerefMut for $name<$($generics)*> {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                &mut self.0
+            }
+        }
     };
 }
 
@@ -57,3 +71,8 @@ newtype!(OpeningUniStream => wtransport::stream::OpeningUniStream);
 newtype!(SendStream => wtransport::SendStream);
 newtype!(RecvStream => wtransport::RecvStream);
 newtype!(Datagram => wtransport::datagram::Datagram);
+
+/// Expose the [`Session`] as a type alias for [`Connection`], as `wtransport`
+/// does not use the session terminology but it might be convenient for
+/// the `xwt` users.
+pub type Session = Connection;

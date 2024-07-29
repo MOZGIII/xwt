@@ -888,12 +888,13 @@ dependencies = [
 
 [[package]]
 name = "rcgen"
-version = "0.12.1"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48406db8ac1f3cbc7dcdb56ec355343817958a356ff430259bb07baf7607e1e1"
+checksum = "54077e1872c46788540de1ea3d7f4ccb1983d12f9aa909b234468676c1a36779"
 dependencies = [
  "pem",
  "ring 0.17.8",
+ "rustls-pki-types",
  "time",
  "yasna",
 ]
@@ -1428,6 +1429,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
+name = "typle"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81269a460d5637912ad758078bff0056129e68f6a84c9ec4f837ae5ee6dfb3d6"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+ "zip_clone",
+]
+
+[[package]]
 name = "unicode-bidi"
 version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1786,18 +1799,19 @@ checksum = "dff9641d1cd4be8d1a070daf9e3773c5f67e78b4d9d42263020c057706765c04"
 
 [[package]]
 name = "wtransport"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "358eb4bb09681342ab5284da0a4a2443183509874e8417e85391850786d08f33"
+checksum = "3367f124e6272c52b83a8e7c9aaea274782b3f32a8997ed0b33776b540a9a1d2"
 dependencies = [
  "bytes",
+ "pem",
  "quinn",
  "rcgen",
- "ring 0.17.8",
  "rustls",
  "rustls-native-certs",
  "rustls-pemfile 2.1.2",
  "rustls-pki-types",
+ "sha2",
  "socket2",
  "thiserror",
  "time",
@@ -1810,9 +1824,9 @@ dependencies = [
 
 [[package]]
 name = "wtransport-proto"
-version = "0.1.12"
+version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "394b6588219ddc2ad6bd4ffd2a94d5ad6858ecf02acdd7d39680ba8933103eb9"
+checksum = "78ac9905446911e950a38598640b63c4a6b401e704b6273935dff33f560977c6"
 dependencies = [
  "httlib-huffman",
  "octets",
@@ -1853,7 +1867,7 @@ dependencies = [
 
 [[package]]
 name = "xwt"
-version = "0.12.0"
+version = "0.13.0"
 dependencies = [
  "cfg-if",
  "xwt-web-sys",
@@ -1862,7 +1876,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-anchor"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "xwt-core",
 ]
@@ -1894,11 +1908,11 @@ dependencies = [
 
 [[package]]
 name = "xwt-core"
-version = "0.3.1"
+version = "0.4.2"
 
 [[package]]
 name = "xwt-error"
-version = "0.3.1"
+version = "0.4.0"
 dependencies = [
  "xwt-core",
 ]
@@ -1982,7 +1996,6 @@ name = "xwt-example-server-shared"
 version = "0.1.0"
 dependencies = [
  "futures-util",
- "rand",
  "tokio",
  "xwt-core",
 ]
@@ -2005,7 +2018,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-server"
-version = "0.4.0"
+version = "0.4.2"
 dependencies = [
  "color-eyre",
  "envfury",
@@ -2013,6 +2026,7 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
+ "typle",
  "wtransport",
  "xwt-cert-fingerprint",
  "xwt-test-assets",
@@ -2020,7 +2034,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "thiserror",
  "tokio",
@@ -2031,7 +2045,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web-sys"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "js-sys",
  "tokio",
@@ -2052,7 +2066,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.6.0"
+version = "0.7.1"
 dependencies = [
  "anyhow",
  "color-eyre",
@@ -2094,3 +2108,9 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "zip_clone"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a370fc1fa7531b16def7a211177ae2c3dd56246e6f6109d7855d85338bafe834"

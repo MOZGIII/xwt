@@ -29,10 +29,10 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let connection = connecting.wait_connect().await?;
+    let session = connecting.wait_connect().await?;
 
     let mut client = xwt_example_client_shared::ExampleClient {
-        connection,
+        session,
         nickname: format!("desktop-{}", rand::random::<u16>()),
         chat_write,
     };

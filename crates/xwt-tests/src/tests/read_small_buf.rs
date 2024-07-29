@@ -3,18 +3,18 @@ use xwt_core::prelude::*;
 #[derive(Debug, thiserror::Error)]
 pub enum Error<Endpoint>
 where
-    Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
+    Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
-    EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
+    ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
 {
     #[error("connect: {0}")]
     Connect(#[source] xwt_error::Connect<Endpoint>),
     #[error("open: {0}")]
-    Open(#[source] xwt_error::OpenBi<EndpointConnectConnectionFor<Endpoint>>),
+    Open(#[source] xwt_error::OpenBi<ConnectSessionFor<Endpoint>>),
     #[error("send: {0}")]
-    Send(#[source] WriteErrorFor<SendStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    Send(#[source] WriteErrorFor<SendStreamFor<ConnectSessionFor<Endpoint>>>),
     #[error("recv: {0}")]
-    Recv(#[source] ReadErrorFor<RecvStreamFor<EndpointConnectConnectionFor<Endpoint>>>),
+    Recv(#[source] ReadErrorFor<RecvStreamFor<ConnectSessionFor<Endpoint>>>),
     #[error("no response")]
     NoResponse,
     #[error("bad data")]
@@ -23,17 +23,16 @@ where
 
 pub async fn run<Endpoint>(endpoint: Endpoint, url: &str) -> Result<(), Error<Endpoint>>
 where
-    Endpoint: xwt_core::EndpointConnect + std::fmt::Debug,
+    Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
-    EndpointConnectConnectionFor<Endpoint>: xwt_core::OpenBiStream + std::fmt::Debug,
+    ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
 {
-    let connection = crate::utils::connect(&endpoint, url)
+    let session = crate::utils::connect(&endpoint, url)
         .await
         .map_err(Error::Connect)?;
 
-    let (mut send_stream, mut recv_stream) = crate::utils::open_bi(&connection)
-        .await
-        .map_err(Error::Open)?;
+    let (mut send_stream, mut recv_stream) =
+        crate::utils::open_bi(&session).await.map_err(Error::Open)?;
 
     let mut to_write = &b"hello"[..];
     loop {

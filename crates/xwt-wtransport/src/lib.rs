@@ -15,7 +15,7 @@ pub use xwt_core as core;
 
 pub use self::types::*;
 
-impl xwt_core::traits::EndpointConnect for Endpoint<wtransport::endpoint::endpoint_side::Client> {
+impl xwt_core::endpoint::Connect for Endpoint<wtransport::endpoint::endpoint_side::Client> {
     type Connecting = xwt_core::utils::dummy::Connecting<Connection>;
     type Error = wtransport::error::ConnectingError;
 
@@ -25,7 +25,7 @@ impl xwt_core::traits::EndpointConnect for Endpoint<wtransport::endpoint::endpoi
     }
 }
 
-impl xwt_core::traits::EndpointAccept for Endpoint<wtransport::endpoint::endpoint_side::Server> {
+impl xwt_core::endpoint::Accept for Endpoint<wtransport::endpoint::endpoint_side::Server> {
     type Accepting = IncomingSession;
     type Error = std::convert::Infallible;
 
@@ -36,7 +36,7 @@ impl xwt_core::traits::EndpointAccept for Endpoint<wtransport::endpoint::endpoin
     }
 }
 
-impl xwt_core::traits::Accepting for IncomingSession {
+impl xwt_core::endpoint::accept::Accepting for IncomingSession {
     type Request = SessionRequest;
     type Error = wtransport::error::ConnectionError;
 
@@ -45,12 +45,12 @@ impl xwt_core::traits::Accepting for IncomingSession {
     }
 }
 
-impl xwt_core::traits::Request for SessionRequest {
-    type Connection = Connection;
+impl xwt_core::endpoint::accept::Request for SessionRequest {
+    type Session = Connection;
     type OkError = wtransport::error::ConnectionError;
     type CloseError = std::convert::Infallible;
 
-    async fn ok(self) -> Result<Self::Connection, Self::OkError> {
+    async fn ok(self) -> Result<Self::Session, Self::OkError> {
         self.0.accept().await.map(Connection)
     }
 
@@ -64,8 +64,11 @@ impl xwt_core::traits::Request for SessionRequest {
     }
 }
 
-impl xwt_core::traits::Streams for Connection {
+impl xwt_core::session::stream::SendSpec for Connection {
     type SendStream = SendStream;
+}
+
+impl xwt_core::session::stream::RecvSpec for Connection {
     type RecvStream = RecvStream;
 }
 
@@ -77,16 +80,18 @@ fn map_streams(
     (SendStream(send), RecvStream(recv))
 }
 
-impl xwt_core::traits::OpeningBiStream for OpeningBiStream {
+impl xwt_core::session::stream::OpeningBi for OpeningBiStream {
     type Streams = Connection;
     type Error = wtransport::error::StreamOpeningError;
 
-    async fn wait_bi(self) -> Result<xwt_core::traits::BiStreamsFor<Self::Streams>, Self::Error> {
+    async fn wait_bi(
+        self,
+    ) -> Result<xwt_core::session::stream::TupleFor<Self::Streams>, Self::Error> {
         self.0.await.map(map_streams)
     }
 }
 
-impl xwt_core::traits::OpenBiStream for Connection {
+impl xwt_core::session::stream::OpenBi for Connection {
     type Opening = OpeningBiStream;
     type Error = wtransport::error::ConnectionError;
 
@@ -95,26 +100,27 @@ impl xwt_core::traits::OpenBiStream for Connection {
     }
 }
 
-impl xwt_core::traits::AcceptBiStream for Connection {
+impl xwt_core::session::stream::AcceptBi for Connection {
     type Error = wtransport::error::ConnectionError;
 
-    async fn accept_bi(&self) -> Result<xwt_core::traits::BiStreamsFor<Self>, Self::Error> {
+    async fn accept_bi(&self) -> Result<xwt_core::session::stream::TupleFor<Self>, Self::Error> {
         self.0.accept_bi().await.map(map_streams)
     }
 }
 
-impl xwt_core::traits::OpeningUniStream for OpeningUniStream {
+impl xwt_core::session::stream::OpeningUni for OpeningUniStream {
     type Streams = Connection;
     type Error = wtransport::error::StreamOpeningError;
 
     async fn wait_uni(
         self,
-    ) -> Result<<Self::Streams as xwt_core::traits::Streams>::SendStream, Self::Error> {
+    ) -> Result<<Self::Streams as xwt_core::session::stream::SendSpec>::SendStream, Self::Error>
+    {
         self.0.await.map(SendStream)
     }
 }
 
-impl xwt_core::traits::OpenUniStream for Connection {
+impl xwt_core::session::stream::OpenUni for Connection {
     type Opening = OpeningUniStream;
     type Error = wtransport::error::ConnectionError;
 
@@ -123,7 +129,7 @@ impl xwt_core::traits::OpenUniStream for Connection {
     }
 }
 
-impl xwt_core::traits::AcceptUniStream for Connection {
+impl xwt_core::session::stream::AcceptUni for Connection {
     type Error = wtransport::error::ConnectionError;
 
     async fn accept_uni(&self) -> Result<Self::RecvStream, Self::Error> {
@@ -131,7 +137,7 @@ impl xwt_core::traits::AcceptUniStream for Connection {
     }
 }
 
-impl xwt_core::io::Read for RecvStream {
+impl xwt_core::stream::Read for RecvStream {
     type Error = wtransport::error::StreamReadError;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
@@ -139,7 +145,7 @@ impl xwt_core::io::Read for RecvStream {
     }
 }
 
-impl xwt_core::io::Write for SendStream {
+impl xwt_core::stream::Write for SendStream {
     type Error = wtransport::error::StreamWriteError;
 
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
@@ -147,7 +153,7 @@ impl xwt_core::io::Write for SendStream {
     }
 }
 
-impl xwt_core::io::WriteChunk<xwt_core::io::chunk::U8> for SendStream {
+impl xwt_core::stream::WriteChunk<xwt_core::stream::chunk::U8> for SendStream {
     type Error = wtransport::error::StreamWriteError;
 
     async fn write_chunk<'a>(&'a mut self, buf: &'a [u8]) -> Result<(), Self::Error> {
@@ -155,7 +161,7 @@ impl xwt_core::io::WriteChunk<xwt_core::io::chunk::U8> for SendStream {
     }
 }
 
-impl xwt_core::datagram::Receive for Connection {
+impl xwt_core::session::datagram::Receive for Connection {
     type Datagram = Datagram;
     type Error = wtransport::error::ConnectionError;
 
@@ -170,7 +176,7 @@ impl AsRef<[u8]> for Datagram {
     }
 }
 
-impl xwt_core::datagram::ReceiveInto for Connection {
+impl xwt_core::session::datagram::ReceiveInto for Connection {
     type Error = wtransport::error::ConnectionError;
 
     async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, Self::Error> {
@@ -181,7 +187,7 @@ impl xwt_core::datagram::ReceiveInto for Connection {
     }
 }
 
-impl xwt_core::datagram::Send for Connection {
+impl xwt_core::session::datagram::Send for Connection {
     type Error = wtransport::error::SendDatagramError;
 
     async fn send_datagram<D>(&self, payload: D) -> Result<(), Self::Error>

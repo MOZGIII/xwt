@@ -1,12 +1,12 @@
-//! Implementations related to connection datagram operations.
+//! Implementations related to session datagram operations.
 
 use xwt_core::utils::maybe;
 
 use crate::types::*;
 
-impl<T> xwt_core::datagram::Receive for Connection<T>
+impl<T> xwt_core::session::datagram::Receive for Session<T>
 where
-    T: xwt_core::datagram::Receive + maybe::Send + maybe::Sync,
+    T: xwt_core::session::datagram::Receive + maybe::Send + maybe::Sync,
 {
     type Datagram = Datagram<T::Datagram>;
     type Error = T::Error;
@@ -16,9 +16,9 @@ where
     }
 }
 
-impl<T> xwt_core::datagram::ReceiveInto for Connection<T>
+impl<T> xwt_core::session::datagram::ReceiveInto for Session<T>
 where
-    T: xwt_core::datagram::ReceiveInto + maybe::Send + maybe::Sync,
+    T: xwt_core::session::datagram::ReceiveInto + maybe::Send + maybe::Sync,
 {
     type Error = T::Error;
 
@@ -27,9 +27,9 @@ where
     }
 }
 
-impl<T> xwt_core::datagram::Send for Connection<T>
+impl<T> xwt_core::session::datagram::Send for Session<T>
 where
-    T: xwt_core::datagram::Send + maybe::Send + maybe::Sync,
+    T: xwt_core::session::datagram::Send + maybe::Send + maybe::Sync,
 {
     type Error = T::Error;
 

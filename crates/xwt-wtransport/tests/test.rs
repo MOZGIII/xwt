@@ -95,12 +95,12 @@ async fn read_resize_buf() -> color_eyre::eyre::Result<()> {
 }
 
 #[tokio::test]
-async fn connection_drop() -> color_eyre::eyre::Result<()> {
+async fn session_drop() -> color_eyre::eyre::Result<()> {
     setup()?;
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::connection_drop::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL, |error| {
+    xwt_tests::tests::session_drop::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL, |error| {
         matches!(error, wtransport::error::StreamReadError::NotConnected)
     })
     .await?;

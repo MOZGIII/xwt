@@ -1,0 +1,5 @@
+[default]
+extend-ignore-identifiers-re = ["typle_.*"]
+
+[default.extend-identifiers]
+"typle" = "typle"

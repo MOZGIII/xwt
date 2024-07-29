@@ -2,7 +2,7 @@ use crate::*;
 
 impl<Endpoint> std::fmt::Display for Connect<Endpoint>
 where
-    Endpoint: xwt_core::EndpointConnect,
+    Endpoint: xwt_core::endpoint::Connect,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -14,7 +14,7 @@ where
 
 impl<Endpoint> std::fmt::Display for Accept<Endpoint>
 where
-    Endpoint: xwt_core::EndpointAccept,
+    Endpoint: xwt_core::endpoint::Accept,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -25,7 +25,7 @@ where
 
 impl<TAccepting> std::fmt::Display for Accepting<TAccepting>
 where
-    TAccepting: xwt_core::Accepting,
+    TAccepting: xwt_core::endpoint::accept::Accepting,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -38,7 +38,7 @@ where
 
 impl<Connect> std::fmt::Display for OpenBi<Connect>
 where
-    Connect: xwt_core::OpenBiStream,
+    Connect: xwt_core::session::stream::OpenBi,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -50,7 +50,7 @@ where
 
 impl<Connect> std::fmt::Display for OpenUni<Connect>
 where
-    Connect: xwt_core::OpenUniStream,
+    Connect: xwt_core::session::stream::OpenUni,
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

@@ -1,58 +1,20 @@
 //! The implementation of the echo server.
 
-use std::sync::Arc;
+use crate::handling::{AcceptSessionRequestWith, RouteSession};
 
-pub async fn serve_session_request(
-    session_request: wtransport::endpoint::SessionRequest,
-) -> Result<(), wtransport::error::ConnectionError> {
-    tracing::info!(message = "accepting incoming session");
-    let connection = session_request.accept().await?;
+pub struct Route;
 
-    tracing::info!(message = "new connection accepted");
+impl RouteSession for Route {
+    const PATH: &'static str = "/echo";
 
-    let connection = Arc::new(connection);
-
-    let mut joinset = tokio::task::JoinSet::new();
-
-    {
-        let connection = Arc::clone(&connection);
-        joinset.spawn(async move {
-            tracing::info!(message = "serving streams");
-            if let Err(error) = serve_streams(connection).await {
-                tracing::error!(message = "error while serving streams", %error);
-            }
-            tracing::info!(message = "done serving streams");
-        });
+    fn handler() -> impl crate::handling::HandleSessionRequest {
+        AcceptSessionRequestWith((serve_streams, serve_datagrams))
     }
-    {
-        let connection = Arc::clone(&connection);
-        joinset.spawn(async move {
-            tracing::info!(message = "serving datagrams");
-            if let Err(error) = serve_datagrams(connection).await {
-                tracing::error!(message = "error while serving datagrams", %error);
-            }
-            tracing::info!(message = "done serving datagrams");
-        });
-    }
-
-    connection.closed().await;
-
-    tracing::info!(message = "connection is closing");
-
-    while let Some(result) = joinset.join_next().await {
-        if let Err(panic) = result {
-            tracing::error!(message = "panic in the connection task", %panic);
-        }
-    }
-
-    tracing::info!(message = "connection tasks are finished");
-
-    Ok(())
 }
 
 pub async fn serve_streams(
     connection: impl AsRef<wtransport::Connection>,
-) -> Result<std::convert::Infallible, wtransport::error::ConnectionError> {
+) -> Result<(), wtransport::error::ConnectionError> {
     let connection = connection.as_ref();
     loop {
         let stream = connection.accept_bi().await?;

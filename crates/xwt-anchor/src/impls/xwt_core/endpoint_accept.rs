@@ -4,9 +4,9 @@ use xwt_core::utils::maybe;
 
 use crate::types::*;
 
-impl<T> xwt_core::EndpointAccept for Endpoint<T>
+impl<T> xwt_core::endpoint::Accept for Endpoint<T>
 where
-    T: xwt_core::EndpointAccept + maybe::Send + maybe::Sync,
+    T: xwt_core::endpoint::Accept + maybe::Send + maybe::Sync,
 {
     type Accepting = Accepting<T::Accepting>;
     type Error = T::Error;
@@ -16,9 +16,9 @@ where
     }
 }
 
-impl<T> xwt_core::Accepting for Accepting<T>
+impl<T> xwt_core::endpoint::accept::Accepting for Accepting<T>
 where
-    T: xwt_core::Accepting,
+    T: xwt_core::endpoint::accept::Accepting,
 {
     type Request = Request<T::Request>;
     type Error = T::Error;
@@ -28,16 +28,16 @@ where
     }
 }
 
-impl<T> xwt_core::Request for Request<T>
+impl<T> xwt_core::endpoint::accept::Request for Request<T>
 where
-    T: xwt_core::Request,
+    T: xwt_core::endpoint::accept::Request,
 {
-    type Connection = Connection<T::Connection>;
+    type Session = Session<T::Session>;
     type OkError = T::OkError;
     type CloseError = T::CloseError;
 
-    async fn ok(self) -> Result<Self::Connection, Self::OkError> {
-        T::ok(self.0).await.map(Connection)
+    async fn ok(self) -> Result<Self::Session, Self::OkError> {
+        T::ok(self.0).await.map(Session)
     }
 
     async fn close(self, status: u16) -> Result<(), Self::CloseError> {
