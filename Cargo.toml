@@ -3,4 +3,6 @@ members = ["crates/*", "examples/*/*"]
 resolver = "2"
 
 [patch.crates-io]
-wasm-bindgen = { git = "https://github.com/MOZGIII/wasm-bindgen", branch = "fix-async-into" }
+web-sys = { git = "https://github.com/rustwasm/wasm-bindgen", branch = "main" }
+js-sys = { git = "https://github.com/rustwasm/wasm-bindgen", branch = "main" }
+wasm-bindgen = { git = "https://github.com/rustwasm/wasm-bindgen", branch = "main" }
