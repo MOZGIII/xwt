@@ -37,8 +37,7 @@ impl xwt_core::endpoint::Connect for Endpoint {
 
     async fn connect(&self, url: &str) -> Result<Self::Connecting, Self::Error> {
         let transport = sys::WebTransport::new_with_options(url, &self.options)?;
-        let ready = transport.ready();
-        Ok(Connecting { ready, transport })
+        Ok(Connecting { transport })
     }
 }
 
@@ -48,8 +47,6 @@ impl xwt_core::endpoint::Connect for Endpoint {
 pub struct Connecting {
     /// The WebTransport instance.
     pub transport: sys::WebTransport,
-    /// The readiness promise future.
-    pub ready: js_sys::Promise,
 }
 
 impl xwt_core::endpoint::connect::Connecting for Connecting {
@@ -57,8 +54,8 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
     type Error = Error;
 
     async fn wait_connect(self) -> Result<Self::Session, Self::Error> {
-        let Connecting { transport, ready } = self;
-        let _ = wasm_bindgen_futures::JsFuture::from(ready).await?;
+        let Connecting { transport } = self;
+        transport.ready().await?;
 
         let datagram_read_buffer_size = 65536; // 65k buffers as per spec recommendation
 
