@@ -1,7 +1,5 @@
 //! High-level API for configuring the transport.
 
-use crate::sys;
-
 /// Options for configuring the transport.
 ///
 /// See <https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport#options>.
@@ -90,13 +88,13 @@ pub enum HashAlgorithm {
 
 impl WebTransportOptions {
     /// Creates a JavaScript value from this value.
-    pub fn to_js(&self) -> sys::WebTransportOptions {
-        let js = sys::WebTransportOptions::new();
+    pub fn to_js(&self) -> web_wt_sys::WebTransportOptions {
+        let js = web_wt_sys::WebTransportOptions::new();
         js.set_allow_pooling(self.allow_pooling);
         js.set_congestion_control(match self.congestion_control {
-            CongestionControl::Default => sys::WebTransportCongestionControl::Default,
-            CongestionControl::Throughput => sys::WebTransportCongestionControl::Throughput,
-            CongestionControl::LowLatency => sys::WebTransportCongestionControl::LowLatency,
+            CongestionControl::Default => web_wt_sys::WebTransportCongestionControl::Default,
+            CongestionControl::Throughput => web_wt_sys::WebTransportCongestionControl::Throughput,
+            CongestionControl::LowLatency => web_wt_sys::WebTransportCongestionControl::LowLatency,
         });
         js.set_require_unreliable(self.require_unreliable);
 
@@ -104,7 +102,7 @@ impl WebTransportOptions {
             .server_certificate_hashes
             .iter()
             .map(|cert| {
-                let hash = sys::WebTransportHash::new();
+                let hash = web_wt_sys::WebTransportHash::new();
                 hash.set_algorithm(match cert.algorithm {
                     HashAlgorithm::Sha256 => "sha-256",
                 });
