@@ -194,7 +194,7 @@ impl xwt_core::session::stream::AcceptBi for Session {
         if read_result.is_done() {
             return Err(Error(JsError::new("xwt: accept bi reader is done").into()));
         }
-        let value: web_wt_sys::WebTransportBidirectionalStream = read_result.value().into();
+        let value: web_wt_sys::WebTransportBidirectionalStream = read_result.get_value().into();
         let value = wrap_bi_stream(&self.transport, value);
         Ok(value)
     }
@@ -223,7 +223,7 @@ impl xwt_core::session::stream::AcceptUni for Session {
         if read_result.is_done() {
             return Err(Error(JsError::new("xwt: accept uni reader is done").into()));
         }
-        let value: web_wt_sys::WebTransportReceiveStream = read_result.value().into();
+        let value: web_wt_sys::WebTransportReceiveStream = read_result.get_value().into();
         let recv_stream = wrap_recv_stream(&self.transport, value);
         Ok(recv_stream)
     }
