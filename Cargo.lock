@@ -822,7 +822,7 @@ dependencies = [
  "ring 0.16.20",
  "rustc-hash",
  "rustls",
- "rustls-native-certs",
+ "rustls-native-certs 0.6.3",
  "slab",
  "thiserror",
  "tinyvec",
@@ -975,6 +975,19 @@ checksum = "a9aace74cb666635c918e9c12bc0d348266037aa8eb599b5cba565709a8dff00"
 dependencies = [
  "openssl-probe",
  "rustls-pemfile 1.0.4",
+ "schannel",
+ "security-framework",
+]
+
+[[package]]
+name = "rustls-native-certs"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a88d6d420651b496bdd98684116959239430022a115c1240e6c3993be0b15fba"
+dependencies = [
+ "openssl-probe",
+ "rustls-pemfile 2.1.2",
+ "rustls-pki-types",
  "schannel",
  "security-framework",
 ]
@@ -1776,16 +1789,16 @@ checksum = "dff9641d1cd4be8d1a070daf9e3773c5f67e78b4d9d42263020c057706765c04"
 
 [[package]]
 name = "wtransport"
-version = "0.1.13"
+version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3367f124e6272c52b83a8e7c9aaea274782b3f32a8997ed0b33776b540a9a1d2"
+checksum = "f3715af45f0227dc92d6ce409126450c09f4aec305b899c9bdc9b0aefb4da538"
 dependencies = [
  "bytes",
  "pem",
  "quinn",
  "rcgen",
  "rustls",
- "rustls-native-certs",
+ "rustls-native-certs 0.7.1",
  "rustls-pemfile 2.1.2",
  "rustls-pki-types",
  "sha2",
@@ -1801,9 +1814,9 @@ dependencies = [
 
 [[package]]
 name = "wtransport-proto"
-version = "0.1.13"
+version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78ac9905446911e950a38598640b63c4a6b401e704b6273935dff33f560977c6"
+checksum = "d7bc3b7ced4e99f0ccdaeaa8d51b3ee844fd1b77f9104cf1a46e7afc6e996fd4"
 dependencies = [
  "httlib-huffman",
  "octets",
@@ -1844,7 +1857,7 @@ dependencies = [
 
 [[package]]
 name = "xwt"
-version = "0.13.0"
+version = "0.14.0"
 dependencies = [
  "cfg-if",
  "xwt-web-sys",
@@ -2042,7 +2055,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.7.1"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "color-eyre",
