@@ -35,11 +35,15 @@ impl<T> StreamOps for T where
 ///
 /// Also, consider depending on the individual datagram APIs directly.
 pub trait DatagramOps:
-    maybe::Send + datagram::Send + datagram::Receive + datagram::ReceiveInto
+    maybe::Send + datagram::MaxDatagramSize + datagram::Send + datagram::Receive + datagram::ReceiveInto
 {
 }
 
 impl<T> DatagramOps for T where
-    T: maybe::Send + datagram::Send + datagram::Receive + datagram::ReceiveInto
+    T: maybe::Send
+        + datagram::MaxDatagramSize
+        + datagram::Send
+        + datagram::Receive
+        + datagram::ReceiveInto
 {
 }

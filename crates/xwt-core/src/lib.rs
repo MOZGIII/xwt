@@ -36,7 +36,9 @@ pub mod prelude {
     pub use crate::endpoint::accept::{Accept as _, Accepting as _, Request as _};
     pub use crate::endpoint::connect::{Connect as _, Connecting as _};
     pub use crate::session::base::{DatagramOps as _, StreamOps as _};
-    pub use crate::session::datagram::{Receive as _, ReceiveInto as _, Send as _};
+    pub use crate::session::datagram::{
+        MaxDatagramSize as _, Receive as _, ReceiveInto as _, Send as _,
+    };
     pub use crate::session::stream::{
         AcceptBi as _, AcceptUni as _, OpenBi as _, OpenUni as _, OpeningBi as _, OpeningUni as _,
     };

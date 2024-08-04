@@ -161,6 +161,12 @@ impl xwt_core::stream::WriteChunk<xwt_core::stream::chunk::U8> for SendStream {
     }
 }
 
+impl xwt_core::session::datagram::MaxDatagramSize for Connection {
+    fn max_datagram_size(&self) -> Option<usize> {
+        self.0.max_datagram_size()
+    }
+}
+
 impl xwt_core::session::datagram::Receive for Connection {
     type Datagram = Datagram;
     type Error = wtransport::error::ConnectionError;
