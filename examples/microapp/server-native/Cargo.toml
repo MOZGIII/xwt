@@ -11,7 +11,7 @@ xwt-example-server-shared = { version = "0.1", path = "../server-shared", defaul
 # Core xwt primitives and driver.
 xwt-cert-fingerprint = { version = "0.1", path = "../../../crates/xwt-cert-fingerprint", default-features = false }
 xwt-core = { version = "0.4", path = "../../../crates/xwt-core", default-features = false }
-xwt-wtransport = { version = "0.7", path = "../../../crates/xwt-wtransport", default-features = false }
+xwt-wtransport = { version = "0.8", path = "../../../crates/xwt-wtransport", default-features = false }
 
 # The dependency specific to this being an xwt example that is designed to
 # work with an xwt test server.
@@ -19,4 +19,4 @@ xwt-test-assets = { version = "0.1", path = "../../../crates/xwt-test-assets", d
 
 # The rest of the dependencies.
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-wtransport = { version = "0.1.12", default-features = false, features = ["dangerous-configuration", "self-signed"] }
+wtransport = { version = "0.1.14", default-features = false, features = ["self-signed"] }
