@@ -347,7 +347,7 @@ impl Session {
     }
 }
 
-impl xwt_core::session::datagram::MaxDatagramSize for Session {
+impl xwt_core::session::datagram::MaxSize for Session {
     fn max_datagram_size(&self) -> Option<usize> {
         let max_datagram_size = self.transport.datagrams().max_datagram_size();
         Some(usize::try_from(max_datagram_size).expect("u32 should fit in a usize on WASM"))
