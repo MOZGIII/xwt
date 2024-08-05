@@ -29,7 +29,7 @@ pub async fn run<Endpoint>(endpoint: Endpoint, url: &str) -> Result<(), Error<En
 where
     Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
     Endpoint::Connecting: std::fmt::Debug,
-    ConnectSessionFor<Endpoint>: xwt_core::session::datagram::MaxDatagramSize
+    ConnectSessionFor<Endpoint>: xwt_core::session::datagram::MaxSize
         + xwt_core::session::datagram::Send
         + xwt_core::session::datagram::Receive
         + std::fmt::Debug,
