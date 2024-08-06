@@ -347,6 +347,13 @@ impl Session {
     }
 }
 
+impl xwt_core::session::datagram::MaxSize for Session {
+    fn max_datagram_size(&self) -> Option<usize> {
+        let max_datagram_size = self.transport.datagrams().max_datagram_size();
+        Some(usize::try_from(max_datagram_size).unwrap()) // u32 should fit in a usize on WASM
+    }
+}
+
 impl xwt_core::session::datagram::Receive for Session {
     type Datagram = Vec<u8>;
     type Error = Error;
