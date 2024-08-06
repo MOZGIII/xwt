@@ -1,7 +1,5 @@
 //! High-level API for configuring the transport.
 
-use crate::sys;
-
 /// Options for configuring the transport.
 ///
 /// See <https://developer.mozilla.org/en-US/docs/Web/API/WebTransport/WebTransport#options>.
@@ -90,29 +88,29 @@ pub enum HashAlgorithm {
 
 impl WebTransportOptions {
     /// Creates a JavaScript value from this value.
-    pub fn to_js(&self) -> sys::WebTransportOptions {
-        let mut js = sys::WebTransportOptions::new();
-        js.allow_pooling(self.allow_pooling);
-        js.congestion_control(match self.congestion_control {
-            CongestionControl::Default => sys::WebTransportCongestionControl::Default,
-            CongestionControl::Throughput => sys::WebTransportCongestionControl::Throughput,
-            CongestionControl::LowLatency => sys::WebTransportCongestionControl::LowLatency,
+    pub fn to_js(&self) -> web_wt_sys::WebTransportOptions {
+        let js = web_wt_sys::WebTransportOptions::new();
+        js.set_allow_pooling(self.allow_pooling);
+        js.set_congestion_control(match self.congestion_control {
+            CongestionControl::Default => web_wt_sys::WebTransportCongestionControl::Default,
+            CongestionControl::Throughput => web_wt_sys::WebTransportCongestionControl::Throughput,
+            CongestionControl::LowLatency => web_wt_sys::WebTransportCongestionControl::LowLatency,
         });
-        js.require_unreliable(self.require_unreliable);
+        js.set_require_unreliable(self.require_unreliable);
 
         let cert_hashes = self
             .server_certificate_hashes
             .iter()
             .map(|cert| {
-                let mut hash = sys::WebTransportHash::new();
-                hash.algorithm(match cert.algorithm {
+                let hash = web_wt_sys::WebTransportHash::new();
+                hash.set_algorithm(match cert.algorithm {
                     HashAlgorithm::Sha256 => "sha-256",
                 });
-                hash.value(&js_sys::Uint8Array::from(cert.value.as_ref()));
-                wasm_bindgen::JsValue::from(hash)
+                hash.set_value(&cert.value);
+                hash
             })
-            .collect::<js_sys::Array>();
-        js.server_certificate_hashes(&cert_hashes);
+            .collect::<Vec<_>>();
+        js.set_server_certificate_hashes(cert_hashes);
 
         js
     }

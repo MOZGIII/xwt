@@ -17,8 +17,8 @@ pub fn get_reader_byob(
     readable_stream: impl Into<web_sys::ReadableStream>,
 ) -> web_sys::ReadableStreamByobReader {
     let readable_stream = readable_stream.into();
-    let mut options = web_sys::ReadableStreamGetReaderOptions::new();
-    options.mode(web_sys::ReadableStreamReaderMode::Byob);
+    let options = web_sys::ReadableStreamGetReaderOptions::new();
+    options.set_mode(web_sys::ReadableStreamReaderMode::Byob);
     let reader: wasm_bindgen::JsValue = readable_stream.get_reader_with_options(&options).into();
     reader.into()
 }
