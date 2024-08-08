@@ -8,5 +8,6 @@ publish = false
 cfg-if = "1"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
+xwt-example-server-native = { path = "../server-native", default-features = false }
+
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-xwt-example-server-native = { version = "0.1", path = "../server-native", default-features = false }

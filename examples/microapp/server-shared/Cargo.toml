@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-xwt-core = { version = "0.4", path = "../../../crates/xwt-core" }
+xwt-core = { path = "../../../crates/xwt-core" }
 
 futures-util = "0.3"
 tokio = { version = "1", default-features = false, features = ["time"] }
