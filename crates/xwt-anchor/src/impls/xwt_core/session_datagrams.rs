@@ -40,3 +40,12 @@ where
         T::send_datagram(&self.0, payload).await
     }
 }
+
+impl<T> xwt_core::session::datagram::MaxSize for Session<T>
+where
+    T: xwt_core::session::datagram::MaxSize + maybe::Send + maybe::Sync,
+{
+    fn max_datagram_size(&self) -> Option<usize> {
+        T::max_datagram_size(&self.0)
+    }
+}
