@@ -15,9 +15,9 @@ default-target = "wasm32-unknown-unknown"
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.69"
 paste = "1"
-wasm-bindgen = { version = "0.2.92" }
-wasm-bindgen-futures = { version = "0.4.42" }
-web-sys = { version = "0.3.69", features = [
+wasm-bindgen = { version = "0.2.93" }
+wasm-bindgen-futures = { version = "0.4.43" }
+web-sys = { version = "0.3.70", features = [
   "ReadableStream",
   "WritableStream",
   "WritableStreamDefaultWriter",
@@ -28,5 +28,5 @@ web-sys = { version = "0.3.69", features = [
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 tracing = "0.1"
 tracing-wasm = "0.2"
-wasm-bindgen-test = "0.3"
-web-sys = { version = "0.3", features = ["console"] }
+wasm-bindgen-test = "0.3.43"
+web-sys = { version = "0.3.70", features = ["console"] }

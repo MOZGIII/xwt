@@ -14,6 +14,6 @@ default-target = "wasm32-unknown-unknown"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3"
-wasm-bindgen = { version = "0.2" }
-wasm-bindgen-futures = { version = "0.4" }
-web-sys = { version = "0.3", features = ["ReadableStream", "WritableStream"] }
+wasm-bindgen = { version = "0.2.93" }
+wasm-bindgen-futures = { version = "0.4.43" }
+web-sys = { version = "0.3.70", features = ["ReadableStream", "WritableStream"] }
