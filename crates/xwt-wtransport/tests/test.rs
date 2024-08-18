@@ -3,6 +3,10 @@
 
 use std::matches;
 
+static_assertions::assert_impl_all!(xwt_wtransport::Endpoint<wtransport::endpoint::endpoint_side::Client>: xwt_core::endpoint::Connect);
+static_assertions::assert_impl_all!(xwt_wtransport::Endpoint<wtransport::endpoint::endpoint_side::Server>: xwt_core::endpoint::Accept);
+static_assertions::assert_impl_all!(xwt_wtransport::Session: xwt_core::base::Session);
+
 fn setup() -> color_eyre::eyre::Result<()> {
     static INIT: std::sync::OnceLock<()> = std::sync::OnceLock::new();
     INIT.get_or_try_init::<_, color_eyre::eyre::Error>(|| {

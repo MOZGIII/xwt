@@ -5,6 +5,9 @@ use xwt_web_sys::{CertificateHash, HashAlgorithm, WebTransportOptions};
 
 wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
+static_assertions::assert_impl_all!(xwt_web_sys::Endpoint: xwt_core::endpoint::Connect);
+static_assertions::assert_impl_all!(xwt_web_sys::Session: xwt_core::base::Session);
+
 fn setup() {
     static INIT: std::sync::Once = std::sync::Once::new();
     INIT.call_once(|| {
