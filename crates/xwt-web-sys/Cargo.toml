@@ -29,6 +29,7 @@ xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint", defa
 xwt-test-assets = { version = "0.1.2", path = "../xwt-test-assets" }
 xwt-tests = { version = "0.7", path = "../xwt-tests" }
 
+static_assertions = "1"
 tracing = "0.1"
 tracing-wasm = "0.2"
 wasm-bindgen-test = "0.3"
