@@ -3,5 +3,6 @@
   "rust-analyzer.cargo.target": "wasm32-unknown-unknown",
   "rust-analyzer.check.targets": ["wasm32-unknown-unknown"],
   "rust-analyzer.check.command": "clippy",
-  "rust-analyzer.cargo.features": "all"
+  "rust-analyzer.cargo.features": "all",
+  "rust-analyzer.cargo.targetDir": true
 }
