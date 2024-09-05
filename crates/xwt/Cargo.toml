@@ -1,6 +1,6 @@
 [package]
 name = "xwt"
-version = "0.15.0"
+version = "0.16.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -27,4 +27,4 @@ cfg-if = "1"
 xwt-web-sys = { version = "0.12", path = "../xwt-web-sys", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-wtransport = { version = "0.9", path = "../xwt-wtransport", default-features = false }
+xwt-wtransport = { version = "0.10", path = "../xwt-wtransport", default-features = false }
