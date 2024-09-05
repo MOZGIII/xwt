@@ -27,7 +27,7 @@ tokio = { version = "1", default-features = false, features = ["rt-multi-thread"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", optional = true }
 typle = "0.10"
-wtransport = { version = "0.1.14", default-features = false, features = ["self-signed", "quinn"] }
+wtransport = { version = "0.3.0", default-features = false, features = ["self-signed", "quinn"] }
 
 [features]
 bin = ["dep:color-eyre", "dep:envfury", "dep:tracing-subscriber", "tokio/macros"]

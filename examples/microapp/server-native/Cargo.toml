@@ -19,4 +19,4 @@ xwt-test-assets = { path = "../../../crates/xwt-test-assets", default-features =
 
 # The rest of the dependencies.
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-wtransport = { version = "0.1.14", default-features = false, features = ["self-signed"] }
+wtransport = { version = "0.3.0", default-features = false, features = ["self-signed"] }
