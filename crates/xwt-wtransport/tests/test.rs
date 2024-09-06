@@ -19,13 +19,14 @@ fn setup() -> color_eyre::eyre::Result<()> {
 
 fn test_endpoint() -> xwt_wtransport::Endpoint<wtransport::endpoint::endpoint_side::Client> {
     let mut root_store = wtransport::tls::rustls::RootCertStore::empty();
-    root_store.add_parsable_certificates(&[xwt_test_assets::CERT]);
+    root_store.add_parsable_certificates(
+        [xwt_test_assets::CERT].map(wtransport::tls::rustls::pki_types::CertificateDer::from_slice),
+    );
 
     let digest = xwt_cert_fingerprint::Sha256::compute_for_der(xwt_test_assets::CERT);
     tracing::info!("certificate sha256 digest: {digest}");
 
     let mut tls_config = wtransport::tls::rustls::ClientConfig::builder()
-        .with_safe_defaults()
         .with_root_certificates(root_store)
         .with_no_client_auth();
 
