@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web-sys"
-version = "0.12.0"
+version = "0.13.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -16,7 +16,7 @@ default-target = "wasm32-unknown-unknown"
 [target.'cfg(target_family = "wasm")'.dependencies]
 web-sys-async-io = { version = "0.4", path = "../web-sys-async-io" }
 web-sys-stream-utils = { version = "0.2", path = "../web-sys-stream-utils" }
-web-wt-sys = { version = "0.1", path = "../web-wt-sys", default-features = false }
+web-wt-sys = { version = "0.2", path = "../web-wt-sys", default-features = false }
 xwt-core = { version = "0.5", path = "../xwt-core", default-features = false }
 
 js-sys = "0.3"
