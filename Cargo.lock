@@ -1971,7 +1971,7 @@ dependencies = [
  "xwt-core",
  "xwt-example-client-shared",
  "xwt-test-assets",
- "xwt-web-sys",
+ "xwt-web",
 ]
 
 [[package]]
@@ -2049,7 +2049,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "xwt-web-sys"
+name = "xwt-web"
 version = "0.13.0"
 dependencies = [
  "js-sys",

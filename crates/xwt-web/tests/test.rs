@@ -1,12 +1,12 @@
 #![cfg(target_family = "wasm")]
 
 use wasm_bindgen_test::*;
-use xwt_web_sys::{CertificateHash, HashAlgorithm, WebTransportOptions};
+use xwt_web::{CertificateHash, HashAlgorithm, WebTransportOptions};
 
 wasm_bindgen_test::wasm_bindgen_test_configure!(run_in_browser);
 
-static_assertions::assert_impl_all!(xwt_web_sys::Endpoint: xwt_core::endpoint::Connect);
-static_assertions::assert_impl_all!(xwt_web_sys::Session: xwt_core::base::Session);
+static_assertions::assert_impl_all!(xwt_web::Endpoint: xwt_core::endpoint::Connect);
+static_assertions::assert_impl_all!(xwt_web::Session: xwt_core::base::Session);
 
 fn setup() {
     static INIT: std::sync::Once = std::sync::Once::new();
@@ -15,7 +15,7 @@ fn setup() {
     });
 }
 
-fn test_endpoint() -> xwt_web_sys::Endpoint {
+fn test_endpoint() -> xwt_web::Endpoint {
     let digest = xwt_cert_fingerprint::Sha256::compute_for_der(xwt_test_assets::CERT);
     console_log!("certificate sha256 digest: {digest}");
 
@@ -27,7 +27,7 @@ fn test_endpoint() -> xwt_web_sys::Endpoint {
         ..Default::default()
     };
 
-    xwt_web_sys::Endpoint {
+    xwt_web::Endpoint {
         options: options.to_js(),
     }
 }
