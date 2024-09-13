@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+npx @puppeteer/browsers install chrome
+npx @puppeteer/browsers install chromedriver
