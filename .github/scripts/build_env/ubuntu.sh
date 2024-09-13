@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 get_wasm_bindgen_version() {
   cargo metadata \
     --format-version 1 \
-    --manifest-path crates/xwt-web-sys/Cargo.toml \
+    --manifest-path crates/xwt-web/Cargo.toml \
     --filter-platform wasm32-unknown-unknown \
     --quiet |
     jq -r \

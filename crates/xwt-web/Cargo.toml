@@ -1,5 +1,5 @@
 [package]
-name = "xwt-web-sys"
+name = "xwt-web"
 version = "0.13.0"
 edition = "2021"
 resolver = "2"

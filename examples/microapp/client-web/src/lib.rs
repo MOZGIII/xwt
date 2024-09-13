@@ -9,14 +9,14 @@ use xwt_core::prelude::*;
 pub async fn main() -> Result<(), JsValue> {
     let server_cert_hash = xwt_cert_fingerprint::Sha256::compute_for_der(xwt_test_assets::CERT);
 
-    let options = xwt_web_sys::WebTransportOptions {
-        server_certificate_hashes: vec![xwt_web_sys::CertificateHash {
-            algorithm: xwt_web_sys::HashAlgorithm::Sha256,
+    let options = xwt_web::WebTransportOptions {
+        server_certificate_hashes: vec![xwt_web::CertificateHash {
+            algorithm: xwt_web::HashAlgorithm::Sha256,
             value: server_cert_hash.into_inner().to_vec(),
         }],
         ..Default::default()
     };
-    let endpoint = xwt_web_sys::Endpoint {
+    let endpoint = xwt_web::Endpoint {
         options: options.to_js(),
     };
 

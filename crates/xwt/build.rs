@@ -7,7 +7,7 @@ the current build target (native vs wasm). For better portability, \
 the `xwt-core` crate should be used instead, and the drivers should \
 be hand-picked for each of the targets instead of using a crate like this one. \
 We will be removing the `xwt` crate soon, and you are free to import \
-`xwt-web-sys` and `xwt-wtransport` manually and put them under \
+`xwt-web` and `xwt-wtransport` manually and put them under \
 a `cfg_if!` macro yourself if you prefer this mode of operation; they key \
 difference there is you maintain explicit control over the your driver \
 dependencies rather than us having to tie them together for you - and this how \
