@@ -1877,12 +1877,7 @@ dependencies = [
 
 [[package]]
 name = "xwt"
-version = "0.17.0"
-dependencies = [
- "cfg-if",
- "xwt-web-sys",
- "xwt-wtransport",
-]
+version = "0.18.0"
 
 [[package]]
 name = "xwt-anchor"
