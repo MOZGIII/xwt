@@ -16,6 +16,7 @@ mod error;
 mod options;
 
 pub use web_sys;
+pub use web_wt_sys;
 pub use xwt_core as core;
 
 pub use {error::*, options::*};
