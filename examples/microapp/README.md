@@ -16,13 +16,13 @@ The server-side works works in the native environment only.
 Native:
 
 ```shell
-cargo run -p xwt-example-client
+cargo run --bin xwt-example-client
 ```
 
 Web:
 
 ```shell
-cargo run -p xwt-example-client --target wasm32-unknown-unknown
+cargo run --bin xwt-example-client --target wasm32-unknown-unknown
 ```
 
 ### Server
@@ -30,7 +30,7 @@ cargo run -p xwt-example-client --target wasm32-unknown-unknown
 Native:
 
 ```shell
-cargo run -p xwt-example-server
+cargo run --bin xwt-example-server
 ```
 
 Web is not supported.
