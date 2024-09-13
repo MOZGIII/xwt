@@ -70,9 +70,34 @@ newtype!(OpeningBiStream => wtransport::stream::OpeningBiStream);
 newtype!(OpeningUniStream => wtransport::stream::OpeningUniStream);
 newtype!(SendStream => wtransport::SendStream);
 newtype!(RecvStream => wtransport::RecvStream);
+newtype!(StreamErrorCode => u32);
 newtype!(Datagram => wtransport::datagram::Datagram);
 
 /// Expose the [`Session`] as a type alias for [`Connection`], as `wtransport`
 /// does not use the session terminology but it might be convenient for
 /// the `xwt` users.
 pub type Session = Connection;
+
+/// The read error.
+#[derive(Debug, thiserror::Error)]
+pub enum StreamReadError {
+    /// The `wtransport` read call failed.
+    #[error("stream read: {0}")]
+    Read(wtransport::error::StreamReadError),
+
+    /// The stream was closed without an error.
+    #[error("stream closed")]
+    Closed,
+}
+
+/// The write error.
+#[derive(Debug, thiserror::Error)]
+pub enum StreamWriteError {
+    /// The write was called with a zero-size write buffer.
+    #[error("zero size write buffer")]
+    ZeroSizeWriteBuffer,
+
+    /// The `wtransport` write call failed.
+    #[error("stream write: {0}")]
+    Write(wtransport::error::StreamWriteError),
+}

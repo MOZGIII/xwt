@@ -3,3 +3,5 @@
 pub mod consts;
 pub mod tests;
 pub mod utils;
+
+pub use constcat::concat;

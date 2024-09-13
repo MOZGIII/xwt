@@ -106,7 +106,10 @@ async fn session_drop() -> color_eyre::eyre::Result<()> {
     let endpoint = test_endpoint();
 
     xwt_tests::tests::session_drop::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL, |error| {
-        matches!(error, wtransport::error::StreamReadError::NotConnected)
+        matches!(
+            error,
+            xwt_wtransport::StreamReadError::Read(wtransport::error::StreamReadError::NotConnected)
+        )
     })
     .await?;
 
@@ -121,6 +124,102 @@ async fn accept_bi_stream() -> color_eyre::eyre::Result<()> {
 
     xwt_tests::tests::accept_bi_stream::run(endpoint, xwt_tests::consts::ECHO_OPEN_BI_SERVER_URL)
         .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn closed_uni_stream() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_uni_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni"),
+        0,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn closed_uni_stream_with_error() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_uni_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni/error"),
+        123,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn closed_bi_read_stream() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_bi_read_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/recv"),
+        0,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn closed_bi_read_stream_with_error() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_bi_read_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/recv/error"),
+        123,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn closed_bi_send_stream() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_bi_send_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/send"),
+        0,
+    )
+    .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn closed_bi_send_stream_with_error() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::closed_bi_send_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/send/error"),
+        123,
+    )
+    .await?;
 
     Ok(())
 }
