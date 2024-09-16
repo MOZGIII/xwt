@@ -15,8 +15,6 @@ where
     Send(#[source] WriteErrorFor<SendStreamFor<ConnectSessionFor<Endpoint>>>),
     #[error("recv: {0}")]
     Recv(#[source] ReadErrorFor<RecvStreamFor<ConnectSessionFor<Endpoint>>>),
-    #[error("no response")]
-    NoResponse,
     #[error("bad data")]
     BadData(Vec<u8>),
 }
@@ -37,6 +35,7 @@ where
     let mut to_write = &b"hello"[..];
     loop {
         let written = send_stream.write(to_write).await.map_err(Error::Send)?;
+        let written = written.get();
         to_write = &to_write[written..];
         if to_write.is_empty() {
             break;
@@ -45,13 +44,11 @@ where
 
     let mut read_buf = vec![0u8; 1];
 
-    let Some(read) = recv_stream
+    let read = recv_stream
         .read(&mut read_buf[..])
         .await
-        .map_err(Error::Recv)?
-    else {
-        return Err(Error::NoResponse);
-    };
+        .map_err(Error::Recv)?;
+    let read = read.get();
     read_buf.truncate(read);
 
     if read_buf != b"h" {
@@ -60,26 +57,22 @@ where
 
     let mut read_buf = vec![0u8; 3];
 
-    let Some(read) = recv_stream
+    let read = recv_stream
         .read(&mut read_buf[..])
         .await
-        .map_err(Error::Recv)?
-    else {
-        return Err(Error::NoResponse);
-    };
+        .map_err(Error::Recv)?;
+    let read = read.get();
     read_buf.truncate(read);
 
     if read_buf != b"ell" {
         return Err(Error::BadData(read_buf));
     }
 
-    let Some(read) = recv_stream
+    let read = recv_stream
         .read(&mut read_buf[..])
         .await
-        .map_err(Error::Recv)?
-    else {
-        return Err(Error::NoResponse);
-    };
+        .map_err(Error::Recv)?;
+    let read = read.get();
     read_buf.truncate(read);
 
     if read_buf != b"o" {

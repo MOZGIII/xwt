@@ -40,7 +40,10 @@ pub mod prelude {
     pub use crate::session::stream::{
         AcceptBi as _, AcceptUni as _, OpenBi as _, OpenUni as _, OpeningBi as _, OpeningUni as _,
     };
-    pub use crate::stream::{Read as _, ReadChunk as _, Write as _, WriteChunk as _};
+    pub use crate::stream::{
+        AsErrorCode as _, Finish as _, Read as _, ReadAbort as _, ReadChunk as _, Write as _,
+        WriteAbort as _, WriteAborted as _, WriteChunk as _,
+    };
 
     pub use crate::endpoint::accept_utils::*;
     pub use crate::endpoint::connect_utils::*;
