@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+rm -rf crates/xwt-test-assets/target/*.{der,pem}
