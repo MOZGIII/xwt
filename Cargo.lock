@@ -35,7 +35,7 @@ dependencies = [
  "nom",
  "num-traits",
  "rusticata-macros",
- "thiserror",
+ "thiserror 1.0.58",
  "time",
 ]
 
@@ -361,7 +361,7 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "992989d95ee0d6435382c5410dca47ab489b7a83c96e18b5b1874734e1409b6f"
 dependencies = [
- "thiserror",
+ "thiserror 1.0.58",
 ]
 
 [[package]]
@@ -797,9 +797,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.81"
+version = "1.0.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d1597b0c024618f09a9c3b8655b7e430397a36d23fdafec26d6965e9eec3eba"
+checksum = "37d3544b3f2748c54e147655edb5025752e2303145b5aefb3c3ea2c78b973bb0"
 dependencies = [
  "unicode-ident",
 ]
@@ -817,7 +817,7 @@ dependencies = [
  "rustc-hash",
  "rustls",
  "socket2",
- "thiserror",
+ "thiserror 1.0.58",
  "tokio",
  "tracing",
 ]
@@ -834,7 +834,7 @@ dependencies = [
  "rustc-hash",
  "rustls",
  "slab",
- "thiserror",
+ "thiserror 1.0.58",
  "tinyvec",
  "tracing",
 ]
@@ -1182,9 +1182,9 @@ checksum = "81cdd64d312baedb58e21336b31bc043b77e01cc99033ce76ef539f78e965ebc"
 
 [[package]]
 name = "syn"
-version = "2.0.48"
+version = "2.0.90"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f3531638e407dfc0814761abb7c00a5b54992b849452a0646b7f65c9f770f3f"
+checksum = "919d3b74a5dd0ccd15aeb8f93e7006bd9e14c295087c9896a110f490752bcf31"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1208,7 +1208,16 @@ version = "1.0.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03468839009160513471e86a034bb2c5c0e4baae3b43f79ffc55c4a5427b3297"
 dependencies = [
- "thiserror-impl",
+ "thiserror-impl 1.0.58",
+]
+
+[[package]]
+name = "thiserror"
+version = "2.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c006c85c7651b3cf2ada4584faa36773bd07bac24acfb39f3c431b36d7e667aa"
+dependencies = [
+ "thiserror-impl 2.0.3",
 ]
 
 [[package]]
@@ -1216,6 +1225,17 @@ name = "thiserror-impl"
 version = "1.0.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c61f3ba182994efc43764a46c018c347bc492c79f024e705f46567b418f6d4f7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "thiserror-impl"
+version = "2.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f077553d607adc1caf65430528a576c757a71ed73944b66ebb58ef2bbd243568"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1650,7 +1670,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1823,7 +1843,7 @@ dependencies = [
  "rustls-pki-types",
  "sha2",
  "socket2",
- "thiserror",
+ "thiserror 1.0.58",
  "time",
  "tokio",
  "tracing",
@@ -1840,7 +1860,7 @@ checksum = "e2e4eb0239a9157bc05e8a40deccc9358796db67e42d096f7673630f17955edb"
 dependencies = [
  "httlib-huffman",
  "octets",
- "thiserror",
+ "thiserror 1.0.58",
  "url",
 ]
 
@@ -1871,7 +1891,7 @@ dependencies = [
  "nom",
  "oid-registry",
  "rusticata-macros",
- "thiserror",
+ "thiserror 1.0.58",
  "time",
 ]
 
@@ -1898,7 +1918,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-cert-gen"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "der",
  "getrandom",
@@ -1907,7 +1927,7 @@ dependencies = [
  "sha2",
  "signature",
  "spki",
- "thiserror",
+ "thiserror 2.0.3",
  "x509-cert",
 ]
 
@@ -2007,14 +2027,14 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-assets"
-version = "0.1.2"
+version = "0.2.0"
 dependencies = [
  "xwt-test-assets-build",
 ]
 
 [[package]]
 name = "xwt-test-assets-build"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "p256",
  "rand",
@@ -2023,11 +2043,11 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-server"
-version = "0.4.3"
+version = "0.5.0"
 dependencies = [
  "color-eyre",
  "envfury",
- "thiserror",
+ "thiserror 2.0.3",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2039,9 +2059,9 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
- "thiserror",
+ "thiserror 2.0.3",
  "tokio",
  "tracing",
  "xwt-core",
@@ -2050,7 +2070,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web"
-version = "0.13.0"
+version = "0.14.0"
 dependencies = [
  "js-sys",
  "static_assertions",
@@ -2072,7 +2092,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.10.0"
+version = "0.11.0"
 dependencies = [
  "anyhow",
  "color-eyre",

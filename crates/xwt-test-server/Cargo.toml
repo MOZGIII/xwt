@@ -1,6 +1,6 @@
 [package]
 name = "xwt-test-server"
-version = "0.4.3"
+version = "0.5.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -18,11 +18,11 @@ required-features = ["bin"]
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint" }
-xwt-test-assets = { version = "0.1.2", path = "../xwt-test-assets" }
+xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
 
 color-eyre = { version = "0.6", optional = true }
 envfury = { version = "0.2", optional = true }
-thiserror = "1"
+thiserror = "2"
 tokio = { version = "1", default-features = false, features = ["rt-multi-thread"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", optional = true }
