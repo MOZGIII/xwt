@@ -81,12 +81,15 @@ impl<Session: xwt_core::base::Session> ExampleClient<Session> {
     pub async fn chat_inbound_loop(&self, mut chat_stream: Session::RecvStream) {
         let mut read_buf = [0u8; 1024];
         loop {
-            // Read the message from the chat stream, and stop if the stream
-            // is closed.
-            let Some(len) = chat_stream.read(&mut read_buf).await.unwrap() else {
-                break; // client has closed the chat stream
+            // Read the message from the chat stream.
+            let result = chat_stream.read(&mut read_buf).await;
+            // Stop if the stream is closed, and panic on any other error.
+            let len = match result {
+                Ok(len) => len,
+                Err(err) if err.is_error_code(0) => break, // server has closed the chat stream
+                Err(err) => panic!("unexpected error: {err:?}"),
             };
-            let chat_message_bytes = &read_buf[..len];
+            let chat_message_bytes = &read_buf[..len.get()];
 
             // Parse the message bytes into a string ref.
             let chat_message = core::str::from_utf8(chat_message_bytes).unwrap();

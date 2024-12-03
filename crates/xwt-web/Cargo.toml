@@ -20,10 +20,11 @@ web-wt-sys = { version = "0.2", path = "../web-wt-sys", default-features = false
 xwt-core = { version = "0.5", path = "../xwt-core", default-features = false }
 
 js-sys = "0.3"
+thiserror = "2"
 tokio = { version = "1", default-features = false, features = ["sync"] }
 wasm-bindgen = { version = "0.2" }
 wasm-bindgen-futures = { version = "0.4" }
-web-sys = { version = "0.3", features = ["ReadableStream", "WritableStream"] }
+web-sys = { version = "0.3", features = ["ReadableStream", "WritableStream", "DomException"] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint", default-features = false }

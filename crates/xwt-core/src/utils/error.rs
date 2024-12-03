@@ -13,6 +13,7 @@ pub use std::error::Error;
 pub use core::error::Error;
 
 #[cfg(all(not(feature = "std"), not(feature = "error-in-core")))]
+/// An xwt error.
 pub trait Error: core::fmt::Debug + core::fmt::Display {}
 
 #[cfg(all(not(feature = "std"), not(feature = "error-in-core")))]

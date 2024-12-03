@@ -30,3 +30,9 @@ impl From<web_sys::DomException> for Error {
         wasm_bindgen::JsValue::from(value).into()
     }
 }
+
+impl From<String> for Error {
+    fn from(value: String) -> Self {
+        wasm_bindgen::JsValue::from(value).into()
+    }
+}
