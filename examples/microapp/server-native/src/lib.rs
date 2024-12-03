@@ -18,7 +18,7 @@ pub async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cfg = xwt_wtransport::wtransport::ServerConfig::builder()
         .with_bind_address(addr)
-        .with_identity(&identity)
+        .with_identity(identity)
         .build();
     let endpoint = xwt_wtransport::wtransport::Endpoint::server(cfg)?;
     let endpoint = xwt_wtransport::Endpoint(endpoint);

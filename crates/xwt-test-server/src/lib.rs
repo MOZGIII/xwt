@@ -40,7 +40,7 @@ pub async fn endpoint(
             .with_bind_address(addr.unwrap_or(std::net::SocketAddr::V4(
                 std::net::SocketAddrV4::new(std::net::Ipv4Addr::new(127, 0, 0, 1), 0),
             )))
-            .with_identity(&identity)
+            .with_identity(identity)
             .build();
 
     let endpoint = wtransport::Endpoint::server(server_config)?;
