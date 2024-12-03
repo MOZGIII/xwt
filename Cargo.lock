@@ -1943,9 +1943,9 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 
 [[package]]
 name = "wtransport"
-version = "0.3.1"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfe1ad803279d5a9c216e2e77f20e46b3c1275a9aba30c5e533f7537a85f5f2a"
+checksum = "93a724f65db90b6a1ffa92ea4966cf03cb7e2bcd3ef7135b84dfe4339640d1b9"
 dependencies = [
  "bytes",
  "pem",
@@ -1968,9 +1968,9 @@ dependencies = [
 
 [[package]]
 name = "wtransport-proto"
-version = "0.3.1"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2e4eb0239a9157bc05e8a40deccc9358796db67e42d096f7673630f17955edb"
+checksum = "14e4882c24a62f15024609b3688e6e29a4c2129634d27debc849ccd3f9b9690b"
 dependencies = [
  "httlib-huffman",
  "octets",
@@ -2157,7 +2157,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-server"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "color-eyre",
  "envfury",
@@ -2206,7 +2206,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.11.0"
+version = "0.12.0"
 dependencies = [
  "anyhow",
  "color-eyre",
