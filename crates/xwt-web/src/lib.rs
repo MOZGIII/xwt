@@ -8,10 +8,11 @@
 )]
 #![cfg(target_family = "wasm")]
 
-use std::rc::Rc;
+use std::{num::NonZeroUsize, rc::Rc};
 
-use wasm_bindgen::JsError;
+use wasm_bindgen::prelude::*;
 
+mod as_error_code;
 mod error;
 mod options;
 
@@ -126,13 +127,17 @@ pub struct RecvStream {
     pub reader: web_sys_async_io::Reader,
 }
 
+/// The stream error code.
+#[derive(Debug)]
+pub struct StreamErrorCode(pub JsValue);
+
 /// Open a reader for the given stream and create a [`RecvStream`].
 fn wrap_recv_stream(
     transport: &Rc<web_wt_sys::WebTransport>,
     stream: web_wt_sys::WebTransportReceiveStream,
 ) -> RecvStream {
     let reader = web_sys_stream_utils::get_reader_byob(stream.clone());
-    let reader: wasm_bindgen::JsValue = reader.into();
+    let reader: JsValue = reader.into();
     let reader = reader.into();
     let reader = web_sys_async_io::Reader::new(reader);
 
@@ -188,7 +193,7 @@ impl xwt_core::session::stream::AcceptBi for Session {
 
     async fn accept_bi(&self) -> Result<(Self::SendStream, Self::RecvStream), Self::Error> {
         let incoming: web_sys::ReadableStream = self.transport.incoming_bidirectional_streams();
-        let reader: wasm_bindgen::JsValue = incoming.get_reader().into();
+        let reader: JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
         let read_result: web_wt_sys::ReadableStreamReadResult = read_result.into();
@@ -217,7 +222,7 @@ impl xwt_core::session::stream::AcceptUni for Session {
 
     async fn accept_uni(&self) -> Result<Self::RecvStream, Self::Error> {
         let incoming: web_sys::ReadableStream = self.transport.incoming_unidirectional_streams();
-        let reader: wasm_bindgen::JsValue = incoming.get_reader().into();
+        let reader: JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
         let read_result: web_wt_sys::ReadableStreamReadResult = read_result.into();
@@ -264,19 +269,109 @@ impl tokio::io::AsyncRead for RecvStream {
     }
 }
 
-impl xwt_core::stream::Write for SendStream {
-    type Error = Error;
+/// An error that can occur during the stream writes.
+#[derive(Debug, thiserror::Error)]
+pub enum StreamWriteError {
+    /// The write was called with a zero-size write buffer.
+    #[error("zero size write buffer")]
+    ZeroSizeWriteBuffer,
 
-    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
-        web_sys_stream_utils::write(&self.writer.inner, buf).await?;
-        Ok(buf.len())
+    /// The write call thrown an exception.
+    #[error("write error: {0}")]
+    Write(Error),
+}
+
+impl xwt_core::stream::Write for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = StreamWriteError;
+
+    async fn write(&mut self, buf: &[u8]) -> Result<NonZeroUsize, Self::Error> {
+        let Some(buf_len) = NonZeroUsize::new(buf.len()) else {
+            return Err(StreamWriteError::ZeroSizeWriteBuffer);
+        };
+
+        web_sys_stream_utils::write(&self.writer.inner, buf)
+            .await
+            .map_err(|err| StreamWriteError::Write(err.into()))?;
+
+        Ok(buf_len)
     }
 }
 
-impl xwt_core::stream::Read for RecvStream {
+impl xwt_core::stream::WriteAbort for SendStream {
+    type ErrorCode = StreamErrorCode;
     type Error = Error;
 
-    async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.writer.inner.abort_with_reason(&error_code.0))
+            .await
+            .map(|val| {
+                debug_assert!(val.is_undefined());
+            })
+            .map_err(Error::from)
+    }
+}
+
+impl xwt_core::stream::WriteAborted for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = Error;
+
+    async fn aborted(self) -> Result<Self::ErrorCode, Self::Error> {
+        // Hack our way through...
+        let result = wasm_bindgen_futures::JsFuture::from(self.writer.inner.closed()).await;
+        match result {
+            Ok(value) => {
+                debug_assert!(value.is_undefined());
+                Ok(0.into())
+            }
+            Err(value) => {
+                let error: web_wt_sys::WebTransportError = value.dyn_into().unwrap();
+                if error.source() != web_wt_sys::WebTransportErrorSource::Stream {
+                    return Err(Error(error.into()));
+                }
+                let Some(code) = error.stream_error_code() else {
+                    return Err(Error(error.into()));
+                };
+                Ok(code.into())
+            }
+        }
+    }
+}
+
+impl xwt_core::stream::Finish for SendStream {
+    type Error = Error;
+
+    async fn finish(self) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.writer.inner.close())
+            .await
+            .map(|val| {
+                debug_assert!(val.is_undefined());
+            })
+            .map_err(Error::from)
+    }
+}
+
+/// An error that can occur while reading stream data.
+#[derive(Debug, thiserror::Error)]
+pub enum StreamReadError {
+    /// This is an odd case, which is still tbd what to do with.
+    #[error("byob read consumed the buffer and didn't provide a new one")]
+    ByobReadConsumedBuffer,
+
+    /// The `read_byob` call thrown an exception.
+    #[error("read error: {0}")]
+    Read(Error),
+
+    /// The stream was closed, and there is no more data to exect there.
+    #[error("stream closed")]
+    Closed,
+}
+
+impl xwt_core::stream::Read for RecvStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = StreamReadError;
+
+    async fn read(&mut self, buf: &mut [u8]) -> Result<NonZeroUsize, Self::Error> {
         let requested_size = buf.len().try_into().unwrap();
         let internal_buf = self
             .reader
@@ -290,19 +385,54 @@ impl xwt_core::stream::Read for RecvStream {
             .unwrap_or_else(|| js_sys::ArrayBuffer::new(requested_size));
         let internal_buf_view = js_sys::Uint8Array::new(&internal_buf);
         let maybe_internal_buf_view =
-            web_sys_stream_utils::read_byob(&self.reader.inner, internal_buf_view).await?;
+            web_sys_stream_utils::read_byob(&self.reader.inner, internal_buf_view)
+                .await
+                .map_err(|err| StreamReadError::Read(err.into()))?;
         let Some(internal_buf_view) = maybe_internal_buf_view else {
-            return Ok(None);
+            return Err(StreamReadError::ByobReadConsumedBuffer);
         };
 
         // Unwrap is safe assuming the `usize` is `u32` in wasm.
         let len = internal_buf_view.byte_length().try_into().unwrap();
 
-        internal_buf_view.copy_to(&mut buf[..len]);
+        // Detect when the read is aborted because the stream was closed without
+        // an error.
+        let Some(len) = NonZeroUsize::new(len) else {
+            return Err(StreamReadError::Closed);
+        };
+
+        internal_buf_view.copy_to(&mut buf[..len.get()]);
 
         self.reader.internal_buf = Some(internal_buf_view.buffer());
 
-        Ok(Some(len))
+        Ok(len)
+    }
+}
+
+impl xwt_core::stream::ReadAbort for RecvStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = Error;
+
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.reader.inner.cancel_with_reason(&error_code.0))
+            .await
+            .map(|_| ())
+            .map_err(Error::from)
+    }
+}
+
+impl From<u32> for StreamErrorCode {
+    fn from(value: u32) -> Self {
+        StreamErrorCode(value.into())
+    }
+}
+
+impl TryFrom<StreamErrorCode> for u32 {
+    type Error = Error;
+
+    fn try_from(value: StreamErrorCode) -> Result<Self, Self::Error> {
+        let value = value.0.as_f64().ok_or_else(|| Error(value.0))?;
+        Ok(value as _)
     }
 }
 

@@ -8,7 +8,11 @@
 )]
 #![cfg(not(target_family = "wasm"))]
 
+mod as_error_code;
+pub mod error_codes;
 mod types;
+
+use std::num::NonZeroUsize;
 
 pub use wtransport;
 pub use xwt_core as core;
@@ -138,18 +142,50 @@ impl xwt_core::session::stream::AcceptUni for Connection {
 }
 
 impl xwt_core::stream::Read for RecvStream {
-    type Error = wtransport::error::StreamReadError;
+    type ErrorCode = StreamErrorCode;
+    type Error = StreamReadError;
 
-    async fn read(&mut self, buf: &mut [u8]) -> Result<Option<usize>, Self::Error> {
-        self.0.read(buf).await
+    async fn read(&mut self, buf: &mut [u8]) -> Result<NonZeroUsize, Self::Error> {
+        match self.0.read(buf).await {
+            Ok(None) => Err(StreamReadError::Closed),
+            Ok(Some(val)) => match NonZeroUsize::new(val) {
+                None => unreachable!(
+                    "reading zero bytes from a stream that is not closed should not be possible"
+                ),
+                Some(val) => Ok(val),
+            },
+            Err(error) => Err(StreamReadError::Read(error)),
+        }
+    }
+}
+
+impl xwt_core::stream::ReadAbort for RecvStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = std::convert::Infallible;
+
+    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        let code = error_codes::to_http(error_code.0).try_into().unwrap();
+        self.0.stop(code);
+        Ok(())
     }
 }
 
 impl xwt_core::stream::Write for SendStream {
-    type Error = wtransport::error::StreamWriteError;
+    type ErrorCode = StreamErrorCode;
+    type Error = StreamWriteError;
 
-    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
-        self.0.write(buf).await
+    async fn write(&mut self, buf: &[u8]) -> Result<NonZeroUsize, Self::Error> {
+        if buf.is_empty() {
+            return Err(StreamWriteError::ZeroSizeWriteBuffer);
+        }
+
+        let len = self.0.write(buf).await.map_err(StreamWriteError::Write)?;
+
+        let Some(len) = NonZeroUsize::new(len) else {
+            unreachable!("writing zero bytes into a stream should've lead to a closed error");
+        };
+
+        Ok(len)
     }
 }
 
@@ -164,6 +200,58 @@ impl xwt_core::stream::WriteChunk<xwt_core::stream::chunk::U8> for SendStream {
 impl xwt_core::session::datagram::MaxSize for Connection {
     fn max_datagram_size(&self) -> Option<usize> {
         self.0.max_datagram_size()
+    }
+}
+
+impl xwt_core::stream::WriteAbort for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = wtransport::error::ClosedStream;
+
+    async fn abort(mut self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
+        let code = error_codes::to_http(error_code.0).try_into().unwrap();
+        self.0.reset(code)?;
+        Ok(())
+    }
+}
+
+/// An error that can occur while waiting for the write stream being aborted.
+#[derive(Debug, thiserror::Error)]
+pub enum WriteAbortedError {
+    /// An unexpected stream write error has occurred.
+    #[error("stream write: {0}")]
+    StreamWrite(wtransport::error::StreamWriteError),
+    /// An error code failed to convert.
+    #[error("error code conversion: {0}")]
+    ErrorCodeConversion(error_codes::FromHttpError),
+}
+
+impl xwt_core::stream::WriteAborted for SendStream {
+    type ErrorCode = StreamErrorCode;
+    type Error = WriteAbortedError;
+
+    async fn aborted(mut self) -> Result<Self::ErrorCode, Self::Error> {
+        match self.0.quic_stream_mut().stopped().await {
+            Ok(Some(error_code)) => {
+                let code = error_codes::from_http(error_code.into_inner())
+                    .map_err(WriteAbortedError::ErrorCodeConversion)?;
+                Ok(code.into())
+            }
+            Ok(None) => Ok(0.into()),
+            Err(wtransport::quinn::StoppedError::ConnectionLost(_)) => Err(
+                WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::NotConnected),
+            ),
+            Err(wtransport::quinn::StoppedError::ZeroRttRejected) => Err(
+                WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::QuicProto),
+            ),
+        }
+    }
+}
+
+impl xwt_core::stream::Finish for SendStream {
+    type Error = wtransport::error::StreamWriteError;
+
+    async fn finish(mut self) -> Result<(), Self::Error> {
+        self.0.finish().await
     }
 }
 

@@ -15,6 +15,7 @@ repository = "https://github.com/MOZGIII/xwt"
 xwt-core = { version = "0.5", path = "../xwt-core", default-features = false }
 xwt-error = { version = "0.5", path = "../xwt-error", default-features = false }
 
+constcat = "0.5.0"
 thiserror = "2"
 tokio = { version = "1", default-features = false, features = ["io-util"] }
 tracing = "0.1"
