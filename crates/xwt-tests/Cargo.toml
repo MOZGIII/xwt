@@ -1,6 +1,6 @@
 [package]
 name = "xwt-tests"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -15,6 +15,6 @@ repository = "https://github.com/MOZGIII/xwt"
 xwt-core = { version = "0.5", path = "../xwt-core", default-features = false }
 xwt-error = { version = "0.5", path = "../xwt-error", default-features = false }
 
-thiserror = "1"
+thiserror = "2"
 tokio = { version = "1", default-features = false, features = ["io-util"] }
 tracing = "0.1"

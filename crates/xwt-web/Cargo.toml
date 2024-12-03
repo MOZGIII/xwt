@@ -1,6 +1,6 @@
 [package]
 name = "xwt-web"
-version = "0.13.0"
+version = "0.14.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -27,8 +27,8 @@ web-sys = { version = "0.3", features = ["ReadableStream", "WritableStream"] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint", default-features = false }
-xwt-test-assets = { version = "0.1.2", path = "../xwt-test-assets" }
-xwt-tests = { version = "0.7", path = "../xwt-tests" }
+xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
+xwt-tests = { version = "0.8", path = "../xwt-tests" }
 
 static_assertions = "1"
 tracing = "0.1"
