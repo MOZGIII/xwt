@@ -24,3 +24,7 @@ ignore = true
 
 [bans]
 multiple-versions = "allow"
+
+[[advisories.ignore]]
+id = "RUSTSEC-2024-0436"
+reason = "paste in unmaintained but still fine to use"
