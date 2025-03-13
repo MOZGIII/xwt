@@ -2021,7 +2021,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-cert-fingerprint"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "base64",
  "rustls-pki-types",
@@ -2031,7 +2031,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-cert-gen"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "der",
  "getrandom",
