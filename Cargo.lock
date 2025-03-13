@@ -25,9 +25,9 @@ checksum = "4c95c10ba0b00a02636238b814946408b1322d5ac4760326e6fb8ec956d85775"
 
 [[package]]
 name = "asn1-rs"
-version = "0.6.2"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5493c3bedbacf7fd7382c6346bbd66687d12bbaad3a89a2d2c303ee6cf20b048"
+checksum = "607495ec7113b178fbba7a6166a27f99e774359ef4823adbefd756b5b81d7970"
 dependencies = [
  "asn1-rs-derive",
  "asn1-rs-impl",
@@ -35,15 +35,15 @@ dependencies = [
  "nom",
  "num-traits",
  "rusticata-macros",
- "thiserror 1.0.69",
+ "thiserror",
  "time",
 ]
 
 [[package]]
 name = "asn1-rs-derive"
-version = "0.5.1"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "965c2d33e53cb6b267e148a4cb0760bc01f4904c1cd4bb4002a085bb016d1490"
+checksum = "3109e49b1e4909e9db6515a30c633684d68cdeaa252f215214cb4fa1a5bfee2c"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -285,9 +285,9 @@ dependencies = [
 
 [[package]]
 name = "der-parser"
-version = "9.0.0"
+version = "10.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5cd0a5c643689626bec213c4d8bd4d96acc8ffdb4ad4bb6bc16abf27d5f4b553"
+checksum = "07da5016415d5a3c4dd39b11ed26f915f52fc4e0dc197d87908bc916e51bc1a6"
 dependencies = [
  "asn1-rs",
  "displaydoc",
@@ -380,7 +380,7 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5d8ddcfead07f5b4acff7a73b51a6c991f2ffe7dab0f6cfd5f3a4a4998e14c2d"
 dependencies = [
- "thiserror 2.0.3",
+ "thiserror",
 ]
 
 [[package]]
@@ -815,9 +815,9 @@ checksum = "109983a091271ee8916076731ba5fdc9ee22fea871bc7c6ceab9bfd423eb1d99"
 
 [[package]]
 name = "oid-registry"
-version = "0.7.1"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8d8034d9489cdaf79228eb9f6a3b8d7bb32ba00d6645ebd48eef4077ceb5bd9"
+checksum = "12f40cff3dde1b6087cc5d5f5d4d65712f34016a03ed60e9c08dcc392736b5b7"
 dependencies = [
  "asn1-rs",
 ]
@@ -957,7 +957,7 @@ dependencies = [
  "rustc-hash",
  "rustls",
  "socket2",
- "thiserror 2.0.3",
+ "thiserror",
  "tokio",
  "tracing",
 ]
@@ -976,7 +976,7 @@ dependencies = [
  "rustls",
  "rustls-pki-types",
  "slab",
- "thiserror 2.0.3",
+ "thiserror",
  "tinyvec",
  "tracing",
  "web-time",
@@ -1095,9 +1095,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.19"
+version = "0.23.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "934b404430bb06b3fae2cba809eb45a1ab1aecd64491213d7c3301b88393f8d1"
+checksum = "47796c98c480fce5406ef69d1c76378375492c3b0a0de587be0c1d9feb12f395"
 dependencies = [
  "once_cell",
  "ring",
@@ -1354,31 +1354,11 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
-dependencies = [
- "thiserror-impl 1.0.69",
-]
-
-[[package]]
-name = "thiserror"
 version = "2.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c006c85c7651b3cf2ada4584faa36773bd07bac24acfb39f3c431b36d7e667aa"
 dependencies = [
- "thiserror-impl 2.0.3",
-]
-
-[[package]]
-name = "thiserror-impl"
-version = "1.0.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "thiserror-impl",
 ]
 
 [[package]]
@@ -1942,9 +1922,9 @@ checksum = "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51"
 
 [[package]]
 name = "wtransport"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "93a724f65db90b6a1ffa92ea4966cf03cb7e2bcd3ef7135b84dfe4339640d1b9"
+checksum = "38ee131bb1ed76628f6c098e56a20e1553e5ee120d9cfff1c3d21c0a63a9f1be"
 dependencies = [
  "bytes",
  "pem",
@@ -1956,7 +1936,7 @@ dependencies = [
  "rustls-pki-types",
  "sha2",
  "socket2",
- "thiserror 1.0.69",
+ "thiserror",
  "time",
  "tokio",
  "tracing",
@@ -1967,13 +1947,13 @@ dependencies = [
 
 [[package]]
 name = "wtransport-proto"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14e4882c24a62f15024609b3688e6e29a4c2129634d27debc849ccd3f9b9690b"
+checksum = "f9ca26a92a87a4d3829bae34a40ac1afdc906941701aae48f56d9e1d8143054b"
 dependencies = [
  "httlib-huffman",
  "octets",
- "thiserror 1.0.69",
+ "thiserror",
  "url",
 ]
 
@@ -1993,9 +1973,9 @@ dependencies = [
 
 [[package]]
 name = "x509-parser"
-version = "0.16.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcbc162f30700d6f3f82a24bf7cc62ffe7caea42c0b2cba8bf7f3ae50cf51f69"
+checksum = "4569f339c0c402346d4a75a9e39cf8dad310e287eef1ff56d4c68e5067f53460"
 dependencies = [
  "asn1-rs",
  "data-encoding",
@@ -2004,7 +1984,7 @@ dependencies = [
  "nom",
  "oid-registry",
  "rusticata-macros",
- "thiserror 1.0.69",
+ "thiserror",
  "time",
 ]
 
@@ -2040,7 +2020,7 @@ dependencies = [
  "sha2",
  "signature",
  "spki",
- "thiserror 2.0.3",
+ "thiserror",
  "x509-cert",
 ]
 
@@ -2160,7 +2140,7 @@ version = "0.7.0"
 dependencies = [
  "color-eyre",
  "envfury",
- "thiserror 2.0.3",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2175,7 +2155,7 @@ name = "xwt-tests"
 version = "0.9.0"
 dependencies = [
  "constcat",
- "thiserror 2.0.3",
+ "thiserror",
  "tokio",
  "tracing",
  "xwt-core",
@@ -2188,7 +2168,7 @@ version = "0.15.0"
 dependencies = [
  "js-sys",
  "static_assertions",
- "thiserror 2.0.3",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-wasm",
@@ -2212,7 +2192,7 @@ dependencies = [
  "anyhow",
  "color-eyre",
  "static_assertions",
- "thiserror 2.0.3",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-subscriber",
