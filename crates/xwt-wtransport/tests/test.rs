@@ -1,3 +1,5 @@
+//! Integration tests.
+
 #![cfg(not(target_family = "wasm"))]
 #![feature(once_cell_try)]
 
