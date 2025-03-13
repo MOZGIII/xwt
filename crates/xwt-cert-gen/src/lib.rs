@@ -52,7 +52,7 @@ pub enum Error {
     Build(x509_cert::builder::Error),
 }
 
-impl<'a> Params<'a> {
+impl Params<'_> {
     /// Generate a new self-signed certificate from this params and
     /// a given key.
     ///
