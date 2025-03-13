@@ -2136,7 +2136,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-server"
-version = "0.7.0"
+version = "0.7.1"
 dependencies = [
  "color-eyre",
  "envfury",
@@ -2187,7 +2187,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.13.0"
+version = "0.13.1"
 dependencies = [
  "anyhow",
  "color-eyre",
