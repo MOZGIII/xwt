@@ -144,7 +144,7 @@ impl core::fmt::Display for Sha256 {
     }
 }
 
-impl<'a> core::fmt::Display for Sha256Ref<'a> {
+impl core::fmt::Display for Sha256Ref<'_> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         let mut first = true;
         for byte in self.0 {

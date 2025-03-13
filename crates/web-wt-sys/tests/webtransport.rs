@@ -1,3 +1,5 @@
+//! Integration tests.
+
 #![cfg(target_family = "wasm")]
 
 use wasm_bindgen_test::*;
