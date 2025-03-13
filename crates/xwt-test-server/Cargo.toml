@@ -1,6 +1,6 @@
 [package]
 name = "xwt-test-server"
-version = "0.7.2"
+version = "0.7.3"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -27,8 +27,8 @@ tokio = { version = "1", default-features = false, features = ["rt-multi-thread"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", optional = true }
 typle = "0.10"
-wtransport = { version = "0.6", default-features = false, features = ["self-signed", "quinn", "ring"] }
+wtransport = { version = "0.6", default-features = false, features = ["self-signed", "quinn"] }
 
 [features]
-bin = ["dep:color-eyre", "dep:envfury", "dep:tracing-subscriber", "tokio/macros"]
+bin = ["dep:color-eyre", "dep:envfury", "dep:tracing-subscriber", "tokio/macros", "wtransport/ring"]
 default = ["bin"]
