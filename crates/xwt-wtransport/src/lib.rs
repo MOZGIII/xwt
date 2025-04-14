@@ -76,12 +76,46 @@ impl xwt_core::session::stream::RecvSpec for Connection {
     type RecvStream = RecvStream;
 }
 
+impl tokio::io::AsyncWrite for SendStream {
+    fn poll_write(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &[u8],
+    ) -> std::task::Poll<Result<usize, std::io::Error>> {
+        self.project().inner.poll_write(cx, buf)
+    }
+
+    fn poll_flush(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), std::io::Error>> {
+        self.project().inner.poll_flush(cx)
+    }
+
+    fn poll_shutdown(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), std::io::Error>> {
+        self.project().inner.poll_shutdown(cx)
+    }
+}
+
+impl tokio::io::AsyncRead for RecvStream {
+    fn poll_read(
+        self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> std::task::Poll<std::io::Result<()>> {
+        self.project().inner.poll_read(cx, buf)
+    }
+}
+
 /// Take a pair of stream ends and wrap into our newtypes.
 fn map_streams(
     streams: (wtransport::SendStream, wtransport::RecvStream),
 ) -> (SendStream, RecvStream) {
     let (send, recv) = streams;
-    (SendStream(send), RecvStream(recv))
+    (SendStream { inner: send }, RecvStream { inner: recv })
 }
 
 impl xwt_core::session::stream::OpeningBi for OpeningBiStream {
@@ -120,7 +154,7 @@ impl xwt_core::session::stream::OpeningUni for OpeningUniStream {
         self,
     ) -> Result<<Self::Streams as xwt_core::session::stream::SendSpec>::SendStream, Self::Error>
     {
-        self.0.await.map(SendStream)
+        self.0.await.map(|i| SendStream { inner: i })
     }
 }
 
@@ -137,7 +171,7 @@ impl xwt_core::session::stream::AcceptUni for Connection {
     type Error = wtransport::error::ConnectionError;
 
     async fn accept_uni(&self) -> Result<Self::RecvStream, Self::Error> {
-        self.0.accept_uni().await.map(RecvStream)
+        self.0.accept_uni().await.map(|i| RecvStream { inner: i })
     }
 }
 
@@ -146,7 +180,7 @@ impl xwt_core::stream::Read for RecvStream {
     type Error = StreamReadError;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<NonZeroUsize, Self::Error> {
-        match self.0.read(buf).await {
+        match self.inner.read(buf).await {
             Ok(None) => Err(StreamReadError::Closed),
             Ok(Some(val)) => match NonZeroUsize::new(val) {
                 None => unreachable!(
@@ -165,7 +199,7 @@ impl xwt_core::stream::ReadAbort for RecvStream {
 
     async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
         let code = error_codes::to_http(error_code.0).try_into().unwrap();
-        self.0.stop(code);
+        self.inner.stop(code);
         Ok(())
     }
 }
@@ -179,7 +213,11 @@ impl xwt_core::stream::Write for SendStream {
             return Err(StreamWriteError::ZeroSizeWriteBuffer);
         }
 
-        let len = self.0.write(buf).await.map_err(StreamWriteError::Write)?;
+        let len = self
+            .inner
+            .write(buf)
+            .await
+            .map_err(StreamWriteError::Write)?;
 
         let Some(len) = NonZeroUsize::new(len) else {
             unreachable!("writing zero bytes into a stream should've lead to a closed error");
@@ -193,7 +231,7 @@ impl xwt_core::stream::WriteChunk<xwt_core::stream::chunk::U8> for SendStream {
     type Error = wtransport::error::StreamWriteError;
 
     async fn write_chunk<'a>(&'a mut self, buf: &'a [u8]) -> Result<(), Self::Error> {
-        self.0.write_all(buf).await
+        self.inner.write_all(buf).await
     }
 }
 
@@ -209,7 +247,7 @@ impl xwt_core::stream::WriteAbort for SendStream {
 
     async fn abort(mut self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
         let code = error_codes::to_http(error_code.0).try_into().unwrap();
-        self.0.reset(code)?;
+        self.inner.reset(code)?;
         Ok(())
     }
 }
@@ -230,7 +268,7 @@ impl xwt_core::stream::WriteAborted for SendStream {
     type Error = WriteAbortedError;
 
     async fn aborted(mut self) -> Result<Self::ErrorCode, Self::Error> {
-        match self.0.quic_stream_mut().stopped().await {
+        match self.inner.quic_stream_mut().stopped().await {
             Ok(Some(error_code)) => {
                 let code = error_codes::from_http(error_code.into_inner())
                     .map_err(WriteAbortedError::ErrorCodeConversion)?;
@@ -251,7 +289,7 @@ impl xwt_core::stream::Finish for SendStream {
     type Error = wtransport::error::StreamWriteError;
 
     async fn finish(mut self) -> Result<(), Self::Error> {
-        self.0.finish().await
+        self.inner.finish().await
     }
 }
 

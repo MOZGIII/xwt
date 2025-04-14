@@ -62,14 +62,46 @@ macro_rules! newtype {
     };
 }
 
+/// Create a newtype wrapper with pin projection for a given type.
+macro_rules! newtype_pin {
+    ($name:ident => $wrapped_type:path) => {
+        pin_project_lite::pin_project! {
+            #[doc = concat!("The [`", stringify!($wrapped_type), "`] newtype with pin projection.")]
+            #[allow(missing_docs)]
+            pub struct $name {
+                #[pin]
+                pub inner: $wrapped_type,
+            }
+        }
+
+        impl std::fmt::Debug for $name {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.debug_tuple(stringify!($name)).finish()
+            }
+        }
+
+        impl From<$wrapped_type> for $name {
+            fn from(value: $wrapped_type) -> Self {
+                Self { inner: value }
+            }
+        }
+
+        impl From<$name> for $wrapped_type {
+            fn from(value: $name) -> Self {
+                value.inner
+            }
+        }
+    };
+}
+
 newtype!(Endpoint<Side> => wtransport::Endpoint<Side>);
 newtype!(Connection => wtransport::Connection);
 newtype!(IncomingSession => wtransport::endpoint::IncomingSession);
 newtype!(SessionRequest => wtransport::endpoint::SessionRequest);
 newtype!(OpeningBiStream => wtransport::stream::OpeningBiStream);
 newtype!(OpeningUniStream => wtransport::stream::OpeningUniStream);
-newtype!(SendStream => wtransport::SendStream);
-newtype!(RecvStream => wtransport::RecvStream);
+newtype_pin!(SendStream => wtransport::SendStream);
+newtype_pin!(RecvStream => wtransport::RecvStream);
 newtype!(StreamErrorCode => u32);
 newtype!(Datagram => wtransport::datagram::Datagram);
 
