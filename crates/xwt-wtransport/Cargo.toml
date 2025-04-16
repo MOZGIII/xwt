@@ -10,11 +10,11 @@ An implementation of the xwt that runs natively via wtransport crate.
 repository = "https://github.com/MOZGIII/xwt"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-pin-project-lite = "0.2"
-tokio = { version = "1", default-features = false }
 xwt-core = { version = "0.6", path = "../xwt-core", default-features = false, features = ["std"] }
 
+pin-project = "1"
 thiserror = "2"
+tokio = { version = "1", default-features = false }
 wtransport = { version = "0.6", default-features = false, features = ["self-signed", "quinn", "ring"] }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]

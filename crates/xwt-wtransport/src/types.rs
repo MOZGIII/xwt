@@ -63,16 +63,13 @@ macro_rules! newtype {
 }
 
 /// Create a newtype wrapper with pin projection for a given type.
+
+/// Create a newtype wrapper for a given type.
 macro_rules! newtype_pin {
     ($name:ident => $wrapped_type:path) => {
-        pin_project_lite::pin_project! {
-            #[doc = concat!("The [`", stringify!($wrapped_type), "`] newtype with pin projection.")]
-            #[allow(missing_docs)]
-            pub struct $name {
-                #[pin]
-                pub inner: $wrapped_type,
-            }
-        }
+        #[pin_project::pin_project]
+        #[doc = concat!("The [`", stringify!($wrapped_type), "`] newtype.")]
+        pub struct $name(#[pin] pub $wrapped_type);
 
         impl std::fmt::Debug for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -82,13 +79,49 @@ macro_rules! newtype_pin {
 
         impl From<$wrapped_type> for $name {
             fn from(value: $wrapped_type) -> Self {
-                Self { inner: value }
+                Self(value)
             }
         }
 
         impl From<$name> for $wrapped_type {
             fn from(value: $name) -> Self {
-                value.inner
+                value.0
+            }
+        }
+    };
+    ($name:ident < $($generics:tt),* > => $wrapped_type:path) => {
+        #[doc = concat!("The [`", stringify!($wrapped_type), "`] newtype.")]
+        pub struct $name<$($generics)*>(pub $wrapped_type);
+
+        impl<$($generics)*> std::fmt::Debug for $name<$($generics)*> {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.debug_tuple(stringify!($name)).finish()
+            }
+        }
+
+        impl<$($generics)*> From<$wrapped_type> for $name<$($generics)*> {
+            fn from(value: $wrapped_type) -> Self {
+                Self(value)
+            }
+        }
+
+        impl<$($generics)*> From<$name<$($generics)*>> for $wrapped_type {
+            fn from(value: $name<$($generics)*>) -> Self {
+                value.0
+            }
+        }
+
+        impl<$($generics)*> std::ops::Deref for $name<$($generics)*> {
+            type Target = $wrapped_type;
+
+            fn deref(&self) -> &Self::Target {
+                &self.0
+            }
+        }
+
+        impl<$($generics)*> std::ops::DerefMut for $name<$($generics)*> {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                &mut self.0
             }
         }
     };
