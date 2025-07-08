@@ -21,11 +21,10 @@ fn js_value_to_io_error(error: wasm_bindgen::JsValue) -> std::io::Error {
 }
 
 #[derive(Debug, Default)]
-pub enum Op {
+pub enum WriterOp {
     #[default]
     Idle,
     Write(JsFuture, usize),
-    Read(JsFuture),
     Flush(JsFuture),
     Shutdown(JsFuture),
 }

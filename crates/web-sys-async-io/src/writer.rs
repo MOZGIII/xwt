@@ -6,19 +6,19 @@ use std::{
 
 use wasm_bindgen_futures::JsFuture;
 
-use crate::Op;
+use crate::WriterOp;
 
 #[derive(Debug)]
 pub struct Writer {
     pub inner: web_sys::WritableStreamDefaultWriter,
-    pub op: Op,
+    pub op: WriterOp,
 }
 
 impl Writer {
     pub fn new(inner: web_sys::WritableStreamDefaultWriter) -> Self {
         Self {
             inner,
-            op: Op::default(),
+            op: WriterOp::default(),
         }
     }
 }
@@ -30,15 +30,15 @@ impl tokio::io::AsyncWrite for Writer {
         buf: &[u8],
     ) -> std::task::Poll<Result<usize, std::io::Error>> {
         match self.op {
-            Op::Write(ref mut fut, size) => {
+            WriterOp::Write(ref mut fut, size) => {
                 let result = ready!(Pin::new(fut).poll(cx));
-                self.op = Op::Idle;
+                self.op = WriterOp::Idle;
                 Poll::Ready(result.map(|_| size).map_err(super::js_value_to_io_error))
             }
-            Op::Idle => {
+            WriterOp::Idle => {
                 let chunk = js_sys::Uint8Array::from(buf);
                 let fut = JsFuture::from(self.inner.write_with_chunk(chunk.as_ref()));
-                self.op = Op::Write(fut, buf.len());
+                self.op = WriterOp::Write(fut, buf.len());
                 self.poll_write(cx, buf)
             }
             _ => Poll::Pending,
@@ -50,14 +50,14 @@ impl tokio::io::AsyncWrite for Writer {
         cx: &mut std::task::Context<'_>,
     ) -> std::task::Poll<Result<(), std::io::Error>> {
         match self.op {
-            Op::Flush(ref mut fut) => {
+            WriterOp::Flush(ref mut fut) => {
                 let result = ready!(Pin::new(fut).poll(cx));
-                self.op = Op::Idle;
+                self.op = WriterOp::Idle;
                 Poll::Ready(result.map(|_| ()).map_err(super::js_value_to_io_error))
             }
-            Op::Idle => {
+            WriterOp::Idle => {
                 let fut = JsFuture::from(self.inner.ready());
-                self.op = Op::Flush(fut);
+                self.op = WriterOp::Flush(fut);
                 self.poll_flush(cx)
             }
             _ => Poll::Pending,
@@ -69,14 +69,14 @@ impl tokio::io::AsyncWrite for Writer {
         cx: &mut std::task::Context<'_>,
     ) -> std::task::Poll<Result<(), std::io::Error>> {
         match self.op {
-            Op::Shutdown(ref mut fut) => {
+            WriterOp::Shutdown(ref mut fut) => {
                 let result = ready!(Pin::new(fut).poll(cx));
-                self.op = Op::Idle;
+                self.op = WriterOp::Idle;
                 Poll::Ready(result.map(|_| ()).map_err(super::js_value_to_io_error))
             }
-            Op::Idle => {
+            WriterOp::Idle => {
                 let fut = JsFuture::from(self.inner.close());
-                self.op = Op::Shutdown(fut);
+                self.op = WriterOp::Shutdown(fut);
                 self.poll_shutdown(cx)
             }
             _ => Poll::Pending,
