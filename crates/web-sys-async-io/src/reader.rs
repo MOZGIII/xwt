@@ -43,7 +43,7 @@ impl tokio::io::AsyncRead for Reader {
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> Poll<std::io::Result<()>> {
         match self.op {
-            Op::Pending(ref mut fut) => {
+            Op::Read(ref mut fut) => {
                 let result = ready!(Pin::new(fut).poll(cx));
                 self.op = Op::Idle;
 
@@ -92,8 +92,11 @@ impl tokio::io::AsyncRead for Reader {
                 // the buffer and the old JS reference to it is no longer valid.
                 let fut =
                     JsFuture::from(self.inner.read_with_array_buffer_view(&internal_buf_view));
-                self.op = Op::Pending(fut);
+                self.op = Op::Read(fut);
                 self.poll_read(cx, buf)
+            }
+            _ => {
+                unreachable!("Reader should only have Read or Idle operations")
             }
         }
     }
