@@ -24,5 +24,8 @@ fn js_value_to_io_error(error: wasm_bindgen::JsValue) -> std::io::Error {
 pub enum Op {
     #[default]
     Idle,
-    Pending(JsFuture),
+    Write(JsFuture, usize),
+    Read(JsFuture),
+    Flush(JsFuture),
+    Shutdown(JsFuture),
 }
