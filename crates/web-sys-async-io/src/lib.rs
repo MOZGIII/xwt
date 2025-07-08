@@ -28,3 +28,11 @@ pub enum WriterOp {
     Flush(JsFuture),
     Shutdown(JsFuture),
 }
+
+#[derive(Debug, Default)]
+pub enum ReaderOp {
+    #[default]
+    Idle,
+    Read(JsFuture),
+    ReadRemaining(js_sys::Uint8Array, usize),
+}
