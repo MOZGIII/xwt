@@ -19,23 +19,3 @@ fn js_value_to_io_error(error: wasm_bindgen::JsValue) -> std::io::Error {
     let err: String = format!("{error:?}");
     std::io::Error::new(std::io::ErrorKind::Other, err)
 }
-
-#[derive(Debug, Default)]
-pub enum WriterOp {
-    #[default]
-    Idle,
-    Write(JsFuture, usize),
-    Flush(JsFuture),
-    Shutdown(JsFuture),
-}
-
-#[derive(Debug, Default)]
-pub enum ReaderOp {
-    #[default]
-    Idle,
-    ReadPending(JsFuture),
-    ConsumingReadBuffer {
-        read_buffer: js_sys::Uint8Array,
-        already_read: usize,
-    },
-}

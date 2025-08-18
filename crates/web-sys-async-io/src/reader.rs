@@ -6,12 +6,21 @@ use std::{
 
 use wasm_bindgen_futures::JsFuture;
 
-use crate::ReaderOp;
+#[derive(Debug, Default)]
+pub enum Op {
+    #[default]
+    Idle,
+    ReadPending(JsFuture),
+    ConsumingReadBuffer {
+        read_buffer: js_sys::Uint8Array,
+        already_read: usize,
+    },
+}
 
 #[derive(Debug)]
 pub struct Reader {
     pub inner: web_sys::ReadableStreamByobReader,
-    pub op: ReaderOp,
+    pub op: Op,
     pub internal_buf: Option<js_sys::ArrayBuffer>,
 }
 
@@ -19,7 +28,7 @@ impl Reader {
     pub fn new(inner: web_sys::ReadableStreamByobReader) -> Self {
         Self {
             inner,
-            op: ReaderOp::default(),
+            op: Op::default(),
             internal_buf: None,
         }
     }
@@ -30,7 +39,7 @@ impl Reader {
     ) -> Self {
         Self {
             inner,
-            op: ReaderOp::default(),
+            op: Op::default(),
             internal_buf: Some(internal_buf),
         }
     }
@@ -43,7 +52,7 @@ impl tokio::io::AsyncRead for Reader {
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> Poll<std::io::Result<()>> {
         match self.op {
-            ReaderOp::ReadPending(ref mut fut) => {
+            Op::ReadPending(ref mut fut) => {
                 let result = ready!(Pin::new(fut).poll(cx));
 
                 let read_result = match result {
@@ -55,18 +64,18 @@ impl tokio::io::AsyncRead for Reader {
                 let value = read_result.value();
                 // No value indicates an error condition or end of stream.
                 let Some(internal_buf_view) = value else {
-                    self.op = ReaderOp::Idle;
+                    self.op = Op::Idle;
                     return Poll::Ready(Ok(()));
                 };
 
-                self.op = ReaderOp::ConsumingReadBuffer {
+                self.op = Op::ConsumingReadBuffer {
                     read_buffer: internal_buf_view,
                     already_read: 0,
                 };
 
                 self.poll_read(cx, buf)
             }
-            ReaderOp::ConsumingReadBuffer {
+            Op::ConsumingReadBuffer {
                 ref mut read_buffer,
                 already_read,
             } => {
@@ -91,17 +100,17 @@ impl tokio::io::AsyncRead for Reader {
                     // We now have to assume the ownership of the buffer and
                     // properly keep for the next time.
                     self.internal_buf = Some(read_buffer.buffer());
-                    self.op = ReaderOp::Idle;
+                    self.op = Op::Idle;
                     Poll::Ready(Ok(()))
                 } else {
-                    self.op = ReaderOp::ConsumingReadBuffer {
+                    self.op = Op::ConsumingReadBuffer {
                         read_buffer: read_buffer.clone(),
                         already_read: copy_size,
                     };
                     Poll::Ready(Ok(()))
                 }
             }
-            ReaderOp::Idle => {
+            Op::Idle => {
                 let requested_size = buf.capacity().try_into().unwrap();
                 let internal_buf = self
                     .internal_buf
@@ -119,7 +128,7 @@ impl tokio::io::AsyncRead for Reader {
                 // the buffer and the old JS reference to it is no longer valid.
                 let fut =
                     JsFuture::from(self.inner.read_with_array_buffer_view(&internal_buf_view));
-                self.op = ReaderOp::ReadPending(fut);
+                self.op = Op::ReadPending(fut);
                 self.poll_read(cx, buf)
             }
         }
