@@ -33,6 +33,9 @@ pub enum WriterOp {
 pub enum ReaderOp {
     #[default]
     Idle,
-    Read(JsFuture),
-    ReadRemaining(js_sys::Uint8Array, usize),
+    ReadPending(JsFuture),
+    ConsumingReadBuffer {
+        read_buffer: js_sys::Uint8Array,
+        already_read: usize,
+    },
 }

@@ -43,7 +43,7 @@ impl tokio::io::AsyncRead for Reader {
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> Poll<std::io::Result<()>> {
         match self.op {
-            ReaderOp::Read(ref mut fut) => {
+            ReaderOp::ReadPending(ref mut fut) => {
                 let result = ready!(Pin::new(fut).poll(cx));
 
                 let read_result = match result {
@@ -59,20 +59,26 @@ impl tokio::io::AsyncRead for Reader {
                     return Poll::Ready(Ok(()));
                 };
 
-                self.op = ReaderOp::ReadRemaining(internal_buf_view, 0);
+                self.op = ReaderOp::ConsumingReadBuffer {
+                    read_buffer: internal_buf_view,
+                    already_read: 0,
+                };
 
                 self.poll_read(cx, buf)
             }
-            ReaderOp::ReadRemaining(ref mut result_buf_view, offset) => {
-                let remaining_size = result_buf_view.byte_length() as usize - offset;
+            ReaderOp::ConsumingReadBuffer {
+                ref mut read_buffer,
+                already_read,
+            } => {
+                let remaining_size = read_buffer.byte_length() as usize - already_read;
 
                 let buf_remaining_size = buf.remaining();
                 let copy_size = remaining_size.min(buf_remaining_size);
 
                 let write_slice = buf.initialize_unfilled_to(copy_size);
                 let source_view = js_sys::Uint8Array::new_with_byte_offset_and_length(
-                    &result_buf_view.buffer(),
-                    offset as u32,
+                    &read_buffer.buffer(),
+                    already_read as u32,
                     copy_size as u32,
                 );
                 source_view.copy_to(&mut write_slice[..copy_size]);
@@ -84,11 +90,14 @@ impl tokio::io::AsyncRead for Reader {
                     // under the hood - despite it being an entirely new JS object.
                     // We now have to assume the ownership of the buffer and
                     // properly keep for the next time.
-                    self.internal_buf = Some(result_buf_view.buffer());
+                    self.internal_buf = Some(read_buffer.buffer());
                     self.op = ReaderOp::Idle;
                     Poll::Ready(Ok(()))
                 } else {
-                    self.op = ReaderOp::ReadRemaining(result_buf_view.clone(), copy_size);
+                    self.op = ReaderOp::ConsumingReadBuffer {
+                        read_buffer: read_buffer.clone(),
+                        already_read: copy_size,
+                    };
                     Poll::Ready(Ok(()))
                 }
             }
@@ -110,7 +119,7 @@ impl tokio::io::AsyncRead for Reader {
                 // the buffer and the old JS reference to it is no longer valid.
                 let fut =
                     JsFuture::from(self.inner.read_with_array_buffer_view(&internal_buf_view));
-                self.op = ReaderOp::Read(fut);
+                self.op = ReaderOp::ReadPending(fut);
                 self.poll_read(cx, buf)
             }
         }
