@@ -4,7 +4,9 @@ use wasm_bindgen::JsCast as _;
 
 use crate::{StreamErrorCode, StreamReadError, StreamWriteError};
 
-impl xwt_core::stream::AsErrorCode<StreamErrorCode> for StreamReadError {
+impl xwt_core::stream::AsErrorCode for StreamReadError {
+    type ErrorCode = StreamErrorCode;
+
     fn as_error_code(&self) -> Option<StreamErrorCode> {
         let error = match self {
             Self::ByobReadConsumedBuffer => return None,
@@ -22,7 +24,9 @@ impl xwt_core::stream::AsErrorCode<StreamErrorCode> for StreamReadError {
 }
 
 // TODO: verify this implementation
-impl xwt_core::stream::AsErrorCode<StreamErrorCode> for StreamWriteError {
+impl xwt_core::stream::AsErrorCode for StreamWriteError {
+    type ErrorCode = StreamErrorCode;
+
     fn as_error_code(&self) -> Option<StreamErrorCode> {
         let error = match self {
             Self::ZeroSizeWriteBuffer => return None,
