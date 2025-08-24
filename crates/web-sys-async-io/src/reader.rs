@@ -6,7 +6,16 @@ use std::{
 
 use wasm_bindgen_futures::JsFuture;
 
-use crate::Op;
+#[derive(Debug, Default)]
+pub enum Op {
+    #[default]
+    Idle,
+    ReadPending(JsFuture),
+    ConsumingReadBuffer {
+        read_buffer: js_sys::Uint8Array,
+        already_read: usize,
+    },
+}
 
 #[derive(Debug)]
 pub struct Reader {
@@ -43,9 +52,8 @@ impl tokio::io::AsyncRead for Reader {
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> Poll<std::io::Result<()>> {
         match self.op {
-            Op::Pending(ref mut fut) => {
+            Op::ReadPending(ref mut fut) => {
                 let result = ready!(Pin::new(fut).poll(cx));
-                self.op = Op::Idle;
 
                 let read_result = match result {
                     Ok(val) => val,
@@ -54,25 +62,53 @@ impl tokio::io::AsyncRead for Reader {
                 let read_result: crate::sys::ReadableStreamByobReaderValue = read_result.into();
 
                 let value = read_result.value();
-                // No value indicates an error condition.
+                // No value indicates an error condition or end of stream.
                 let Some(internal_buf_view) = value else {
+                    self.op = Op::Idle;
                     return Poll::Ready(Ok(()));
                 };
 
-                let len = wasm_u32_to_usize(internal_buf_view.byte_length());
+                self.op = Op::ConsumingReadBuffer {
+                    read_buffer: internal_buf_view,
+                    already_read: 0,
+                };
 
-                let write_slice = buf.initialize_unfilled_to(len);
-                internal_buf_view.copy_to(&mut write_slice[..len]);
-                buf.advance(len);
+                self.poll_read(cx, buf)
+            }
+            Op::ConsumingReadBuffer {
+                ref mut read_buffer,
+                already_read,
+            } => {
+                let remaining_size = read_buffer.byte_length() as usize - already_read;
 
-                // The buffer returned is actually the same buffer we passed
-                // earlier when we called the `read_with_array_buffer_view`
-                // under the hood - despite it being an entirely new JS object.
-                // We now have to assume the ownership of the buffer and
-                // properly keep for the next time.
-                self.internal_buf = Some(internal_buf_view.buffer());
+                let buf_remaining_size = buf.remaining();
+                let copy_size = remaining_size.min(buf_remaining_size);
 
-                Poll::Ready(Ok(()))
+                let write_slice = buf.initialize_unfilled_to(copy_size);
+                let source_view = js_sys::Uint8Array::new_with_byte_offset_and_length(
+                    &read_buffer.buffer(),
+                    already_read as u32,
+                    copy_size as u32,
+                );
+                source_view.copy_to(&mut write_slice[..copy_size]);
+                buf.advance(copy_size);
+
+                if remaining_size <= buf_remaining_size {
+                    // The buffer returned is actually the same buffer we passed
+                    // earlier when we called the `read_with_array_buffer_view`
+                    // under the hood - despite it being an entirely new JS object.
+                    // We now have to assume the ownership of the buffer and
+                    // properly keep for the next time.
+                    self.internal_buf = Some(read_buffer.buffer());
+                    self.op = Op::Idle;
+                    Poll::Ready(Ok(()))
+                } else {
+                    self.op = Op::ConsumingReadBuffer {
+                        read_buffer: read_buffer.clone(),
+                        already_read: copy_size,
+                    };
+                    Poll::Ready(Ok(()))
+                }
             }
             Op::Idle => {
                 let requested_size = buf.capacity().try_into().unwrap();
@@ -92,14 +128,9 @@ impl tokio::io::AsyncRead for Reader {
                 // the buffer and the old JS reference to it is no longer valid.
                 let fut =
                     JsFuture::from(self.inner.read_with_array_buffer_view(&internal_buf_view));
-                self.op = Op::Pending(fut);
+                self.op = Op::ReadPending(fut);
                 self.poll_read(cx, buf)
             }
         }
     }
-}
-
-#[inline]
-fn wasm_u32_to_usize(val: u32) -> usize {
-    val.try_into().unwrap()
 }
