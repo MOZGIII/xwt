@@ -5,7 +5,6 @@
 //! flexibility at the type level.
 
 #![no_std]
-#![cfg_attr(feature = "error-in-core", feature(error_in_core))]
 
 #[cfg(feature = "std")]
 extern crate std;
@@ -25,8 +24,7 @@ pub mod utils {
     pub mod dummy;
     pub mod maybe;
 
-    mod error;
-    pub use error::Error;
+    pub use core::error::Error;
 }
 
 pub mod prelude {
