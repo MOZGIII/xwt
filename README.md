@@ -39,13 +39,20 @@ Install it via `cargo install -f cargo-advrunner`.
 
 Next, the following tools are also required:
 
-- `wasm-bindgen-test-runner` - from the `wasm-bindgen-cli` crate; the runner harness for running the WASM tests in a browser environment
+- `wasm-bindgen-test-runner` - from the `wasm-bindgen-cli` crate;
+   the runner harness for running the WASM tests in a browser environment
 
    Install with: `cargo install -f wasm-bindgen-cli`
 
-   You might have to adjust the command above to install a particular version if you see a message to do so down the road.
+   You might have to adjust the command above to install a particular version
+   if you see a message to do so down the road.
+   Also, there is sometimes a need to bump the `wasm-bindgen` in the lockfile -
+   usually when the `wasm-server-runner` is too far in
+   the future `wasm-server-runner`-version wise from us.
 
-- `wasm-server-runner` - from the `wasm-server-runner` crate; the runner harness for running a dev server to server the WASM modules in a browser
+- `wasm-server-runner` - from the `wasm-server-runner` crate;
+   the runner harness for running a dev server to server the WASM modules in
+   a browser
 
    Install with: `cargo install -f wasm-server-runner`
 
