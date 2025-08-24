@@ -6,8 +6,6 @@
 #![cfg(target_family = "wasm")]
 #![allow(missing_docs, clippy::missing_docs_in_private_items)]
 
-use wasm_bindgen_futures::JsFuture;
-
 pub mod reader;
 mod sys;
 pub mod writer;
