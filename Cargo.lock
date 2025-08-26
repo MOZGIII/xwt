@@ -213,9 +213,9 @@ checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
 
 [[package]]
 name = "constcat"
-version = "0.5.1"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4938185353434999ef52c81753c8cca8955ed38042fc29913db3751916f3b7ab"
+checksum = "136d3e02915a2cea4d74caa8681e2d44b1c3254bdbf17d11d41d587ff858832c"
 
 [[package]]
 name = "core-foundation"
@@ -993,7 +993,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1818,7 +1818,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1995,7 +1995,7 @@ version = "0.18.0"
 
 [[package]]
 name = "xwt-anchor"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "xwt-core",
 ]
@@ -2027,11 +2027,11 @@ dependencies = [
 
 [[package]]
 name = "xwt-core"
-version = "0.6.0"
+version = "0.7.0"
 
 [[package]]
 name = "xwt-error"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "xwt-core",
 ]
@@ -2153,7 +2153,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.9.0"
+version = "0.10.0"
 dependencies = [
  "constcat",
  "thiserror",
@@ -2165,7 +2165,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web"
-version = "0.16.0"
+version = "0.17.0"
 dependencies = [
  "js-sys",
  "static_assertions",
@@ -2188,7 +2188,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.13.2"
+version = "0.14.0"
 dependencies = [
  "anyhow",
  "color-eyre",
