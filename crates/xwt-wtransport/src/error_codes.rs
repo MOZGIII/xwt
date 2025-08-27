@@ -30,6 +30,7 @@ pub fn from_http(h: u64) -> Result<u32, FromHttpError> {
         return Ok(0);
     }
 
+    #[allow(clippy::manual_is_multiple_of)]
     if !((FIRST..=LAST).contains(&h) && (h - 0x21) % 0x1f != 0) {
         return Err(FromHttpError(h));
     }
