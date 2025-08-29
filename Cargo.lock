@@ -2067,6 +2067,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "xwt-erased-error"
+version = "0.1.0"
+dependencies = [
+ "xwt-erased",
+]
+
+[[package]]
 name = "xwt-error"
 version = "0.6.0"
 dependencies = [
