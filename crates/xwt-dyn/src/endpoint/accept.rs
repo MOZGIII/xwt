@@ -6,7 +6,7 @@ use xwt_core::utils::maybe;
 use crate::utils::traits::{maybe_send, maybe_send_sync};
 
 #[dyn_safe::dyn_safe(true)]
-pub trait Accept: maybe::Send {
+pub trait Accept: maybe::Send + maybe::Sync {
     fn accept(
         &self,
     ) -> maybe_send::BoxedFuture<
@@ -20,6 +20,7 @@ where
     X: xwt_core::endpoint::Accept,
     X: maybe::Sync,
     X: 'static,
+    xwt_core::prelude::AcceptRequestFor<X>: maybe::Sync,
     xwt_core::prelude::AcceptSessionFor<X>: crate::base::Session,
 {
     fn accept(
@@ -49,7 +50,7 @@ pub trait Accepting: maybe::Send {
 
 impl<X> Accepting for X
 where
-    X: xwt_core::endpoint::accept::Accepting,
+    X: xwt_core::endpoint::accept::Accepting<Request: maybe::Sync>,
     X: 'static,
     xwt_core::prelude::AcceptingSessionFor<X>: crate::base::Session,
 {
@@ -69,7 +70,7 @@ where
 }
 
 #[dyn_safe::dyn_safe(true)]
-pub trait Request: maybe::Send {
+pub trait Request: maybe::Send + maybe::Sync {
     fn ok(
         self: Box<Self>,
     ) -> maybe_send::BoxedFuture<
@@ -86,6 +87,7 @@ pub trait Request: maybe::Send {
 impl<X> Request for X
 where
     X: xwt_core::endpoint::accept::Request,
+    X: maybe::Sync,
     X: 'static,
     xwt_core::prelude::RequestSessionFor<X>: crate::base::Session,
 {

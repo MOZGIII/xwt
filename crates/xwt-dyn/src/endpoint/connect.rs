@@ -6,7 +6,7 @@ use xwt_core::utils::maybe;
 use crate::utils::traits::{maybe_send, maybe_send_sync};
 
 #[dyn_safe::dyn_safe(true)]
-pub trait Connect: maybe::Send {
+pub trait Connect: maybe::Send + maybe::Sync {
     fn connect<'a>(
         &'a self,
         url: &'a str,

@@ -60,7 +60,7 @@ where
 }
 
 #[dyn_safe::dyn_safe(true)]
-pub trait OpenBi: maybe::Send {
+pub trait OpenBi: maybe::Send + maybe::Sync {
     fn open_bi(
         &self,
     ) -> maybe_send::BoxedFuture<
@@ -152,7 +152,7 @@ where
 }
 
 #[dyn_safe::dyn_safe(true)]
-pub trait OpenUni: maybe::Send {
+pub trait OpenUni: maybe::Send + maybe::Sync {
     fn open_uni(
         &self,
     ) -> maybe_send::BoxedFuture<
