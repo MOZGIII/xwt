@@ -341,6 +341,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "dyn_safe"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aabdea360e2a7c8d9102e372012e48127655b9fa1de157372680229a6d1f0f04"
+dependencies = [
+ "dyn_safe-proc_macros",
+]
+
+[[package]]
+name = "dyn_safe-proc_macros"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dac1d242ed8ebf8341e00cfa5b629bf122640d188a339afe503501de3fc29db1"
+
+[[package]]
 name = "ecdsa"
 version = "0.16.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -993,7 +1008,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1818,7 +1833,7 @@ version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2028,6 +2043,120 @@ dependencies = [
 [[package]]
 name = "xwt-core"
 version = "0.6.0"
+
+[[package]]
+name = "xwt-dyn"
+version = "0.1.0"
+dependencies = [
+ "dyn_safe",
+ "xwt-core",
+]
+
+[[package]]
+name = "xwt-erased"
+version = "0.1.0"
+dependencies = [
+ "tokio",
+ "tracing",
+ "wtransport",
+ "xwt-cert-fingerprint",
+ "xwt-dyn",
+ "xwt-test-assets",
+ "xwt-web",
+ "xwt-wtransport",
+]
+
+[[package]]
+name = "xwt-erased-error"
+version = "0.1.0"
+dependencies = [
+ "xwt-erased",
+]
+
+[[package]]
+name = "xwt-erased-example-client"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "console_error_panic_hook",
+ "tokio",
+ "wasm-bindgen-futures",
+ "xwt-erased-example-client-native",
+ "xwt-erased-example-client-shared",
+ "xwt-erased-example-client-web",
+]
+
+[[package]]
+name = "xwt-erased-example-client-native"
+version = "0.1.0"
+dependencies = [
+ "rand",
+ "tokio",
+ "wtransport",
+ "xwt-cert-fingerprint",
+ "xwt-erased",
+ "xwt-erased-example-client-shared",
+ "xwt-test-assets",
+ "xwt-wtransport",
+]
+
+[[package]]
+name = "xwt-erased-example-client-shared"
+version = "0.1.0"
+dependencies = [
+ "async-timer",
+ "futures-util",
+ "rand",
+ "xwt-erased",
+]
+
+[[package]]
+name = "xwt-erased-example-client-web"
+version = "0.1.0"
+dependencies = [
+ "getrandom",
+ "rand",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "xwt-cert-fingerprint",
+ "xwt-core",
+ "xwt-erased",
+ "xwt-erased-example-client-shared",
+ "xwt-test-assets",
+ "xwt-web",
+]
+
+[[package]]
+name = "xwt-erased-example-server"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "tokio",
+ "xwt-erased-example-server-native",
+]
+
+[[package]]
+name = "xwt-erased-example-server-native"
+version = "0.1.0"
+dependencies = [
+ "tokio",
+ "wtransport",
+ "xwt-cert-fingerprint",
+ "xwt-erased",
+ "xwt-erased-example-server-shared",
+ "xwt-test-assets",
+ "xwt-wtransport",
+]
+
+[[package]]
+name = "xwt-erased-example-server-shared"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "tokio",
+ "xwt-erased",
+]
 
 [[package]]
 name = "xwt-error"

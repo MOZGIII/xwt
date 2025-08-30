@@ -2,7 +2,9 @@
 
 use crate::{error_codes, StreamErrorCode, StreamReadError, StreamWriteError};
 
-impl xwt_core::stream::AsErrorCode<StreamErrorCode> for StreamReadError {
+impl xwt_core::stream::AsErrorCode for StreamReadError {
+    type ErrorCode = StreamErrorCode;
+
     fn as_error_code(&self) -> Option<StreamErrorCode> {
         match self {
             Self::Closed => Some(0.into()),
@@ -17,7 +19,9 @@ impl xwt_core::stream::AsErrorCode<StreamErrorCode> for StreamReadError {
     }
 }
 
-impl xwt_core::stream::AsErrorCode<StreamErrorCode> for StreamWriteError {
+impl xwt_core::stream::AsErrorCode for StreamWriteError {
+    type ErrorCode = StreamErrorCode;
+
     fn as_error_code(&self) -> Option<StreamErrorCode> {
         match self {
             Self::ZeroSizeWriteBuffer => None,
