@@ -2074,6 +2074,91 @@ dependencies = [
 ]
 
 [[package]]
+name = "xwt-erased-example-client"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "console_error_panic_hook",
+ "tokio",
+ "wasm-bindgen-futures",
+ "xwt-erased-example-client-native",
+ "xwt-erased-example-client-shared",
+ "xwt-erased-example-client-web",
+]
+
+[[package]]
+name = "xwt-erased-example-client-native"
+version = "0.1.0"
+dependencies = [
+ "rand",
+ "tokio",
+ "wtransport",
+ "xwt-cert-fingerprint",
+ "xwt-erased",
+ "xwt-erased-example-client-shared",
+ "xwt-test-assets",
+ "xwt-wtransport",
+]
+
+[[package]]
+name = "xwt-erased-example-client-shared"
+version = "0.1.0"
+dependencies = [
+ "async-timer",
+ "futures-util",
+ "rand",
+ "xwt-erased",
+]
+
+[[package]]
+name = "xwt-erased-example-client-web"
+version = "0.1.0"
+dependencies = [
+ "getrandom",
+ "rand",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "xwt-cert-fingerprint",
+ "xwt-core",
+ "xwt-erased",
+ "xwt-erased-example-client-shared",
+ "xwt-test-assets",
+ "xwt-web",
+]
+
+[[package]]
+name = "xwt-erased-example-server"
+version = "0.1.0"
+dependencies = [
+ "cfg-if",
+ "tokio",
+ "xwt-erased-example-server-native",
+]
+
+[[package]]
+name = "xwt-erased-example-server-native"
+version = "0.1.0"
+dependencies = [
+ "tokio",
+ "wtransport",
+ "xwt-cert-fingerprint",
+ "xwt-erased",
+ "xwt-erased-example-server-shared",
+ "xwt-test-assets",
+ "xwt-wtransport",
+]
+
+[[package]]
+name = "xwt-erased-example-server-shared"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "tokio",
+ "xwt-erased",
+]
+
+[[package]]
 name = "xwt-error"
 version = "0.6.0"
 dependencies = [

@@ -1,0 +1,22 @@
+[package]
+name = "xwt-erased-example-server-native"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+# Shared server code for the example.
+xwt-erased-example-server-shared = { path = "../server-shared", default-features = false }
+
+# Core xwt primitives and driver.
+xwt-cert-fingerprint = { path = "../../../crates/xwt-cert-fingerprint", default-features = false }
+xwt-erased = { path = "../../../crates/xwt-erased", default-features = false }
+xwt-wtransport = { path = "../../../crates/xwt-wtransport", default-features = false }
+
+# The dependency specific to this being an xwt example that is designed to
+# work with an xwt test server.
+xwt-test-assets = { path = "../../../crates/xwt-test-assets", default-features = false }
+
+# The rest of the dependencies.
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+wtransport = { version = "0.6", default-features = false, features = ["self-signed"] }
