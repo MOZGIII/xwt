@@ -1,0 +1,13 @@
+[package]
+name = "xwt-erased-example-server"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+cfg-if = "1"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+xwt-erased-example-server-native = { path = "../server-native", default-features = false }
+
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

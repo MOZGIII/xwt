@@ -6,21 +6,25 @@ use core::num::NonZeroUsize;
 use crate::utils::{maybe, Error};
 
 /// A way to represent a stream operation error as an error code.
-pub trait AsErrorCode<ErrorCode>: maybe::Send
-where
-    ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync,
-{
+pub trait AsErrorCode: maybe::Send {
+    /// An error code type.
+    type ErrorCode: maybe::Send + maybe::Sync;
+
     /// Represent the error as an error code.
-    fn as_error_code(&self) -> Option<ErrorCode>;
+    fn as_error_code(&self) -> Option<Self::ErrorCode>;
 }
 
 /// Read the data from the stream.
 pub trait Read: maybe::Send {
     /// An error code the stream may be aborted with.
-    type ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync;
+    type ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync + 'static;
 
     /// An error that can occur while reading the stream.
-    type Error: Error + AsErrorCode<Self::ErrorCode> + maybe::Send + maybe::Sync + 'static;
+    type Error: Error
+        + AsErrorCode<ErrorCode = Self::ErrorCode>
+        + maybe::Send
+        + maybe::Sync
+        + 'static;
 
     /// Read the data from the stream into a given buffer and return the amount
     /// of bytes filled in the buffer or `None` if the stream is closed and does
@@ -52,10 +56,14 @@ pub trait Read: maybe::Send {
 /// Write the data to a stream.
 pub trait Write: maybe::Send {
     /// An error code the stream may be aborted with.
-    type ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync;
+    type ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync + 'static;
 
     /// An error that can occur while writing to the stream.
-    type Error: Error + AsErrorCode<Self::ErrorCode> + maybe::Send + maybe::Sync + 'static;
+    type Error: Error
+        + AsErrorCode<ErrorCode = Self::ErrorCode>
+        + maybe::Send
+        + maybe::Sync
+        + 'static;
 
     /// Write the data from the given buffer into the stream, returning
     /// the amount of of bytes that were successfully written into the stream.
@@ -80,7 +88,7 @@ pub trait ReadAbort: maybe::Send {
     /// An error code to abort the stream with.
     ///
     /// Pass `0` for default.
-    type ErrorCode: From<u32> + maybe::Send + maybe::Sync;
+    type ErrorCode: From<u32> + maybe::Send + maybe::Sync + 'static;
 
     /// An error that can occur while stopping the stream.
     type Error: Error + maybe::Send + maybe::Sync + 'static;
@@ -105,7 +113,7 @@ pub trait WriteAbort: maybe::Send {
     /// An error code to abort the stream with.
     ///
     /// Pass `0` for default.
-    type ErrorCode: From<u32> + maybe::Send + maybe::Sync;
+    type ErrorCode: From<u32> + maybe::Send + maybe::Sync + 'static;
 
     /// An error that can occur while stopping the stream.
     type Error: Error + maybe::Send + maybe::Sync + 'static;
@@ -122,7 +130,7 @@ pub trait WriteAbort: maybe::Send {
 /// This can happen when the "read" part aborts the stream.
 pub trait WriteAborted: maybe::Send {
     /// An error code the stream is aborted with.
-    type ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync;
+    type ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync + 'static;
 
     /// An error that can occur while waiting for a stream to be aborted.
     type Error: Error + maybe::Send + maybe::Sync + 'static;

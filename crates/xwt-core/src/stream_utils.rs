@@ -1,6 +1,6 @@
 //! Utilitites for the WebTransport streams.
 
-use crate::{stream, utils::maybe};
+use crate::stream;
 
 /// A shortcut for the error type for a given [`stream::Read`] type.
 pub type ReadErrorFor<T> = <T as stream::Read>::Error;
@@ -36,10 +36,7 @@ pub type WriteAbortedErrorCodeFor<T> = <T as stream::WriteAborted>::ErrorCode;
 pub type FinishErrorFor<T> = <T as stream::Finish>::Error;
 
 /// Extensions to the .
-pub trait AsErrorCodeExt<ErrorCode>: stream::AsErrorCode<ErrorCode>
-where
-    ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync,
-{
+pub trait AsErrorCodeExt: stream::AsErrorCode<ErrorCode: TryInto<u32>> {
     /// Get the error code value.
     fn as_error_code_value(&self) -> Option<u32>;
 
@@ -50,10 +47,10 @@ where
     fn is_closed(&self) -> bool;
 }
 
-impl<T, ErrorCode> AsErrorCodeExt<ErrorCode> for T
+impl<T> AsErrorCodeExt for T
 where
-    T: stream::AsErrorCode<ErrorCode>,
-    ErrorCode: TryInto<u32> + maybe::Send + maybe::Sync,
+    T: stream::AsErrorCode,
+    T::ErrorCode: TryInto<u32>,
 {
     fn as_error_code_value(&self) -> Option<u32> {
         let error_code = self.as_error_code()?;
