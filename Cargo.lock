@@ -2010,7 +2010,7 @@ version = "0.18.0"
 
 [[package]]
 name = "xwt-anchor"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "xwt-core",
 ]
@@ -2042,7 +2042,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-core"
-version = "0.6.0"
+version = "0.7.0"
 
 [[package]]
 name = "xwt-dyn"
@@ -2160,7 +2160,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-error"
-version = "0.6.0"
+version = "0.7.0"
 dependencies = [
  "xwt-core",
 ]
@@ -2282,7 +2282,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.9.0"
+version = "0.10.0"
 dependencies = [
  "constcat",
  "thiserror",
@@ -2294,7 +2294,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web"
-version = "0.16.0"
+version = "0.17.0"
 dependencies = [
  "js-sys",
  "static_assertions",
@@ -2317,7 +2317,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.13.2"
+version = "0.14.0"
 dependencies = [
  "anyhow",
  "color-eyre",

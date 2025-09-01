@@ -11,7 +11,7 @@ A suite of dyn-safe companion traits for xwt-core.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-core = { version = "0.6", path = "../xwt-core", default-features = false }
+xwt-core = { version = "0.7", path = "../xwt-core", default-features = false }
 
 dyn_safe = "0.1"
 

@@ -1,6 +1,6 @@
 [package]
 name = "xwt-wtransport"
-version = "0.13.2"
+version = "0.14.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -10,7 +10,7 @@ An implementation of the xwt that runs natively via wtransport crate.
 repository = "https://github.com/MOZGIII/xwt"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-core = { version = "0.6", path = "../xwt-core", default-features = false, features = ["std"] }
+xwt-core = { version = "0.7", path = "../xwt-core", default-features = false, features = ["std"] }
 
 thiserror = "2"
 wtransport = { version = "0.6", default-features = false, features = ["self-signed", "quinn", "ring"] }
@@ -18,7 +18,7 @@ wtransport = { version = "0.6", default-features = false, features = ["self-sign
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint" }
 xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
-xwt-tests = { version = "0.9", path = "../xwt-tests" }
+xwt-tests = { version = "0.10", path = "../xwt-tests" }
 
 anyhow = "1"
 color-eyre = "0.6"
