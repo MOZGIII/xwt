@@ -13,7 +13,7 @@ pub use self::endpoint::Client;
 pub use self::endpoint::Server;
 pub use self::error::Error;
 pub use self::session::Session;
-pub use self::stream::OpError;
+pub use self::stream::Error as StreamError;
 
 pub mod utils {
     pub use xwt_dyn::utils::maybe;

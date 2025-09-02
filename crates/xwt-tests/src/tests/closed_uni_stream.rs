@@ -17,16 +17,14 @@ where
     WriteStreamAborted(#[source] WriteAbortedErrorFor<SendStreamFor<ConnectSessionFor<Endpoint>>>),
     #[error("no error code was returned")]
     NoErrorCode,
-    #[error("error code conversion to u32 failed")]
-    ErrorCodeConversion,
     #[error("error code mismatch: got code {0}")]
-    ErrorCodeMismatch(u32),
+    ErrorCodeMismatch(xwt_core::stream::ErrorCode),
 }
 
 pub async fn run<Endpoint>(
     endpoint: Endpoint,
     url: &str,
-    expected_error_code: u32,
+    expected_error_code: xwt_core::stream::ErrorCode,
 ) -> Result<(), Error<Endpoint>>
 where
     Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
@@ -45,10 +43,6 @@ where
         .aborted()
         .await
         .map_err(Error::WriteStreamAborted)?;
-
-    let error_code: u32 = error_code
-        .try_into()
-        .map_err(|_| Error::ErrorCodeConversion)?;
 
     if error_code != expected_error_code {
         return Err(Error::ErrorCodeMismatch(error_code));

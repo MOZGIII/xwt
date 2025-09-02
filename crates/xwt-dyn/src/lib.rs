@@ -8,7 +8,6 @@ pub mod base;
 pub mod endpoint;
 pub mod session;
 pub mod stream;
-pub mod stream_utils;
 
 pub mod utils {
     //! Useful utilities.
@@ -16,6 +15,8 @@ pub mod utils {
     pub mod traits;
     pub use xwt_core::utils::maybe;
 }
+
+pub use xwt_core as core;
 
 pub mod prelude {
     //! A prelude of the frequently used types.
@@ -29,15 +30,15 @@ pub mod prelude {
         AcceptBi as _, AcceptUni as _, OpenBi as _, OpenUni as _, OpeningBi as _, OpeningUni as _,
     };
     pub use crate::stream::{
-        AsErrorCode as _, Finish as _, Read as _, ReadAbort as _, ReadChunkU8 as _, Write as _,
-        WriteAbort as _, WriteAborted as _, WriteChunkU8 as _,
+        Finish as _, Read as _, ReadAbort as _, ReadChunkU8 as _, Write as _, WriteAbort as _,
+        WriteAborted as _, WriteChunkU8 as _,
     };
 
-    pub use crate::stream_utils::*;
+    pub use xwt_core::stream_utils::ErrorAsErrorCodeExt as _;
 
     pub use crate::session::datagram::IncomingDatagram;
     pub use crate::session::stream::{RecvStream, SendStream};
 
-    pub use crate::stream::OpError;
-    pub use crate::utils::traits::maybe_send_sync::Error;
+    pub use crate::stream::{BoxedError as BoxedStreamError, Error as StreamError};
+    pub use crate::utils::traits::maybe_send_sync::{BoxedError, Error};
 }

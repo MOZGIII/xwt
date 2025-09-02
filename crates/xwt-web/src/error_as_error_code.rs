@@ -1,16 +1,14 @@
-//! [`xwt_core::stream::AsErrorCode`] implementations.
+//! [`xwt_core::stream::ErrorAsErrorCode`] implementations.
 
 use wasm_bindgen::JsCast as _;
 
-use crate::{StreamErrorCode, StreamReadError, StreamWriteError};
+use crate::{StreamReadError, StreamWriteError};
 
-impl xwt_core::stream::AsErrorCode for StreamReadError {
-    type ErrorCode = StreamErrorCode;
-
-    fn as_error_code(&self) -> Option<StreamErrorCode> {
+impl xwt_core::stream::ErrorAsErrorCode for StreamReadError {
+    fn as_error_code(&self) -> Option<xwt_core::stream::ErrorCode> {
         let error = match self {
             Self::ByobReadConsumedBuffer => return None,
-            Self::Closed => return Some(0.into()),
+            Self::Closed => return Some(0),
             Self::Read(error) => error,
         };
 
@@ -18,16 +16,14 @@ impl xwt_core::stream::AsErrorCode for StreamReadError {
         if error.source() != web_wt_sys::WebTransportErrorSource::Stream {
             return None;
         }
-        let code = error.stream_error_code().unwrap_or(0);
-        Some(code.into())
+        let code = error.stream_error_code()?;
+        Some(code)
     }
 }
 
 // TODO: verify this implementation
-impl xwt_core::stream::AsErrorCode for StreamWriteError {
-    type ErrorCode = StreamErrorCode;
-
-    fn as_error_code(&self) -> Option<StreamErrorCode> {
+impl xwt_core::stream::ErrorAsErrorCode for StreamWriteError {
+    fn as_error_code(&self) -> Option<xwt_core::stream::ErrorCode> {
         let error = match self {
             Self::ZeroSizeWriteBuffer => return None,
             Self::Write(error) => error,
@@ -37,7 +33,7 @@ impl xwt_core::stream::AsErrorCode for StreamWriteError {
         if error.source() != web_wt_sys::WebTransportErrorSource::Stream {
             return None;
         }
-        let code = error.stream_error_code().unwrap_or(0);
-        Some(code.into())
+        let code = error.stream_error_code()?;
+        Some(code)
     }
 }

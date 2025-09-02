@@ -7,38 +7,21 @@ use xwt_core::utils::maybe;
 
 use crate::utils::traits::{maybe_send, maybe_send_sync};
 
-#[dyn_safe::dyn_safe(true)]
-pub trait AsErrorCode: maybe::Send {
-    fn as_error_code(&self) -> Option<Result<u32, Box<dyn core::any::Any + 'static>>>;
-}
-
-impl<X> AsErrorCode for X
-where
-    X: xwt_core::stream::AsErrorCode<ErrorCode: TryInto<u32> + 'static>,
-{
-    fn as_error_code(&self) -> Option<Result<u32, Box<dyn core::any::Any + 'static>>> {
-        let error_code = <X as xwt_core::stream::AsErrorCode>::as_error_code(self)?;
-        let error_code = match error_code.try_into() {
-            Ok(val) => val,
-            Err(error) => {
-                return Some(Err(Box::new(error)));
-            }
-        };
-        Some(Ok(error_code))
-    }
-}
+pub use xwt_core::stream::ErrorCode;
 
 #[dyn_safe::dyn_safe(true)]
-pub trait OpError: maybe_send_sync::Error + AsErrorCode {}
+pub trait Error: maybe_send_sync::Error + xwt_core::stream::ErrorAsErrorCode {}
 
-impl<X> OpError for X where X: maybe_send_sync::Error + AsErrorCode {}
+impl<X> Error for X where X: maybe_send_sync::Error + xwt_core::stream::ErrorAsErrorCode {}
+
+pub type BoxedError<'a> = Box<dyn Error + 'a>;
 
 #[dyn_safe::dyn_safe(true)]
 pub trait Read: maybe::Send {
     fn read<'a>(
         &'a mut self,
         buf: &'a mut [u8],
-    ) -> maybe_send::BoxedFuture<'a, Result<NonZeroUsize, Box<dyn OpError + 'static>>>;
+    ) -> maybe_send::BoxedFuture<'a, Result<NonZeroUsize, BoxedError<'static>>>;
 }
 
 impl<X> Read for X
@@ -48,7 +31,7 @@ where
     fn read<'a>(
         &'a mut self,
         buf: &'a mut [u8],
-    ) -> maybe_send::BoxedFuture<'a, Result<NonZeroUsize, Box<dyn OpError + 'static>>> {
+    ) -> maybe_send::BoxedFuture<'a, Result<NonZeroUsize, BoxedError<'static>>> {
         Box::pin(async move {
             <X as xwt_core::stream::Read>::read(self, buf)
                 .await
@@ -62,7 +45,7 @@ pub trait Write: maybe::Send {
     fn write<'a>(
         &'a mut self,
         buf: &'a [u8],
-    ) -> maybe_send::BoxedFuture<'a, Result<NonZeroUsize, Box<dyn OpError + 'static>>>;
+    ) -> maybe_send::BoxedFuture<'a, Result<NonZeroUsize, BoxedError<'static>>>;
 }
 
 impl<X> Write for X
@@ -72,7 +55,7 @@ where
     fn write<'a>(
         &'a mut self,
         buf: &'a [u8],
-    ) -> maybe_send::BoxedFuture<'a, Result<NonZeroUsize, Box<dyn OpError + 'static>>> {
+    ) -> maybe_send::BoxedFuture<'a, Result<NonZeroUsize, BoxedError<'static>>> {
         Box::pin(async move {
             <X as xwt_core::stream::Write>::write(self, buf)
                 .await
@@ -85,7 +68,7 @@ where
 pub trait ReadAbort: maybe::Send {
     fn abort(
         self: Box<Self>,
-        error_code: u32,
+        error_code: xwt_core::stream::ErrorCode,
     ) -> maybe_send::BoxedFuture<'static, Result<(), maybe_send_sync::BoxedError<'static>>>;
 }
 
@@ -96,9 +79,8 @@ where
 {
     fn abort(
         self: Box<Self>,
-        error_code: u32,
+        error_code: xwt_core::stream::ErrorCode,
     ) -> maybe_send::BoxedFuture<'static, Result<(), maybe_send_sync::BoxedError<'static>>> {
-        let error_code = error_code.into();
         Box::pin(async move {
             <X as xwt_core::stream::ReadAbort>::abort(*self, error_code)
                 .await
@@ -111,7 +93,7 @@ where
 pub trait WriteAbort: maybe::Send {
     fn abort(
         self: Box<Self>,
-        error_code: u32,
+        error_code: xwt_core::stream::ErrorCode,
     ) -> maybe_send::BoxedFuture<'static, Result<(), maybe_send_sync::BoxedError<'static>>>;
 }
 
@@ -122,9 +104,8 @@ where
 {
     fn abort(
         self: Box<Self>,
-        error_code: u32,
+        error_code: xwt_core::stream::ErrorCode,
     ) -> maybe_send::BoxedFuture<'static, Result<(), maybe_send_sync::BoxedError<'static>>> {
-        let error_code = error_code.into();
         Box::pin(async move {
             <X as xwt_core::stream::WriteAbort>::abort(*self, error_code)
                 .await
@@ -139,10 +120,7 @@ pub trait WriteAborted: maybe::Send {
         self: Box<Self>,
     ) -> maybe_send::BoxedFuture<
         'static,
-        Result<
-            Result<u32, Box<dyn core::any::Any + 'static>>,
-            maybe_send_sync::BoxedError<'static>,
-        >,
+        Result<xwt_core::stream::ErrorCode, maybe_send_sync::BoxedError<'static>>,
     >;
 }
 
@@ -155,16 +133,12 @@ where
         self: Box<Self>,
     ) -> maybe_send::BoxedFuture<
         'static,
-        Result<
-            Result<u32, Box<dyn core::any::Any + 'static>>,
-            maybe_send_sync::BoxedError<'static>,
-        >,
+        Result<xwt_core::stream::ErrorCode, maybe_send_sync::BoxedError<'static>>,
     > {
         Box::pin(async move {
             <X as xwt_core::stream::WriteAborted>::aborted(*self)
                 .await
                 .map_err(|error| Box::new(error) as _)
-                .map(|error_code| error_code.try_into().map_err(|error| Box::new(error) as _))
         })
     }
 }
