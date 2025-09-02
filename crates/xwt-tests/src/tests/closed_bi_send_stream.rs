@@ -19,16 +19,14 @@ where
     ReadStream(#[source] ReadErrorFor<RecvStreamFor<ConnectSessionFor<Endpoint>>>),
     #[error("a read was successful while we expected it to abort (read {0} bytes)")]
     ReadDidNotFail(NonZeroUsize),
-    #[error("error code conversion to u32 failed")]
-    ErrorCodeConversion,
     #[error("error code mismatch: got code {0}")]
-    ErrorCodeMismatch(u32),
+    ErrorCodeMismatch(xwt_core::stream::ErrorCode),
 }
 
 pub async fn run<Endpoint>(
     endpoint: Endpoint,
     url: &str,
-    expected_error_code: u32,
+    expected_error_code: xwt_core::stream::ErrorCode,
 ) -> Result<(), Error<Endpoint>>
 where
     Endpoint: xwt_core::endpoint::Connect + std::fmt::Debug,
@@ -49,9 +47,7 @@ where
     let error_code = match recv_stream.read(&mut buf).await {
         Ok(len) => return Err(Error::ReadDidNotFail(len)),
         Err(err) => match err.as_error_code() {
-            Some(error_code) => error_code
-                .try_into()
-                .map_err(|_| Error::ErrorCodeConversion)?,
+            Some(error_code) => error_code,
             None => return Err(Error::ReadStream(err)),
         },
     };

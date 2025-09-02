@@ -8,7 +8,7 @@
 )]
 #![cfg(not(target_family = "wasm"))]
 
-mod as_error_code;
+mod error_as_error_code;
 pub mod error_codes;
 mod types;
 
@@ -142,7 +142,6 @@ impl xwt_core::session::stream::AcceptUni for Connection {
 }
 
 impl xwt_core::stream::Read for RecvStream {
-    type ErrorCode = StreamErrorCode;
     type Error = StreamReadError;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<NonZeroUsize, Self::Error> {
@@ -160,18 +159,16 @@ impl xwt_core::stream::Read for RecvStream {
 }
 
 impl xwt_core::stream::ReadAbort for RecvStream {
-    type ErrorCode = StreamErrorCode;
     type Error = std::convert::Infallible;
 
-    async fn abort(self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
-        let code = error_codes::to_http(error_code.0).try_into().unwrap();
+    async fn abort(self, error_code: xwt_core::stream::ErrorCode) -> Result<(), Self::Error> {
+        let code = error_codes::to_http(error_code).try_into().unwrap();
         self.0.stop(code);
         Ok(())
     }
 }
 
 impl xwt_core::stream::Write for SendStream {
-    type ErrorCode = StreamErrorCode;
     type Error = StreamWriteError;
 
     async fn write(&mut self, buf: &[u8]) -> Result<NonZeroUsize, Self::Error> {
@@ -204,11 +201,10 @@ impl xwt_core::session::datagram::MaxSize for Connection {
 }
 
 impl xwt_core::stream::WriteAbort for SendStream {
-    type ErrorCode = StreamErrorCode;
     type Error = wtransport::error::ClosedStream;
 
-    async fn abort(mut self, error_code: Self::ErrorCode) -> Result<(), Self::Error> {
-        let code = error_codes::to_http(error_code.0).try_into().unwrap();
+    async fn abort(mut self, error_code: xwt_core::stream::ErrorCode) -> Result<(), Self::Error> {
+        let code = error_codes::to_http(error_code).try_into().unwrap();
         self.0.reset(code)?;
         Ok(())
     }
@@ -226,17 +222,16 @@ pub enum WriteAbortedError {
 }
 
 impl xwt_core::stream::WriteAborted for SendStream {
-    type ErrorCode = StreamErrorCode;
     type Error = WriteAbortedError;
 
-    async fn aborted(mut self) -> Result<Self::ErrorCode, Self::Error> {
+    async fn aborted(mut self) -> Result<xwt_core::stream::ErrorCode, Self::Error> {
         match self.0.quic_stream_mut().stopped().await {
             Ok(Some(error_code)) => {
                 let code = error_codes::from_http(error_code.into_inner())
                     .map_err(WriteAbortedError::ErrorCodeConversion)?;
-                Ok(code.into())
+                Ok(code)
             }
-            Ok(None) => Ok(0.into()),
+            Ok(None) => Ok(0),
             Err(wtransport::quinn::StoppedError::ConnectionLost(_)) => Err(
                 WriteAbortedError::StreamWrite(wtransport::error::StreamWriteError::NotConnected),
             ),
