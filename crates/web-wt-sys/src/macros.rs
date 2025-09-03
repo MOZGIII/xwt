@@ -35,7 +35,7 @@ macro_rules! _dictionary_erase_type_option_jsvalue {
 #[macro_export]
 macro_rules! _dictionary_type_non_wasm_bindgen_accessors {
     ($attr:ident, JsValue, $js_name:ident) => {
-        ::paste::paste! {
+        ::pastey::paste! {
             #[doc = "Set `" $js_name "` field to the given value."]
             pub fn [<set_ $attr>](&self, val: JsValue) {
                 self.[<set_option_ $attr>](val)
@@ -49,7 +49,7 @@ macro_rules! _dictionary_type_non_wasm_bindgen_accessors {
     };
 
     ($attr:ident, $value_type:ty, $js_name:ident) => {
-        ::paste::paste! {
+        ::pastey::paste! {
             #[doc = "Set `" $js_name "` field to the given value."]
             pub fn [<set_ $attr>](&self, val: $value_type) {
                 self.[<set_option_ $attr>](Some(val))
@@ -72,7 +72,7 @@ macro_rules! dictionary_type {
             $($attr:ident: $value_type:ty => $js_name:ident)*
         }
     ) => {
-        ::paste::paste! {
+        ::pastey::paste! {
             #[wasm_bindgen]
             extern "C" {
                 #[doc = "[`" $name "`] dictionary type."]
@@ -110,7 +110,7 @@ macro_rules! set_option_accessors {
         $( #[$attrs:meta] )*
         $attr:ident: $value_type:ty
     ) => {
-        ::paste::paste! {
+        ::pastey::paste! {
             /// Set field to the given value.
             $( #[$attrs] )*
             pub fn [<set_ $attr>](&self, val: $value_type) {
@@ -133,7 +133,7 @@ macro_rules! set_option_accessors_fallible {
         $( #[$attrs:meta] )*
         $attr:ident: $value_type:ty => $error_type:ty
     ) => {
-        ::paste::paste! {
+        ::pastey::paste! {
             /// Set field to the given value.
             $( #[$attrs] )*
             pub fn [<set_ $attr>](&self, val: $value_type) -> Result<(), $error_type> {
