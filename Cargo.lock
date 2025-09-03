@@ -1792,7 +1792,7 @@ dependencies = [
 
 [[package]]
 name = "web-wt-sys"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "js-sys",
  "pastey",
