@@ -1,6 +1,6 @@
 [package]
 name = "xwt-error"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -12,4 +12,4 @@ Use when you don't want/need your own more precise types.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-core = { version = "0.7", path = "../xwt-core", default-features = false }
+xwt-core = { version = "0.8", path = "../xwt-core", default-features = false }

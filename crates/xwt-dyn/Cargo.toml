@@ -1,6 +1,6 @@
 [package]
 name = "xwt-dyn"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 resolver = "2"
 rust-version = "1.81"
@@ -11,7 +11,7 @@ A suite of dyn-safe companion traits for xwt-core.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-core = { version = "0.7", path = "../xwt-core", default-features = false }
+xwt-core = { version = "0.8", path = "../xwt-core", default-features = false }
 
 dyn_safe = "0.1"
 

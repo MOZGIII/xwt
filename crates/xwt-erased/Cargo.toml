@@ -1,17 +1,17 @@
 [package]
 name = "xwt-erased"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 resolver = "2"
 rust-version = "1.81"
 license = "MIT"
 description = """
-TODO
+Type-erased wrappers for the `xwt-dyn` traits.
 """
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-dyn = { version = "0.1", path = "../xwt-dyn", default-features = false }
+xwt-dyn = { version = "0.2", path = "../xwt-dyn", default-features = false }
 
 [dev-dependencies]
 xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint", default-features = false }
@@ -21,9 +21,9 @@ tokio = { version = "1", features = ["macros", "rt"] }
 tracing = "0.1"
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwt-web = { version = "0.17", path = "../xwt-web", default-features = false }
+xwt-web = { version = "0.18", path = "../xwt-web", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
-xwt-wtransport = { version = "0.14", path = "../xwt-wtransport", default-features = false }
+xwt-wtransport = { version = "0.15", path = "../xwt-wtransport", default-features = false }
 
 wtransport = { version = "0.6", default-features = false }

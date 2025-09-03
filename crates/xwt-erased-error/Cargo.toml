@@ -1,6 +1,6 @@
 [package]
 name = "xwt-erased-error"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -11,4 +11,4 @@ Use when you don't want/need your own more precise types.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-erased = { version = "0.1", path = "../xwt-erased", default-features = false }
+xwt-erased = { version = "0.2", path = "../xwt-erased", default-features = false }
