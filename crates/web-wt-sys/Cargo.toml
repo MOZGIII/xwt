@@ -1,6 +1,6 @@
 [package]
 name = "web-wt-sys"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -14,7 +14,7 @@ default-target = "wasm32-unknown-unknown"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.69"
-paste = "1"
+pastey = "0.1"
 wasm-bindgen = { version = "0.2.93" }
 wasm-bindgen-futures = { version = "0.4.43" }
 web-sys = { version = "0.3.70", features = [
