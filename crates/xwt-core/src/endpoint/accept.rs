@@ -4,7 +4,7 @@ use core::future::Future;
 
 use crate::utils::{maybe, Error};
 
-pub trait Accept: Sized + maybe::Send {
+pub trait Accept: maybe::Send {
     type Accepting: Accepting;
     type Error: Error + maybe::Send + maybe::Sync + 'static;
 

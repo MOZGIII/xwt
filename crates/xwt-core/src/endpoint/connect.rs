@@ -4,8 +4,8 @@ use core::future::Future;
 
 use crate::utils::{maybe, Error};
 
-pub trait Connect: Sized + maybe::Send {
-    type Connecting: Connecting;
+pub trait Connect: maybe::Send {
+    type Connecting: Connecting + 'static;
     type Error: Error + maybe::Send + maybe::Sync + 'static;
 
     fn connect(
