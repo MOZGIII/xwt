@@ -41,10 +41,7 @@ impl ExampleClient {
             let movement_input = moves.choose(&mut thread_rng()).unwrap();
 
             // Send it to the connection as a datagram.
-            self.session
-                .send_datagram(movement_input.as_ref())
-                .await
-                .unwrap();
+            self.session.send_datagram(movement_input).await.unwrap();
 
             // Wait for 1 second before sending the next move.
             async_timer::new_timer(std::time::Duration::from_secs(1)).await;

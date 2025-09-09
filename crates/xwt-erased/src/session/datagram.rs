@@ -13,6 +13,12 @@ impl core::ops::Deref for IncomingDatagram {
     }
 }
 
+impl AsRef<[u8]> for IncomingDatagram {
+    fn as_ref(&self) -> &[u8] {
+        (*self.0).as_ref()
+    }
+}
+
 impl Session {
     pub async fn receive_datagram(&self) -> Result<IncomingDatagram, crate::Error> {
         self.0
@@ -29,10 +35,17 @@ impl Session {
             .map_err(crate::Error::from_inner)
     }
 
-    pub async fn send_datagram(&self, payload: &[u8]) -> Result<(), crate::Error> {
+    pub async fn send_datagram<D>(&self, payload: D) -> Result<(), crate::Error>
+    where
+        D: xwt_dyn::utils::maybe::Send + AsRef<[u8]>,
+    {
         self.0
-            .send_datagram(payload)
+            .send_datagram(payload.as_ref())
             .await
             .map_err(crate::Error::from_inner)
+    }
+
+    pub fn max_datagram_size(&self) -> Option<usize> {
+        self.0.max_datagram_size()
     }
 }
