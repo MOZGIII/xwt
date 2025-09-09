@@ -9,6 +9,9 @@ pub type UniStreamOpenErrorFor<T> = <T as stream::OpenUni>::Error;
 pub type UniStreamOpeningErrorFor<T> =
     <<T as stream::OpenUni>::Opening as stream::OpeningUni>::Error;
 
+pub type BiStreamAcceptErrorFor<T> = <T as stream::AcceptBi>::Error;
+pub type UniStreamAcceptErrorFor<T> = <T as stream::AcceptUni>::Error;
+
 pub type SendStreamFor<T> = <T as stream::SendSpec>::SendStream;
 
 pub type RecvStreamFor<T> = <T as stream::RecvSpec>::RecvStream;
