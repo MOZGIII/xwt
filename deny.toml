@@ -23,3 +23,7 @@ ignore = true
 
 [bans]
 multiple-versions = "allow"
+
+[[advisories.ignore]]
+id = "RUSTSEC-2025-0056"
+reason = "it is used, ultimately, by the color-eyre - and doesn't have an update that resolves this yet"
