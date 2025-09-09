@@ -13,6 +13,7 @@ repository = "https://github.com/MOZGIII/xwt"
 xwt-core = { version = "0.8", path = "../xwt-core", default-features = false, features = ["std"] }
 
 thiserror = "2"
+tracing = "0.1"
 wtransport = { version = "0.6", default-features = false, features = ["self-signed", "quinn", "ring"] }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
@@ -24,5 +25,4 @@ anyhow = "1"
 color-eyre = "0.6"
 static_assertions = "1"
 tokio = { version = "1", features = ["macros"] }
-tracing = "0.1"
 tracing-subscriber = "0.3"

@@ -148,9 +148,16 @@ impl xwt_core::stream::Read for RecvStream {
         match self.0.read(buf).await {
             Ok(None) => Err(StreamReadError::Closed),
             Ok(Some(val)) => match NonZeroUsize::new(val) {
-                None => unreachable!(
-                    "reading zero bytes from a stream that is not closed should not be possible"
-                ),
+                None => {
+                    tracing::warn!(
+                        "reading zero bytes from a stream that is not closed \
+                            should not be possible, but it just happened; \
+                            this is most likely a bug at wtransport; \
+                            xwt will treat it the same way as if the stream \
+                            was closed"
+                    );
+                    Err(StreamReadError::Closed)
+                }
                 Some(val) => Ok(val),
             },
             Err(error) => Err(StreamReadError::Read(error)),
