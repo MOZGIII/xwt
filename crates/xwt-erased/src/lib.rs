@@ -18,3 +18,6 @@ pub use self::stream::Error as StreamError;
 pub mod utils {
     pub use xwt_dyn::utils::maybe;
 }
+
+#[cfg(feature = "core-compat")]
+mod core_compat;
