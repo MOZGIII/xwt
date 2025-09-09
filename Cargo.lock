@@ -2027,10 +2027,12 @@ dependencies = [
 name = "xwt-erased"
 version = "0.2.0"
 dependencies = [
+ "static_assertions",
  "tokio",
  "tracing",
  "wtransport",
  "xwt-cert-fingerprint",
+ "xwt-core",
  "xwt-dyn",
  "xwt-test-assets",
  "xwt-web",

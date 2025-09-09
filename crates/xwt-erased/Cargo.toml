@@ -11,7 +11,10 @@ Type-erased wrappers for the `xwt-dyn` traits.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
+xwt-core = { version = "0.8", path = "../xwt-core", default-features = false, optional = true }
 xwt-dyn = { version = "0.2", path = "../xwt-dyn", default-features = false }
+
+static_assertions = { version = "1", optional = true }
 
 [dev-dependencies]
 xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint", default-features = false }
@@ -27,3 +30,8 @@ xwt-web = { version = "0.18", path = "../xwt-web", default-features = false }
 xwt-wtransport = { version = "0.15", path = "../xwt-wtransport", default-features = false }
 
 wtransport = { version = "0.6", default-features = false }
+
+[features]
+default = ["core-compat"]
+
+core-compat = ["dep:xwt-core", "dep:static_assertions"]
