@@ -19,7 +19,7 @@ impl Client {
         Self { endpoint }
     }
 
-    pub async fn connect(&self, url: &str) -> Result<Connecting<'_>, Error> {
+    pub async fn connect(&self, url: &str) -> Result<Connecting, Error> {
         self.endpoint
             .connect(url)
             .await
@@ -28,9 +28,9 @@ impl Client {
     }
 }
 
-pub struct Connecting<'a>(Box<dyn xwt_dyn::endpoint::connect::Connecting + 'a>);
+pub struct Connecting(Box<dyn xwt_dyn::endpoint::connect::Connecting + 'static>);
 
-impl<'a> Connecting<'a> {
+impl Connecting {
     pub async fn wait_connect(self) -> Result<crate::Session, Error> {
         self.0
             .wait_connect()
