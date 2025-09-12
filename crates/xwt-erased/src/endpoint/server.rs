@@ -20,6 +20,7 @@ impl Server {
     }
 
     pub async fn accept(&self) -> Result<Option<Accepting>, Error> {
+        crate::trace_call!();
         self.endpoint
             .accept()
             .await
@@ -32,6 +33,7 @@ pub struct Accepting(Box<dyn xwt_dyn::endpoint::accept::Accepting + 'static>);
 
 impl Accepting {
     pub async fn wait_accept(self) -> Result<Request, Error> {
+        crate::trace_call!();
         self.0
             .wait_accept()
             .await
@@ -44,6 +46,7 @@ pub struct Request(Box<dyn xwt_dyn::endpoint::accept::Request>);
 
 impl Request {
     pub async fn ok(self) -> Result<crate::Session, Error> {
+        crate::trace_call!();
         self.0
             .ok()
             .await
@@ -52,6 +55,7 @@ impl Request {
     }
 
     pub async fn close(self, status: u16) -> Result<(), Error> {
+        crate::trace_call!();
         self.0.close(status).await.map_err(Error::from_inner)
     }
 }

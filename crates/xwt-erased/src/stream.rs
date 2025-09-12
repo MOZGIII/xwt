@@ -34,14 +34,17 @@ impl core::error::Error for Error {
 
 impl Error {
     pub fn as_error_code(&self) -> Option<xwt_dyn::stream::ErrorCode> {
+        crate::trace_call!();
         self.0.as_error_code()
     }
 
     pub fn is_error_code(&self, expected_error_code: xwt_dyn::stream::ErrorCode) -> bool {
+        crate::trace_call!();
         self.0.is_error_code(expected_error_code)
     }
 
     pub fn is_closed(&self) -> bool {
+        crate::trace_call!();
         self.0.is_closed()
     }
 }
@@ -56,12 +59,14 @@ impl RecvStream {
     }
 
     pub async fn read<'a>(&'a mut self, buf: &'a mut [u8]) -> Result<NonZeroUsize, Error> {
+        crate::trace_call!();
         xwt_dyn::stream::Read::read(&mut *self.0, buf)
             .await
             .map_err(Error)
     }
 
     pub async fn abort(self, error_code: xwt_dyn::stream::ErrorCode) -> Result<(), crate::Error> {
+        crate::trace_call!();
         xwt_dyn::stream::ReadAbort::abort(self.0, error_code)
             .await
             .map_err(crate::Error::from_inner)
@@ -74,24 +79,28 @@ impl SendStream {
     }
 
     pub async fn write<'a>(&'a mut self, buf: &'a [u8]) -> Result<NonZeroUsize, Error> {
+        crate::trace_call!();
         xwt_dyn::stream::Write::write(&mut *self.0, buf)
             .await
             .map_err(Error)
     }
 
     pub async fn abort(self, error_code: xwt_dyn::stream::ErrorCode) -> Result<(), crate::Error> {
+        crate::trace_call!();
         xwt_dyn::stream::WriteAbort::abort(self.0, error_code)
             .await
             .map_err(crate::Error::from_inner)
     }
 
     pub async fn finish(self) -> Result<(), crate::Error> {
+        crate::trace_call!();
         xwt_dyn::stream::Finish::finish(self.0)
             .await
             .map_err(crate::Error::from_inner)
     }
 
     pub async fn aborted(self) -> Result<xwt_dyn::stream::ErrorCode, crate::Error> {
+        crate::trace_call!();
         xwt_dyn::stream::WriteAborted::aborted(self.0)
             .await
             .map_err(crate::Error::from_inner)
