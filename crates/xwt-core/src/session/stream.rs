@@ -12,7 +12,10 @@ pub trait SendSpec: maybe::Send {
 }
 
 pub trait RecvSpec: maybe::Send {
-    type RecvStream: crate::stream::Read + crate::stream::ReadAbort;
+    type RecvStream: crate::stream::Read
+        + crate::stream::ReadAbort
+        + crate::stream::ReadAborted
+        + crate::stream::Finished;
 }
 
 pub trait PairSpec: maybe::Send + SendSpec + RecvSpec {}

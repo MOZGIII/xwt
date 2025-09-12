@@ -90,6 +90,35 @@ where
 }
 
 #[dyn_safe::dyn_safe(true)]
+pub trait ReadAborted: maybe::Send {
+    fn aborted(
+        self: Box<Self>,
+    ) -> maybe_send::BoxedFuture<
+        'static,
+        Result<xwt_core::stream::ErrorCode, maybe_send_sync::BoxedError<'static>>,
+    >;
+}
+
+impl<X> ReadAborted for X
+where
+    X: xwt_core::stream::ReadAborted,
+    X: 'static,
+{
+    fn aborted(
+        self: Box<Self>,
+    ) -> maybe_send::BoxedFuture<
+        'static,
+        Result<xwt_core::stream::ErrorCode, maybe_send_sync::BoxedError<'static>>,
+    > {
+        Box::pin(async move {
+            <X as xwt_core::stream::ReadAborted>::aborted(*self)
+                .await
+                .map_err(|error| Box::new(error) as _)
+        })
+    }
+}
+
+#[dyn_safe::dyn_safe(true)]
 pub trait WriteAbort: maybe::Send {
     fn abort(
         self: Box<Self>,
@@ -160,6 +189,29 @@ where
     ) -> maybe_send::BoxedFuture<'static, Result<(), maybe_send_sync::BoxedError<'static>>> {
         Box::pin(async move {
             <X as xwt_core::stream::Finish>::finish(*self)
+                .await
+                .map_err(|error| Box::new(error) as _)
+        })
+    }
+}
+
+#[dyn_safe::dyn_safe(true)]
+pub trait Finished: maybe::Send {
+    fn finished(
+        self: Box<Self>,
+    ) -> maybe_send::BoxedFuture<'static, Result<(), BoxedError<'static>>>;
+}
+
+impl<X> Finished for X
+where
+    X: xwt_core::stream::Finished,
+    X: 'static,
+{
+    fn finished(
+        self: Box<Self>,
+    ) -> maybe_send::BoxedFuture<'static, Result<(), BoxedError<'static>>> {
+        Box::pin(async move {
+            <X as xwt_core::stream::Finished>::finished(*self)
                 .await
                 .map_err(|error| Box::new(error) as _)
         })

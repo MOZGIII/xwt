@@ -39,8 +39,9 @@ pub mod prelude {
         AcceptBi as _, AcceptUni as _, OpenBi as _, OpenUni as _, OpeningBi as _, OpeningUni as _,
     };
     pub use crate::stream::{
-        ErrorAsErrorCode as _, Finish as _, Read as _, ReadAbort as _, ReadChunk as _, Write as _,
-        WriteAbort as _, WriteAborted as _, WriteChunk as _,
+        ErrorAsErrorCode as _, Finish as _, Finished as _, Read as _, ReadAbort as _,
+        ReadAborted as _, ReadChunk as _, Write as _, WriteAbort as _, WriteAborted as _,
+        WriteChunk as _,
     };
 
     pub use crate::endpoint::accept_utils::*;

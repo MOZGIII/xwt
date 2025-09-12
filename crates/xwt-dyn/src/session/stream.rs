@@ -23,9 +23,21 @@ impl<X> SendStream for X where
 }
 
 #[dyn_safe::dyn_safe(true)]
-pub trait RecvStream: crate::stream::Read + crate::stream::ReadAbort {}
+pub trait RecvStream:
+    crate::stream::Read
+    + crate::stream::ReadAbort
+    + crate::stream::ReadAborted
+    + crate::stream::Finished
+{
+}
 
-impl<X> RecvStream for X where X: crate::stream::Read + crate::stream::ReadAbort {}
+impl<X> RecvStream for X where
+    X: crate::stream::Read
+        + crate::stream::ReadAbort
+        + crate::stream::ReadAborted
+        + crate::stream::Finished
+{
+}
 
 pub type StreamsTuple<'a> = (Box<dyn SendStream + 'a>, Box<dyn RecvStream + 'a>);
 

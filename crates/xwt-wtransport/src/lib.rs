@@ -148,9 +148,7 @@ impl xwt_core::stream::Read for RecvStream {
         match self.0.read(buf).await {
             Ok(None) => Err(StreamReadError::Closed),
             Ok(Some(val)) => match NonZeroUsize::new(val) {
-                None => unreachable!(
-                    "reading zero bytes from a stream that is not closed should not be possible"
-                ),
+                None => Err(StreamReadError::ZeroBytes),
                 Some(val) => Ok(val),
             },
             Err(error) => Err(StreamReadError::Read(error)),
@@ -165,6 +163,38 @@ impl xwt_core::stream::ReadAbort for RecvStream {
         let code = error_codes::to_http(error_code).try_into().unwrap();
         self.0.stop(code);
         Ok(())
+    }
+}
+
+/// An error that can occur while waiting for the read stream being aborted.
+#[derive(Debug, thiserror::Error)]
+pub enum ReadAbortedError {
+    /// An unexpected stream read error has occurred.
+    #[error("stream read: {0}")]
+    StreamRead(wtransport::error::StreamReadError),
+    /// An error code failed to convert.
+    #[error("error code conversion: {0}")]
+    ErrorCodeConversion(error_codes::FromHttpError),
+}
+
+impl xwt_core::stream::ReadAborted for RecvStream {
+    type Error = ReadAbortedError;
+
+    async fn aborted(mut self) -> Result<xwt_core::stream::ErrorCode, Self::Error> {
+        match self.0.quic_stream_mut().received_reset().await {
+            Ok(Some(error_code)) => {
+                let code = error_codes::from_http(error_code.into_inner())
+                    .map_err(ReadAbortedError::ErrorCodeConversion)?;
+                Ok(code)
+            }
+            Ok(None) => Ok(0),
+            Err(wtransport::quinn::ResetError::ConnectionLost(_)) => Err(
+                ReadAbortedError::StreamRead(wtransport::error::StreamReadError::NotConnected),
+            ),
+            Err(wtransport::quinn::ResetError::ZeroRttRejected) => Err(
+                ReadAbortedError::StreamRead(wtransport::error::StreamReadError::QuicProto),
+            ),
+        }
     }
 }
 
@@ -247,6 +277,26 @@ impl xwt_core::stream::Finish for SendStream {
 
     async fn finish(mut self) -> Result<(), Self::Error> {
         self.0.finish().await
+    }
+}
+
+impl xwt_core::stream::Finished for RecvStream {
+    type Error = StreamFinishedError;
+
+    async fn finished(mut self) -> Result<(), Self::Error> {
+        let byte = 0;
+        let buf: &mut [u8] = &mut [byte];
+        match self.0.read(buf).await {
+            Ok(None) => Ok(()),
+            Ok(Some(val)) => match NonZeroUsize::new(val) {
+                None => unreachable!(), // we know we pass a non-zero-sized buffer; should be impossible
+                Some(_) => Err(StreamFinishedError::TrailingData {
+                    first_byte: byte,
+                    stream: self,
+                }),
+            },
+            Err(error) => Err(StreamFinishedError::Read(error)),
+        }
     }
 }
 

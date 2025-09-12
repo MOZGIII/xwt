@@ -71,6 +71,20 @@ impl RecvStream {
             .await
             .map_err(crate::Error::from_inner)
     }
+
+    pub async fn aborted(self) -> Result<xwt_dyn::stream::ErrorCode, crate::Error> {
+        crate::trace_call!();
+        xwt_dyn::stream::ReadAborted::aborted(self.0)
+            .await
+            .map_err(crate::Error::from_inner)
+    }
+
+    pub async fn finished(self) -> Result<(), Error> {
+        crate::trace_call!();
+        xwt_dyn::stream::Finished::finished(self.0)
+            .await
+            .map_err(Error)
+    }
 }
 
 impl SendStream {
@@ -92,16 +106,16 @@ impl SendStream {
             .map_err(crate::Error::from_inner)
     }
 
-    pub async fn finish(self) -> Result<(), crate::Error> {
+    pub async fn aborted(self) -> Result<xwt_dyn::stream::ErrorCode, crate::Error> {
         crate::trace_call!();
-        xwt_dyn::stream::Finish::finish(self.0)
+        xwt_dyn::stream::WriteAborted::aborted(self.0)
             .await
             .map_err(crate::Error::from_inner)
     }
 
-    pub async fn aborted(self) -> Result<xwt_dyn::stream::ErrorCode, crate::Error> {
+    pub async fn finish(self) -> Result<(), crate::Error> {
         crate::trace_call!();
-        xwt_dyn::stream::WriteAborted::aborted(self.0)
+        xwt_dyn::stream::Finish::finish(self.0)
             .await
             .map_err(crate::Error::from_inner)
     }

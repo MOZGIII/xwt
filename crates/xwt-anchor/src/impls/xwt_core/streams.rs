@@ -48,6 +48,17 @@ where
     }
 }
 
+impl<T> xwt_core::stream::Finished for RecvStream<T>
+where
+    T: xwt_core::stream::Finished,
+{
+    type Error = T::Error;
+
+    async fn finished(self) -> Result<(), Self::Error> {
+        T::finished(self.0).await
+    }
+}
+
 impl<T> xwt_core::stream::Read for RecvStream<T>
 where
     T: xwt_core::stream::Read,
@@ -67,5 +78,16 @@ where
 
     async fn abort(self, error_code: xwt_core::stream::ErrorCode) -> Result<(), Self::Error> {
         T::abort(self.0, error_code).await
+    }
+}
+
+impl<T> xwt_core::stream::ReadAborted for RecvStream<T>
+where
+    T: xwt_core::stream::ReadAborted,
+{
+    type Error = T::Error;
+
+    async fn aborted(self) -> Result<xwt_core::stream::ErrorCode, Self::Error> {
+        T::aborted(self.0).await
     }
 }
