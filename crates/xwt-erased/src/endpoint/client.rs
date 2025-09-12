@@ -20,6 +20,7 @@ impl Client {
     }
 
     pub async fn connect(&self, url: &str) -> Result<Connecting, Error> {
+        crate::trace_call!();
         self.endpoint
             .connect(url)
             .await
@@ -32,6 +33,7 @@ pub struct Connecting(Box<dyn xwt_dyn::endpoint::connect::Connecting + 'static>)
 
 impl Connecting {
     pub async fn wait_connect(self) -> Result<crate::Session, Error> {
+        crate::trace_call!();
         self.0
             .wait_connect()
             .await

@@ -21,6 +21,7 @@ impl AsRef<[u8]> for IncomingDatagram {
 
 impl Session {
     pub async fn receive_datagram(&self) -> Result<IncomingDatagram, crate::Error> {
+        crate::trace_call!();
         self.0
             .receive_datagram()
             .await
@@ -29,6 +30,7 @@ impl Session {
     }
 
     pub async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, crate::Error> {
+        crate::trace_call!();
         self.0
             .receive_datagram_into(buf)
             .await
@@ -39,6 +41,7 @@ impl Session {
     where
         D: xwt_dyn::utils::maybe::Send + AsRef<[u8]>,
     {
+        crate::trace_call!();
         self.0
             .send_datagram(payload.as_ref())
             .await
@@ -46,6 +49,7 @@ impl Session {
     }
 
     pub fn max_datagram_size(&self) -> Option<usize> {
+        crate::trace_call!();
         self.0.max_datagram_size()
     }
 }

@@ -12,6 +12,7 @@ pub struct OpeningUni(Box<dyn xwt_dyn::session::stream::OpeningUni>);
 
 impl Session {
     pub async fn open_bi(&self) -> Result<OpeningBi, crate::Error> {
+        crate::trace_call!();
         self.0
             .open_bi()
             .await
@@ -20,6 +21,7 @@ impl Session {
     }
 
     pub async fn open_uni(&self) -> Result<OpeningUni, crate::Error> {
+        crate::trace_call!();
         self.0
             .open_uni()
             .await
@@ -28,6 +30,7 @@ impl Session {
     }
 
     pub async fn accept_bi(&self) -> Result<(SendStream, RecvStream), crate::Error> {
+        crate::trace_call!();
         self.0
             .accept_bi()
             .await
@@ -36,6 +39,7 @@ impl Session {
     }
 
     pub async fn accept_uni(&self) -> Result<RecvStream, crate::Error> {
+        crate::trace_call!();
         self.0
             .accept_uni()
             .await
@@ -46,6 +50,7 @@ impl Session {
 
 impl OpeningBi {
     pub async fn wait_bi(self) -> Result<(SendStream, RecvStream), crate::Error> {
+        crate::trace_call!();
         self.0
             .wait_bi()
             .await
@@ -56,6 +61,7 @@ impl OpeningBi {
 
 impl OpeningUni {
     pub async fn wait_uni(self) -> Result<SendStream, crate::Error> {
+        crate::trace_call!();
         self.0
             .wait_uni()
             .await

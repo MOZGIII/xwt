@@ -8,6 +8,7 @@ pub mod endpoint;
 pub mod error;
 pub mod session;
 pub mod stream;
+pub(crate) mod trace_calls;
 
 pub use self::endpoint::Client;
 pub use self::endpoint::Server;
