@@ -1,6 +1,6 @@
 [package]
 name = "xwt-core"
-version = "0.8.0"
+version = "0.8.1"
 edition = "2021"
 resolver = "2"
 rust-version = "1.81"
