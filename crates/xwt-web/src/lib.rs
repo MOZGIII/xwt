@@ -346,6 +346,19 @@ impl xwt_core::stream::Finish for SendStream {
     }
 }
 
+impl xwt_core::stream::Finished for RecvStream {
+    type Error = Error;
+
+    async fn finished(self) -> Result<(), Self::Error> {
+        wasm_bindgen_futures::JsFuture::from(self.reader.inner.closed())
+            .await
+            .map(|val| {
+                debug_assert!(val.is_undefined());
+            })
+            .map_err(Error::from)
+    }
+}
+
 /// An error that can occur while reading stream data.
 #[derive(Debug, thiserror::Error)]
 pub enum StreamReadError {
@@ -416,6 +429,30 @@ impl xwt_core::stream::ReadAbort for RecvStream {
     }
 }
 
+impl xwt_core::stream::ReadAborted for RecvStream {
+    type Error = Error;
+
+    async fn aborted(self) -> Result<xwt_core::stream::ErrorCode, Self::Error> {
+        // Hack our way through...
+        let result = wasm_bindgen_futures::JsFuture::from(self.reader.inner.closed()).await;
+        match result {
+            Ok(value) => {
+                debug_assert!(value.is_undefined());
+                Ok(0)
+            }
+            Err(value) => {
+                let error: web_wt_sys::WebTransportError = value.dyn_into().unwrap();
+                if error.source() != web_wt_sys::WebTransportErrorSource::Stream {
+                    return Err(Error(error.into()));
+                }
+                let Some(code) = error.stream_error_code() else {
+                    return Err(Error(error.into()));
+                };
+                Ok(code)
+            }
+        }
+    }
+}
 impl Session {
     /// Receive the datagram and handle the buffer with the given function.
     ///

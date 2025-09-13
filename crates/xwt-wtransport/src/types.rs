@@ -84,6 +84,10 @@ pub enum StreamReadError {
     #[error("stream read: {0}")]
     Read(wtransport::error::StreamReadError),
 
+    /// The `wtransport` read call has returned with zero bytes.
+    #[error("read returned zero bytes; possibly a zero-sized read buffer is passed as the output")]
+    ZeroBytes,
+
     /// The stream was closed without an error.
     #[error("stream closed")]
     Closed,
@@ -99,4 +103,27 @@ pub enum StreamWriteError {
     /// The `wtransport` write call failed.
     #[error("stream write: {0}")]
     Write(wtransport::error::StreamWriteError),
+}
+
+/// The error that occurs when stream is expected to be finished.
+#[derive(Debug, thiserror::Error)]
+pub enum StreamFinishedError {
+    /// The `wtransport` read call failed.
+    #[error("stream read: {0}")]
+    Read(wtransport::error::StreamReadError),
+
+    /// The stream was expected to have no data,
+    /// but it actually had some trailing data.
+    #[error(
+        "the stream was expected to be finished but it had more data (first byte: {first_byte:02x?})"
+    )]
+    TrailingData {
+        /// The first byte of the data leftovers.
+        /// You may choose to try reading the data further - in which has
+        /// prepend this byte after you read the rest.
+        first_byte: u8,
+
+        /// The recv stream that was expected to finish.
+        stream: RecvStream,
+    },
 }

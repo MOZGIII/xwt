@@ -17,6 +17,9 @@ pub type WriteChunkErrorFor<T, Data> = <T as stream::WriteChunk<Data>>::Error;
 /// A shortcut for the error type for a given [`stream::ReadAbort`] type.
 pub type ReadAbortErrorFor<T> = <T as stream::ReadAbort>::Error;
 
+/// A shortcut for the error type for a given [`stream::ReadAborted`] type.
+pub type ReadAbortedErrorFor<T> = <T as stream::ReadAborted>::Error;
+
 /// A shortcut for the error type for a given [`stream::WriteAbort`] type.
 pub type WriteAbortErrorFor<T> = <T as stream::WriteAbort>::Error;
 
@@ -25,6 +28,9 @@ pub type WriteAbortedErrorFor<T> = <T as stream::WriteAborted>::Error;
 
 /// A shortcut for the error type for a given [`stream::Finish`] type.
 pub type FinishErrorFor<T> = <T as stream::Finish>::Error;
+
+/// A shortcut for the error type for a given [`stream::Finished`] type.
+pub type FinishedErrorFor<T> = <T as stream::Finished>::Error;
 
 /// Extensions to the [`stream::ErrorAsErrorCode`] providing some convenience methods.
 pub trait ErrorAsErrorCodeExt: stream::ErrorAsErrorCode {

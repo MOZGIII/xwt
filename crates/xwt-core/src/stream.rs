@@ -122,7 +122,18 @@ pub trait WriteAborted: maybe::Send {
     /// An error that can occur while waiting for a stream to be aborted.
     type Error: Error + maybe::Send + maybe::Sync + 'static;
 
-    /// Wait for a stream to abort.
+    /// Wait for a stream's corresponding read side to abort.
+    fn aborted(self) -> impl Future<Output = Result<ErrorCode, Self::Error>> + maybe::Send;
+}
+
+/// Wait for the read stream to abort.
+///
+/// This can happen when the "write" part aborts the stream.
+pub trait ReadAborted: maybe::Send {
+    /// An error that can occur while waiting for a stream to be aborted.
+    type Error: Error + maybe::Send + maybe::Sync + 'static;
+
+    /// Wait for a stream's corresponding write side to abort.
     fn aborted(self) -> impl Future<Output = Result<ErrorCode, Self::Error>> + maybe::Send;
 }
 
@@ -135,6 +146,17 @@ pub trait Finish: maybe::Send {
 
     /// Finish the stream.
     fn finish(self) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send;
+}
+
+/// Wait for the read stream to finish.
+///
+/// This can happen when the "write" part finishes the stream.
+pub trait Finished: maybe::Send {
+    /// An error that can occur while waiting for a stream to be aborted.
+    type Error: Error + ErrorAsErrorCode + maybe::Send + maybe::Sync + 'static;
+
+    /// Wait for a stream to finish.
+    fn finished(self) -> impl Future<Output = Result<(), Self::Error>> + maybe::Send;
 }
 
 /// An chunk of data with an explicit offset in the stream.
