@@ -12,6 +12,9 @@ repository = "https://github.com/MOZGIII/xwt"
 [package.metadata.docs.rs]
 default-target = "wasm32-unknown-unknown"
 
+[package.metadata.cargo-shear]
+ignored = ["wasm-bindgen-futures"]
+
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.69"
 pastey = "0.1"
@@ -26,7 +29,6 @@ web-sys = { version = "0.3.70", features = [
 ] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-tracing = "0.1"
 tracing-wasm = "0.2"
 wasm-bindgen-test = "0.3.43"
 web-sys = { version = "0.3.70", features = ["console"] }

@@ -9,7 +9,6 @@ publish = false
 xwt-example-server-shared = { path = "../server-shared", default-features = false }
 
 # Core xwt primitives and driver.
-xwt-cert-fingerprint = { path = "../../../crates/xwt-cert-fingerprint", default-features = false }
 xwt-core = { path = "../../../crates/xwt-core", default-features = false }
 xwt-wtransport = { path = "../../../crates/xwt-wtransport", default-features = false }
 
