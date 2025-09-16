@@ -1,15 +1,13 @@
-export const selfHostedRunners = {} as const;
-
 export type RunnerOS =
-  | "ubuntu-22.04"
-  | "windows-latest"
-  | "macos-14"
-  | (typeof selfHostedRunners)[keyof typeof selfHostedRunners];
+  | "ubuntu-24.04"
+  | "ubuntu-24.04-arm"
+  | "macos-15" // arm
+  | "macos-15-large" // intel
+  | "windows-latest";
 
 export type Platform = {
   name: string;
   os: RunnerOS;
-  isOnSelfHostedRunner: boolean;
   buildEnvScript: string;
   essential: boolean;
   env: Record<string, string>;
@@ -26,40 +24,57 @@ const buildEnvScriptPath = (script: string) =>
 
 // All the platforms that we support, and their respective settings.
 export const all = {
-  ubuntu2204: {
-    name: "Ubuntu 22.04",
-    os: "ubuntu-22.04",
+  ubuntu2404_amd64: {
+    name: "Ubuntu 24.04 (amd64)",
+    os: "ubuntu-24.04",
     buildEnvScript: buildEnvScriptPath("ubuntu.sh"),
-    isOnSelfHostedRunner: false,
     essential: true,
     env: {},
-    cacheKey: "ubuntu2204-amd64",
-    artifactMarker: "ubuntu2204",
+    cacheKey: "ubuntu2404-amd64",
+    artifactMarker: "amd64-ubuntu2404",
     isBroken: false,
   },
-  windows: {
-    name: "Windows",
+  ubuntu2404_aarch64: {
+    name: "Ubuntu 24.04 (aarch64)",
+    os: "ubuntu-24.04-arm",
+    buildEnvScript: buildEnvScriptPath("ubuntu.sh"),
+    essential: false,
+    env: {},
+    cacheKey: "ubuntu2404-aarch64",
+    artifactMarker: "aarch64-ubuntu2404",
+    isBroken: false,
+  },
+  windows_amd64: {
+    name: "Windows (amd64)",
     os: "windows-latest",
     buildEnvScript: buildEnvScriptPath("windows.sh"),
-    isOnSelfHostedRunner: false,
     essential: true,
     env: {},
     cacheKey: "windows-amd64",
-    artifactMarker: null,
+    artifactMarker: "amd64",
     isBroken: false,
   },
-  macos: {
-    name: "macOS",
-    os: "macos-14",
+  macos15_amd64: {
+    name: "macOS 15 (amd64)",
+    os: "macos-15-large",
     buildEnvScript: buildEnvScriptPath("macos.sh"),
-    isOnSelfHostedRunner: false,
+    essential: false,
+    env: {},
+    cacheKey: "macos15-amd64",
+    artifactMarker: "amd64",
+    isBroken: true, // needs payment, because it's a `-large` runner
+  },
+  macos15_aarch64: {
+    name: "macOS 15 (aarch64)",
+    os: "macos-15",
+    buildEnvScript: buildEnvScriptPath("macos.sh"),
     essential: true,
     env: {},
-    cacheKey: "macos-aarch64",
-    artifactMarker: null,
+    cacheKey: "macos15-aarch64",
+    artifactMarker: "aarch64",
     isBroken: false,
   },
 } satisfies Platforms;
 
 // A platform for running things that are platform-independent.
-export const core = all.ubuntu2204 satisfies Platform;
+export const core = all.ubuntu2404_amd64 satisfies Platform;

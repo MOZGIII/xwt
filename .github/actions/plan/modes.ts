@@ -11,66 +11,66 @@ export type Modes = Record<string, Mode>;
 
 export const code = {
   clippy: {
-    name: "clippy",
+    name: "cargo clippy",
     cargoCommand: "clippy",
-    cargoArgs: "--workspace --all-targets -- -D warnings",
+    cargoArgs: "--locked --workspace --all-targets -- -D warnings",
     cargoCacheKey: "clippy",
   },
   clippy_wasm: {
-    name: "clippy (wasm)",
+    name: "cargo clippy (wasm)",
     cargoCommand: "clippy",
     cargoArgs:
-      "--workspace --target wasm32-unknown-unknown --all-targets -- -D warnings",
+      "--locked --workspace --target wasm32-unknown-unknown --all-targets -- -D warnings",
     platformIndependent: true,
     cargoCacheKey: "clippy-wasm",
   },
   test: {
-    name: "test",
+    name: "cargo test",
     cargoCommand: "test",
-    cargoArgs: "--workspace",
+    cargoArgs: "--locked --workspace",
     cargoCacheKey: "test",
     needsEchoServer: true,
   },
   test_wasm: {
-    name: "test (wasm)",
+    name: "cargo test (wasm)",
     cargoCommand: "test",
-    cargoArgs: "--workspace --target wasm32-unknown-unknown",
+    cargoArgs: "--locked --workspace --target wasm32-unknown-unknown",
     platformIndependent: true,
     cargoCacheKey: "test-wasm",
     needsEchoServer: true,
   },
   build: {
-    name: "build",
+    name: "cargo build",
     cargoCommand: "build",
-    cargoArgs: "--workspace",
+    cargoArgs: "--locked --workspace",
     cargoCacheKey: "build",
   },
   build_wasm: {
-    name: "build (wasm)",
+    name: "cargo build (wasm)",
     cargoCommand: "build",
-    cargoArgs: "--workspace --target wasm32-unknown-unknown",
+    cargoArgs: "--locked --workspace --target wasm32-unknown-unknown",
     platformIndependent: true,
     cargoCacheKey: "build-wasm",
   },
   fmt: {
-    name: "fmt",
+    name: "cargo fmt",
     cargoCommand: "fmt",
     cargoArgs: "-- --check",
     platformIndependent: true,
     cargoCacheKey: "code",
   },
   docs: {
-    name: "doc",
+    name: "cargo doc",
     cargoCommand: "doc",
-    cargoArgs: "--workspace --document-private-items",
+    cargoArgs: "--locked --workspace --document-private-items",
     platformIndependent: true,
     cargoCacheKey: "doc",
   },
   docs_wasm: {
-    name: "doc (wasm)",
+    name: "cargo doc (wasm)",
     cargoCommand: "doc",
     cargoArgs:
-      "--workspace --target wasm32-unknown-unknown --document-private-items",
+      "--locked --workspace --target wasm32-unknown-unknown --document-private-items",
     platformIndependent: true,
     cargoCacheKey: "doc-wasm",
   },
@@ -78,9 +78,9 @@ export const code = {
 
 export const build = {
   build: {
-    name: "build",
+    name: "cargo build",
     cargoCommand: "build",
-    cargoArgs: "--workspace --release",
+    cargoArgs: "--locked --workspace --release",
     cargoCacheKey: "release-build",
   },
 } satisfies Modes;

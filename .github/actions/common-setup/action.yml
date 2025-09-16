@@ -13,10 +13,6 @@ inputs:
     description: "Requires rust to be installed"
     required: false
     default: "true"
-  isOnSelfHostedRunner:
-    description: "Enable if running on a self-hosted runner"
-    required: false
-    default: "false"
   buildEnvScript:
     description: "The script to run to bootstrap the given environment"
     required: false
@@ -29,7 +25,7 @@ runs:
       with:
         key: ${{ inputs.modeCacheKey == '' && inputs.platformCacheKey || ''}}
         shared-key: ${{ inputs.modeCacheKey != '' && format('{0}-{1}', inputs.platformCacheKey, inputs.modeCacheKey) || '' }}
-      if: ${{ inputs.platformCacheKey != '' && inputs.isOnSelfHostedRunner != 'true' && inputs.requiresRust == 'true' }}
+      if: ${{ inputs.platformCacheKey != '' && inputs.requiresRust == 'true' }}
 
     - name: Install rust toolchain
       shell: bash
