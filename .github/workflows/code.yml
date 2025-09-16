@@ -25,14 +25,14 @@ env:
 jobs:
   plan:
     name: Plan the execution
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     permissions:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
       - name: Compute matrix
         uses: ./.github/actions/plan
         id: set-matrix
@@ -45,7 +45,7 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.plan.outputs.matrix) }}
       fail-fast: false
-    name: ${{ matrix.plan.platform.name }} / ${{ matrix.plan.mode.name }}
+    name: ${{ matrix.plan.mode.platformIndependent == true && matrix.plan.mode.name || format('{0} / {1}', matrix.plan.platform.name, matrix.plan.mode.name) }}
     runs-on: ${{ matrix.plan.platform.os }}
     env: ${{ matrix.plan.platform.env }}
     timeout-minutes: 50
@@ -58,14 +58,13 @@ jobs:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         timeout-minutes: 5
 
       - uses: ./.github/actions/common-setup
         with:
           platformCacheKey: ${{ matrix.plan.platform.cacheKey }}
           modeCacheKey: ${{ matrix.plan.mode.cargoCacheKey }}
-          isOnSelfHostedRunner: ${{ matrix.plan.platform.isOnSelfHostedRunner }}
           buildEnvScript: ${{ matrix.plan.platform.buildEnvScript }}
         timeout-minutes: 10
 
@@ -76,10 +75,7 @@ jobs:
         if: ${{ matrix.plan.mode.needsEchoServer }}
 
       - name: Run cargo ${{ matrix.plan.mode.cargoCommand }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: ${{ matrix.plan.mode.cargoCommand }}
-          args: ${{ matrix.plan.mode.cargoArgs }}
+        run: cargo ${{ matrix.plan.mode.cargoCommand }} ${{ matrix.plan.mode.cargoArgs }}
 
   downloadable-utils:
     strategy:
@@ -94,38 +90,38 @@ jobs:
 
           - name: taplo
             download: >
-              curl -sSL "https://github.com/tamasfe/taplo/releases/download/0.8.1/taplo-linux-x86_64.gz" |
+              curl -sSL "https://github.com/tamasfe/taplo/releases/download/0.9.3/taplo-linux-x86_64.gz" |
                 zcat > /usr/local/bin/taplo \
               && chmod +x /usr/local/bin/taplo
             run: taplo format --check
 
-          - name: cargo-sort
+          - name: cargo sort
             download: >
               curl -sSL "https://github.com/DevinR528/cargo-sort/releases/download/v1.0.9/cargo-sort-x86_64-unknown-linux-gnu.tar.gz" |
                 sudo tar -xzvf - -C /usr/local/bin
             run: cargo-sort -cwg
 
-          - name: cargo-machete
+          - name: cargo shear
             download: >
-              curl -sSL "https://github.com/bnjbvr/cargo-machete/releases/download/v0.6.0/cargo-machete-v0.6.0-x86_64-unknown-linux-musl.tar.gz" |
-                sudo tar -xzvf - --strip-components=1 -C /usr/local/bin
-            run: cargo-machete
+              curl -sSL "https://github.com/Boshen/cargo-shear/releases/download/v1.1.8/cargo-shear-x86_64-unknown-linux-gnu.tar.gz" |
+                sudo tar -xzvf - -C /usr/local/bin
+            run: cargo-shear
 
           - name: typos
             download: >
-              curl -sSL "https://github.com/crate-ci/typos/releases/download/v1.21.0/typos-v1.21.0-x86_64-unknown-linux-musl.tar.gz" |
+              curl -sSL "https://github.com/crate-ci/typos/releases/download/v1.29.4/typos-v1.29.4-x86_64-unknown-linux-musl.tar.gz" |
                 sudo tar -xzvf - -C /usr/local/bin
             run: typos
 
       fail-fast: false
     name: ${{ matrix.util.name }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         timeout-minutes: 5
 
       - uses: ./.github/actions/common-setup
