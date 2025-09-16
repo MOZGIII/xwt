@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
+[package.metadata.cargo-shear]
+ignored = ["getrandom"]
+
 [target.'cfg(target_family = "wasm")'.dependencies]
 # Shared code between native and web examples.
 xwt-example-client-shared = { path = "../client-shared", default-features = false }
@@ -21,5 +24,4 @@ xwt-test-assets = { path = "../../../crates/xwt-test-assets", default-features =
 getrandom = { version = "0.2", features = ["js"] }
 rand = "0.8"
 wasm-bindgen = "0.2"
-wasm-bindgen-futures = "0.4"
 web-sys = { version = "0.3", features = ["Window", "Document", "HtmlElement"] }

@@ -4,6 +4,9 @@ version = "0.1.0"
 edition = "2021"
 publish = false
 
+[package.metadata.cargo-shear]
+ignored = ["tokio"]
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 # Shared code between native and web examples.
 xwt-example-client-shared = { path = "../client-shared", default-features = false }

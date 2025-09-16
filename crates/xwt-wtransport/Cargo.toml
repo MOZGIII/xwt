@@ -20,7 +20,6 @@ xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint" }
 xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
 xwt-tests = { version = "0.12", path = "../xwt-tests" }
 
-anyhow = "1"
 color-eyre = "0.6"
 static_assertions = "1"
 tokio = { version = "1", features = ["macros"] }

@@ -18,10 +18,6 @@ static_assertions = { version = "1", optional = true }
 tracing = { version = "0.1", default-features = false, optional = true }
 
 [dev-dependencies]
-xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint", default-features = false }
-xwt-test-assets = { version = "0.2", path = "../xwt-test-assets", default-features = false }
-
-tokio = { version = "1", features = ["macros", "rt"] }
 tracing = "0.1"
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
