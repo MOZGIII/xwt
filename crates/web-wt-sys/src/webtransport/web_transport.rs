@@ -13,7 +13,7 @@ extern "C" {
     /// The `WebTransport` interface.
     ///
     /// <https://w3c.github.io/webtransport/#webtransport>
-    #[wasm_bindgen(extends = Object)]
+    #[wasm_bindgen(extends = Object, typescript_type = "WebTransport")]
     #[derive(Debug, Clone, PartialEq, Eq)]
     pub type WebTransport;
 
