@@ -75,6 +75,7 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
             datagram_writable_stream_writer,
             datagram_read_buffer_size,
             datagram_read_buffer,
+            close_on_drop: true,
         };
         Ok(session)
     }
@@ -97,6 +98,8 @@ pub struct Session {
     pub datagram_read_buffer_size: u32,
     /// The datagram read internal buffer.
     pub datagram_read_buffer: tokio::sync::Mutex<Option<js_sys::ArrayBuffer>>,
+    /// Whether to close the session on drop.
+    pub close_on_drop: bool,
 }
 
 impl xwt_core::session::stream::SendSpec for Session {
@@ -529,6 +532,8 @@ impl xwt_core::session::datagram::Send for Session {
 
 impl Drop for Session {
     fn drop(&mut self) {
-        self.transport.close();
+        if self.close_on_drop {
+            self.transport.close();
+        }
     }
 }
