@@ -101,6 +101,9 @@ pub struct Datagrams {
 
     /// The datagram read internal buffer.
     pub read_buffer: tokio::sync::Mutex<Option<js_sys::ArrayBuffer>>,
+
+    /// Unlock the streams on drop.
+    pub unlock_streams_on_drop: bool,
 }
 
 impl Datagrams {
@@ -126,6 +129,16 @@ impl Datagrams {
             writable_stream_writer,
             read_buffer_size,
             read_buffer,
+            unlock_streams_on_drop: true,
+        }
+    }
+}
+
+impl Drop for Datagrams {
+    fn drop(&mut self) {
+        if self.unlock_streams_on_drop {
+            self.readable_stream_reader.release_lock();
+            self.writable_stream_writer.release_lock();
         }
     }
 }
