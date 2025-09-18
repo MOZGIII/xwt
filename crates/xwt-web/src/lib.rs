@@ -58,23 +58,11 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
         let Connecting { transport } = self;
         transport.ready().await?;
 
-        let datagram_read_buffer_size = 65536; // 65k buffers as per spec recommendation
-
-        let datagrams = transport.datagrams();
-        let datagram_readable_stream_reader =
-            web_sys_stream_utils::get_reader_byob(datagrams.readable());
-        let datagram_writable_stream_writer =
-            web_sys_stream_utils::get_writer(datagrams.writable());
-
-        let datagram_read_buffer = js_sys::ArrayBuffer::new(datagram_read_buffer_size);
-        let datagram_read_buffer = tokio::sync::Mutex::new(Some(datagram_read_buffer));
+        let datagrams = Datagrams::from_transport(&transport);
 
         let session = Session {
             transport: Rc::new(transport),
-            datagram_readable_stream_reader,
-            datagram_writable_stream_writer,
-            datagram_read_buffer_size,
-            datagram_read_buffer,
+            datagrams,
             close_on_drop: true,
         };
         Ok(session)
@@ -89,17 +77,57 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
 pub struct Session {
     /// The WebTransport instance.
     pub transport: Rc<web_wt_sys::WebTransport>,
-    /// The datagram reader.
-    pub datagram_readable_stream_reader: web_sys::ReadableStreamByobReader,
-    /// The datagram writer.
-    pub datagram_writable_stream_writer: web_sys::WritableStreamDefaultWriter,
-    /// The desired size of the datagram read buffer.
-    /// Used to allocate the datagram read buffer in case it gets lost.
-    pub datagram_read_buffer_size: u32,
-    /// The datagram read internal buffer.
-    pub datagram_read_buffer: tokio::sync::Mutex<Option<js_sys::ArrayBuffer>>,
+
+    /// The datagrams state for this session.
+    pub datagrams: Datagrams,
+
     /// Whether to close the session on drop.
     pub close_on_drop: bool,
+}
+
+/// Datagrams hold the portions of the session that are responsible for working
+/// with the datagrams.
+#[derive(Debug)]
+pub struct Datagrams {
+    /// The datagram reader.
+    pub readable_stream_reader: web_sys::ReadableStreamByobReader,
+
+    /// The datagram writer.
+    pub writable_stream_writer: web_sys::WritableStreamDefaultWriter,
+
+    /// The desired size of the datagram read buffer.
+    /// Used to allocate the datagram read buffer in case it gets lost.
+    pub read_buffer_size: u32,
+
+    /// The datagram read internal buffer.
+    pub read_buffer: tokio::sync::Mutex<Option<js_sys::ArrayBuffer>>,
+}
+
+impl Datagrams {
+    /// Create a datagrams state from the transport.
+    pub fn from_transport(transport: &web_wt_sys::WebTransport) -> Self {
+        Self::from_transport_datagrams(&transport.datagrams())
+    }
+
+    /// Create a datagrams state from the transport datagrams.
+    pub fn from_transport_datagrams(
+        datagrams: &web_wt_sys::WebTransportDatagramDuplexStream,
+    ) -> Self {
+        let read_buffer_size = 65536; // 65k buffers as per spec recommendation
+
+        let readable_stream_reader = web_sys_stream_utils::get_reader_byob(datagrams.readable());
+        let writable_stream_writer = web_sys_stream_utils::get_writer(datagrams.writable());
+
+        let read_buffer = js_sys::ArrayBuffer::new(read_buffer_size);
+        let read_buffer = tokio::sync::Mutex::new(Some(read_buffer));
+
+        Self {
+            readable_stream_reader,
+            writable_stream_writer,
+            read_buffer_size,
+            read_buffer,
+        }
+    }
 }
 
 impl xwt_core::session::stream::SendSpec for Session {
@@ -456,7 +484,8 @@ impl xwt_core::stream::ReadAborted for RecvStream {
         }
     }
 }
-impl Session {
+
+impl Datagrams {
     /// Receive the datagram and handle the buffer with the given function.
     ///
     /// Cloning the buffer in the `f` will result in the undefined behaviour,
@@ -464,19 +493,19 @@ impl Session {
     /// to be under a `mut ref`.
     /// Although is would not teachnically be unsafe, it would violate
     /// the borrow checker rules.
-    pub async fn receive_datagram_with<R>(
+    pub async fn receive_with<R>(
         &self,
         f: impl FnOnce(&mut js_sys::Uint8Array) -> R,
     ) -> Result<R, Error> {
-        let mut buffer_guard = self.datagram_read_buffer.lock().await;
+        let mut buffer_guard = self.read_buffer.lock().await;
 
         let buffer = buffer_guard
             .take()
-            .unwrap_or_else(|| js_sys::ArrayBuffer::new(self.datagram_read_buffer_size));
+            .unwrap_or_else(|| js_sys::ArrayBuffer::new(self.read_buffer_size));
         let view = js_sys::Uint8Array::new(&buffer);
 
         let maybe_view =
-            web_sys_stream_utils::read_byob(&self.datagram_readable_stream_reader, view).await?;
+            web_sys_stream_utils::read_byob(&self.readable_stream_reader, view).await?;
         let Some(mut view) = maybe_view else {
             return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
         };
@@ -500,7 +529,7 @@ impl xwt_core::session::datagram::Receive for Session {
     type Error = Error;
 
     async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
-        self.receive_datagram_with(|buffer| buffer.to_vec()).await
+        self.datagrams.receive_with(|buffer| buffer.to_vec()).await
     }
 }
 
@@ -508,12 +537,17 @@ impl xwt_core::session::datagram::ReceiveInto for Session {
     type Error = Error;
 
     async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, Self::Error> {
-        self.receive_datagram_with(|buffer| {
-            let len = buffer.length() as usize;
-            buffer.copy_to(&mut buf[..len]);
-            len
-        })
-        .await
+        // TODO: reduce the `receive_with` internal buffer size by the size of
+        // `buf` if it is smaller than the buffer.
+        // Currently, the users are supposed to just make the `buf` big enough
+        // to fit any datagram - 65536 bytes.
+        self.datagrams
+            .receive_with(|buffer| {
+                let len = buffer.length() as usize;
+                buffer.copy_to(&mut buf[..len]);
+                len
+            })
+            .await
     }
 }
 
@@ -524,7 +558,7 @@ impl xwt_core::session::datagram::Send for Session {
     where
         D: AsRef<[u8]>,
     {
-        web_sys_stream_utils::write(&self.datagram_writable_stream_writer, payload.as_ref())
+        web_sys_stream_utils::write(&self.datagrams.writable_stream_writer, payload.as_ref())
             .await?;
         Ok(())
     }
