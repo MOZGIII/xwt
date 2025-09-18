@@ -495,6 +495,7 @@ impl Datagrams {
     /// the borrow checker rules.
     pub async fn receive_with<R>(
         &self,
+        max_read_size: Option<u32>,
         f: impl FnOnce(&mut js_sys::Uint8Array) -> R,
     ) -> Result<R, Error> {
         let mut buffer_guard = self.read_buffer.lock().await;
@@ -502,7 +503,12 @@ impl Datagrams {
         let buffer = buffer_guard
             .take()
             .unwrap_or_else(|| js_sys::ArrayBuffer::new(self.read_buffer_size));
-        let view = js_sys::Uint8Array::new(&buffer);
+        let view = if let Some(max_read_size) = max_read_size {
+            let desired_buffer_length = buffer.byte_length().min(max_read_size);
+            js_sys::Uint8Array::new_with_byte_offset_and_length(&buffer, 0, desired_buffer_length)
+        } else {
+            js_sys::Uint8Array::new(&buffer)
+        };
 
         let maybe_view =
             web_sys_stream_utils::read_byob(&self.readable_stream_reader, view).await?;
@@ -529,7 +535,9 @@ impl xwt_core::session::datagram::Receive for Session {
     type Error = Error;
 
     async fn receive_datagram(&self) -> Result<Self::Datagram, Self::Error> {
-        self.datagrams.receive_with(|buffer| buffer.to_vec()).await
+        self.datagrams
+            .receive_with(None, |buffer| buffer.to_vec())
+            .await
     }
 }
 
@@ -537,12 +545,9 @@ impl xwt_core::session::datagram::ReceiveInto for Session {
     type Error = Error;
 
     async fn receive_datagram_into(&self, buf: &mut [u8]) -> Result<usize, Self::Error> {
-        // TODO: reduce the `receive_with` internal buffer size by the size of
-        // `buf` if it is smaller than the buffer.
-        // Currently, the users are supposed to just make the `buf` big enough
-        // to fit any datagram - 65536 bytes.
+        let max_read_size = buf.len().try_into().unwrap();
         self.datagrams
-            .receive_with(|buffer| {
+            .receive_with(Some(max_read_size), |buffer| {
                 let len = buffer.length() as usize;
                 buffer.copy_to(&mut buf[..len]);
                 len
