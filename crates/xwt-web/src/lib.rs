@@ -421,7 +421,8 @@ impl xwt_core::stream::Read for RecvStream {
                 actual_size >= requested_size
             })
             .unwrap_or_else(|| js_sys::ArrayBuffer::new(requested_size));
-        let internal_buf_view = js_sys::Uint8Array::new(&internal_buf);
+        let internal_buf_view =
+            js_sys::Uint8Array::new_with_byte_offset_and_length(&internal_buf, 0, requested_size);
         let maybe_internal_buf_view =
             web_sys_stream_utils::read_byob(&self.reader.inner, internal_buf_view)
                 .await
