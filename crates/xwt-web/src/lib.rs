@@ -120,9 +120,8 @@ impl Session {
         Ok(unwrapped)
     }
 
-    /// An internal helper to get a transport ref assuming the transport is
-    /// not gone.
-    fn transport_ref(&self) -> &Rc<web_wt_sys::WebTransport> {
+    /// Obtain a transport ref.
+    pub const fn transport_ref(&self) -> &Rc<web_wt_sys::WebTransport> {
         // Trnasport should never be gone generally, only inside of
         // the `try_unwrap`.
         self.transport.as_ref().unwrap()
