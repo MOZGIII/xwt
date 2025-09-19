@@ -58,14 +58,7 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
         let Connecting { transport } = self;
         transport.ready().await?;
 
-        let datagrams = Datagrams::from_transport(&transport);
-
-        let session = Session {
-            transport: Rc::new(transport),
-            datagrams,
-            close_on_drop: true,
-        };
-        Ok(session)
+        Ok(Session::new(transport))
     }
 }
 
@@ -76,13 +69,72 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
 #[derive(Debug)]
 pub struct Session {
     /// The WebTransport instance.
-    pub transport: Rc<web_wt_sys::WebTransport>,
+    transport: Option<Rc<web_wt_sys::WebTransport>>,
 
     /// The datagrams state for this session.
     pub datagrams: Datagrams,
 
     /// Whether to close the session on drop.
     pub close_on_drop: bool,
+}
+
+impl Session {
+    /// Construct a new session from a [`web_wt_sys::WebTransport`].
+    pub fn new(transport: web_wt_sys::WebTransport) -> Self {
+        let datagrams = Datagrams::from_transport(&transport);
+        Self {
+            transport: Some(Rc::new(transport)),
+            datagrams,
+            close_on_drop: true,
+        }
+    }
+
+    /// If possible, relieves the underlying [`web_wt_sys::WebTransport`] of
+    /// any [`xwt_web`]-held locks and dependencies and exposes it.
+    pub fn try_unwrap(mut self) -> Result<web_wt_sys::WebTransport, Self> {
+        // Take the transport out of the session; this state is not valid
+        // "publicly", only while we're in this fn.
+        let transport = self.transport.take().unwrap();
+
+        // We want to ensure there are no other references to
+        // the transport's [`Rc`], otherwise something must still be using it.
+        // If we can't unwrap it successfully - we reinsert the transport back
+        // into `self` and return it as an `Err` - it will thus remain
+        // operational to permit doing whatever work may have to be done
+        // further.
+        let unwrapped = match Rc::try_unwrap(transport) {
+            Ok(unwrapped) => unwrapped,
+            Err(transport) => {
+                let _ = self.transport.insert(transport);
+                return Err(self);
+            }
+        };
+
+        // Do not close the transport (we have taken it out anyway).
+        self.close_on_drop = false;
+
+        // Drop the session to release the datagram readers/writers.
+        drop(self);
+
+        // Return the unwrapped transport.
+        Ok(unwrapped)
+    }
+
+    /// An internal helper to get a transport ref assuming the transport is
+    /// not gone.
+    fn transport_ref(&self) -> &Rc<web_wt_sys::WebTransport> {
+        // Trnasport should never be gone generally, only inside of
+        // the `try_unwrap`.
+        self.transport.as_ref().unwrap()
+    }
+}
+
+impl Drop for Session {
+    fn drop(&mut self) {
+        if self.close_on_drop {
+            self.transport.as_ref().unwrap().close();
+        }
+    }
 }
 
 /// Datagrams hold the portions of the session that are responsible for working
@@ -161,6 +213,12 @@ pub struct SendStream {
     pub writer: web_sys_async_io::Writer,
 }
 
+impl Drop for SendStream {
+    fn drop(&mut self) {
+        self.writer.inner.release_lock();
+    }
+}
+
 /// Recv the data from a WebTransport stream.
 pub struct RecvStream {
     /// The WebTransport instance.
@@ -169,6 +227,12 @@ pub struct RecvStream {
     pub stream: web_wt_sys::WebTransportReceiveStream,
     /// A reader to conduct the operation.
     pub reader: web_sys_async_io::Reader,
+}
+
+impl Drop for RecvStream {
+    fn drop(&mut self) {
+        self.reader.inner.release_lock();
+    }
 }
 
 /// Open a reader for the given stream and create a [`RecvStream`].
@@ -222,8 +286,9 @@ impl xwt_core::session::stream::OpenBi for Session {
     type Error = Error;
 
     async fn open_bi(&self) -> Result<Self::Opening, Self::Error> {
-        let value = self.transport.create_bidirectional_stream().await?;
-        let value = wrap_bi_stream(&self.transport, value);
+        let transport = self.transport_ref();
+        let value = transport.create_bidirectional_stream().await?;
+        let value = wrap_bi_stream(transport, value);
         Ok(xwt_core::utils::dummy::OpeningBiStream(value))
     }
 }
@@ -232,7 +297,8 @@ impl xwt_core::session::stream::AcceptBi for Session {
     type Error = Error;
 
     async fn accept_bi(&self) -> Result<(Self::SendStream, Self::RecvStream), Self::Error> {
-        let incoming: web_sys::ReadableStream = self.transport.incoming_bidirectional_streams();
+        let transport = self.transport_ref();
+        let incoming: web_sys::ReadableStream = transport.incoming_bidirectional_streams();
         let reader: JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
@@ -241,7 +307,7 @@ impl xwt_core::session::stream::AcceptBi for Session {
             return Err(Error(JsError::new("xwt: accept bi reader is done").into()));
         }
         let value: web_wt_sys::WebTransportBidirectionalStream = read_result.get_value().into();
-        let value = wrap_bi_stream(&self.transport, value);
+        let value = wrap_bi_stream(transport, value);
         Ok(value)
     }
 }
@@ -251,8 +317,9 @@ impl xwt_core::session::stream::OpenUni for Session {
     type Error = Error;
 
     async fn open_uni(&self) -> Result<Self::Opening, Self::Error> {
-        let value = self.transport.create_unidirectional_stream().await?;
-        let send_stream = wrap_send_stream(&self.transport, value);
+        let transport = self.transport_ref();
+        let value = transport.create_unidirectional_stream().await?;
+        let send_stream = wrap_send_stream(transport, value);
         Ok(xwt_core::utils::dummy::OpeningUniStream(send_stream))
     }
 }
@@ -261,7 +328,8 @@ impl xwt_core::session::stream::AcceptUni for Session {
     type Error = Error;
 
     async fn accept_uni(&self) -> Result<Self::RecvStream, Self::Error> {
-        let incoming: web_sys::ReadableStream = self.transport.incoming_unidirectional_streams();
+        let transport = self.transport_ref();
+        let incoming: web_sys::ReadableStream = transport.incoming_unidirectional_streams();
         let reader: JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
@@ -270,7 +338,7 @@ impl xwt_core::session::stream::AcceptUni for Session {
             return Err(Error(JsError::new("xwt: accept uni reader is done").into()));
         }
         let value: web_wt_sys::WebTransportReceiveStream = read_result.get_value().into();
-        let recv_stream = wrap_recv_stream(&self.transport, value);
+        let recv_stream = wrap_recv_stream(transport, value);
         Ok(recv_stream)
     }
 }
@@ -539,7 +607,8 @@ impl Datagrams {
 
 impl xwt_core::session::datagram::MaxSize for Session {
     fn max_datagram_size(&self) -> Option<usize> {
-        let max_datagram_size = self.transport.datagrams().max_datagram_size();
+        let transport = self.transport_ref();
+        let max_datagram_size = transport.datagrams().max_datagram_size();
         Some(usize::try_from(max_datagram_size).unwrap()) // u32 should fit in a usize on WASM
     }
 }
@@ -580,13 +649,5 @@ impl xwt_core::session::datagram::Send for Session {
         web_sys_stream_utils::write(&self.datagrams.writable_stream_writer, payload.as_ref())
             .await?;
         Ok(())
-    }
-}
-
-impl Drop for Session {
-    fn drop(&mut self) {
-        if self.close_on_drop {
-            self.transport.close();
-        }
     }
 }
