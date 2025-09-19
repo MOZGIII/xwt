@@ -206,15 +206,22 @@ impl xwt_core::session::stream::RecvSpec for Session {
 pub struct SendStream {
     /// The WebTransport instance.
     pub transport: Rc<web_wt_sys::WebTransport>,
+
     /// The handle to the stream to write to.
     pub stream: web_wt_sys::WebTransportSendStream,
+
     /// A writer to conduct the operation.
     pub writer: web_sys_async_io::Writer,
+
+    /// Unlock the writer on drop.
+    pub unlock_writer_on_drop: bool,
 }
 
 impl Drop for SendStream {
     fn drop(&mut self) {
-        self.writer.inner.release_lock();
+        if self.unlock_writer_on_drop {
+            self.writer.inner.release_lock();
+        }
     }
 }
 
@@ -222,15 +229,22 @@ impl Drop for SendStream {
 pub struct RecvStream {
     /// The WebTransport instance.
     pub transport: Rc<web_wt_sys::WebTransport>,
+
     /// The handle to the stream to read from.
     pub stream: web_wt_sys::WebTransportReceiveStream,
+
     /// A reader to conduct the operation.
     pub reader: web_sys_async_io::Reader,
+
+    /// Unlock the reader on drop.
+    pub unlock_reader_on_drop: bool,
 }
 
 impl Drop for RecvStream {
     fn drop(&mut self) {
-        self.reader.inner.release_lock();
+        if self.unlock_reader_on_drop {
+            self.reader.inner.release_lock();
+        }
     }
 }
 
@@ -248,6 +262,7 @@ fn wrap_recv_stream(
         transport: Rc::clone(transport),
         stream,
         reader,
+        unlock_reader_on_drop: true,
     }
 }
 
@@ -262,6 +277,7 @@ fn wrap_send_stream(
         transport: Rc::clone(transport),
         stream,
         writer,
+        unlock_writer_on_drop: true,
     }
 }
 
