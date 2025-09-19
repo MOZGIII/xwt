@@ -90,7 +90,7 @@ impl Session {
     }
 
     /// If possible, relieves the underlying [`web_wt_sys::WebTransport`] of
-    /// any [`xwt_web`]-held locks and dependencies and exposes it.
+    /// any `xwt-web`-held locks and dependencies and exposes it.
     pub fn try_unwrap(mut self) -> Result<web_wt_sys::WebTransport, Self> {
         // Take the transport out of the session; this state is not valid
         // "publicly", only while we're in this fn.
