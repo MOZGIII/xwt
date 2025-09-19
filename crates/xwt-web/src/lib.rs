@@ -131,7 +131,7 @@ impl Session {
 impl Drop for Session {
     fn drop(&mut self) {
         if self.close_on_drop {
-            self.transport.as_ref().unwrap().close();
+            self.transport_ref().close();
         }
     }
 }
