@@ -21,7 +21,7 @@ tracing = { version = "0.1", default-features = false, optional = true }
 tracing = "0.1"
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwt-web = { version = "0.19", path = "../xwt-web", default-features = false }
+xwt-web = { version = "0.20", path = "../xwt-web", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 xwt-wtransport = { version = "0.16", path = "../xwt-wtransport", default-features = false }
