@@ -14,3 +14,4 @@ xwt-cert-gen = { version = "0.2", path = "../xwt-cert-gen" }
 
 p256 = { version = "0.13", features = ["ecdsa", "pkcs8"] }
 rand = "0.8"
+time = { version = "0.3.38", default-features = false, features = ["std", "formatting", "parsing"] }
