@@ -336,3 +336,56 @@ impl xwt_core::session::datagram::Send for Connection {
         self.0.send_datagram(payload)
     }
 }
+
+#[cfg(feature = "tokio")]
+impl tokio::io::AsyncWrite for SendStream {
+    fn poll_write(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &[u8],
+    ) -> std::task::Poll<Result<usize, std::io::Error>> {
+        let pinned = std::pin::pin!(&mut self.0);
+        tokio::io::AsyncWrite::poll_write(pinned, cx, buf)
+    }
+
+    fn poll_write_vectored(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        bufs: &[std::io::IoSlice<'_>],
+    ) -> std::task::Poll<Result<usize, std::io::Error>> {
+        let pinned = std::pin::pin!(&mut self.0);
+        tokio::io::AsyncWrite::poll_write_vectored(pinned, cx, bufs)
+    }
+
+    fn poll_flush(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), std::io::Error>> {
+        let pinned = std::pin::pin!(&mut self.0);
+        tokio::io::AsyncWrite::poll_flush(pinned, cx)
+    }
+
+    fn poll_shutdown(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Result<(), std::io::Error>> {
+        let pinned = std::pin::pin!(&mut self.0);
+        tokio::io::AsyncWrite::poll_shutdown(pinned, cx)
+    }
+
+    fn is_write_vectored(&self) -> bool {
+        tokio::io::AsyncWrite::is_write_vectored(&self.0)
+    }
+}
+
+#[cfg(feature = "tokio")]
+impl tokio::io::AsyncRead for RecvStream {
+    fn poll_read(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+        buf: &mut tokio::io::ReadBuf<'_>,
+    ) -> std::task::Poll<std::io::Result<()>> {
+        let pinned = std::pin::pin!(&mut self.0);
+        tokio::io::AsyncRead::poll_read(pinned, cx, buf)
+    }
+}
