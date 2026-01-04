@@ -18,8 +18,8 @@ ignored = ["wasm-bindgen-futures"]
 [target.'cfg(target_family = "wasm")'.dependencies]
 js-sys = "0.3.69"
 pastey = "0.1"
-wasm-bindgen = { version = "0.2.93" }
-wasm-bindgen-futures = { version = "0.4.43" }
+wasm-bindgen = { version = "0.2.106" }
+wasm-bindgen-futures = { version = "0.4.56" }
 web-sys = { version = "0.3.70", features = [
   "ReadableStream",
   "WritableStream",
@@ -30,5 +30,5 @@ web-sys = { version = "0.3.70", features = [
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 tracing-wasm = "0.2"
-wasm-bindgen-test = "0.3.43"
+wasm-bindgen-test = "0.3.56"
 web-sys = { version = "0.3.70", features = ["console"] }
