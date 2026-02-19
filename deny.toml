@@ -24,5 +24,14 @@ ignore = true
 [bans]
 multiple-versions = "allow"
 
+[[bans.deny]]
+name = "rcgen"
+reason = "we generate certificates manually"
+
+[[bans.features]]
+name = "wtransport"
+deny = ["default", "self-signed"]
+reason = "never force default features for wtransport"
+
 [advisories]
 unmaintained = "workspace"
