@@ -1,6 +1,6 @@
 [package]
 name = "xwt-erased"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 resolver = "2"
 rust-version = "1.81"
@@ -24,7 +24,7 @@ tracing = "0.1"
 xwt-web = { version = "0.20", path = "../xwt-web", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
-xwt-wtransport = { version = "0.18", path = "../xwt-wtransport", default-features = false }
+xwt-wtransport = { version = "0.19", path = "../xwt-wtransport", default-features = false }
 
 wtransport = { version = "0.7", default-features = false }
 
