@@ -9,6 +9,9 @@ An implementation of the xwt that runs natively via wtransport crate.
 """
 repository = "https://github.com/MOZGIII/xwt"
 
+[package.metadata.cargo-shear]
+ignored = ["rcgen"]
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwt-core = { version = "0.9", path = "../xwt-core", default-features = false, features = ["std"] }
 
