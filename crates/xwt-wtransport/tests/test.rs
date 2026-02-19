@@ -14,6 +14,13 @@ fn setup() -> color_eyre::eyre::Result<()> {
     INIT.get_or_try_init::<_, color_eyre::eyre::Error>(|| {
         tracing_subscriber::fmt::init();
         color_eyre::install()?;
+
+        #[cfg(all(feature = "ring", any(feature = "aws-lc-rs", feature = "aws-lc-rs-fips")))]
+        {
+            let provider = wtransport::tls::rustls::crypto::aws_lc_rs::default_provider();
+            provider.install_default().ok();
+        }
+
         Ok(())
     })?;
     Ok(())
