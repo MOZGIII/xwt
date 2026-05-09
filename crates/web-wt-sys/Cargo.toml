@@ -16,8 +16,8 @@ default-target = "wasm32-unknown-unknown"
 ignored = ["wasm-bindgen-futures"]
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-js-sys = "0.3.69"
-pastey = "0.1"
+js-sys = { version = "0.3.69" }
+pastey = { workspace = true }
 wasm-bindgen = { version = "0.2.93" }
 wasm-bindgen-futures = { version = "0.4.43" }
 web-sys = { version = "0.3.70", features = [
@@ -29,6 +29,6 @@ web-sys = { version = "0.3.70", features = [
 ] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-tracing-wasm = "0.2"
+tracing-wasm = { workspace = true }
 wasm-bindgen-test = "0.3.43"
 web-sys = { version = "0.3.70", features = ["console"] }

@@ -11,22 +11,22 @@ Type-erased wrappers for the `xwt-dyn` traits.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-core = { version = "0.9", path = "../xwt-core", default-features = false, optional = true }
-xwt-dyn = { version = "0.3", path = "../xwt-dyn", default-features = false }
+xwt-core = { workspace = true, optional = true }
+xwt-dyn = { workspace = true }
 
-static_assertions = { version = "1", optional = true }
-tracing = { version = "0.1", default-features = false, optional = true }
+static_assertions = { workspace = true, optional = true }
+tracing = { workspace = true, default-features = false, optional = true }
 
 [dev-dependencies]
-tracing = "0.1"
+tracing = { workspace = true }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwt-web = { version = "0.20", path = "../xwt-web", default-features = false }
+xwt-web = { workspace = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
-xwt-wtransport = { version = "0.19", path = "../xwt-wtransport", default-features = false }
+xwt-wtransport = { workspace = true }
 
-wtransport = { version = "0.7", default-features = false }
+wtransport = { workspace = true }
 
 [features]
 default = ["core-compat"]

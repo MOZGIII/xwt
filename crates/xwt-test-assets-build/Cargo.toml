@@ -10,8 +10,8 @@ A static assets generation utility.
 repository = "https://github.com/MOZGIII/xwt"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-cert-gen = { version = "0.2", path = "../xwt-cert-gen" }
+xwt-cert-gen = { workspace = true }
 
-p256 = { version = "0.13", features = ["ecdsa", "pkcs8"] }
-rand = "0.8"
-time = { version = "0.3.38", default-features = false, features = ["std", "formatting", "parsing"] }
+p256 = { workspace = true }
+rand = { workspace = true }
+time = { workspace = true }

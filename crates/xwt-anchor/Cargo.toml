@@ -11,4 +11,4 @@ Useful to overcome foreign type implementation limitations.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-core = { version = "0.9", path = "../xwt-core", default-features = false }
+xwt-core = { workspace = true }

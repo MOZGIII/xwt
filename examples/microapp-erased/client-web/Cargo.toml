@@ -12,17 +12,17 @@ ignored = ["getrandom"]
 xwt-erased-example-client-shared = { path = "../client-shared", default-features = false }
 
 # Core xwt primitives and driver.
-xwt-cert-fingerprint = { path = "../../../crates/xwt-cert-fingerprint", default-features = false }
-xwt-core = { path = "../../../crates/xwt-core", default-features = false }
-xwt-erased = { path = "../../../crates/xwt-erased", default-features = false }
-xwt-web = { path = "../../../crates/xwt-web", default-features = false }
+xwt-cert-fingerprint = { workspace = true }
+xwt-core = { workspace = true }
+xwt-erased = { workspace = true }
+xwt-web = { workspace = true }
 
 # The dependency specific to this being an xwt example that is designed to
 # work with an xwt test server.
-xwt-test-assets = { path = "../../../crates/xwt-test-assets", default-features = false }
+xwt-test-assets = { workspace = true }
 
 # The rest of the dependencies.
-getrandom = { version = "0.2", features = ["js"] }
-rand = "0.8"
-wasm-bindgen = "0.2"
-web-sys = { version = "0.3", features = ["Window", "Document", "HtmlElement"] }
+getrandom = { workspace = true }
+rand = { workspace = true }
+wasm-bindgen = { workspace = true }
+web-sys = { workspace = true, features = ["Window", "Document", "HtmlElement"] }

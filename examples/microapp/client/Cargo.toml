@@ -5,13 +5,13 @@ edition = "2021"
 publish = false
 
 [dependencies]
-cfg-if = "1"
+cfg-if = { workspace = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-console_error_panic_hook = "0.1"
-wasm-bindgen-futures = "0.4"
+console_error_panic_hook = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
 xwt-example-client-web = { version = "0.1", path = "../client-web", default-features = false }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 xwt-example-client-native = { version = "0.1", path = "../client-native", default-features = false }

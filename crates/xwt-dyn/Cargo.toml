@@ -11,9 +11,9 @@ A suite of dyn-safe companion traits for xwt-core.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-core = { version = "0.9", path = "../xwt-core", default-features = false }
+xwt-core = { workspace = true }
 
-dyn_safe = "0.1"
+dyn_safe = { workspace = true }
 
 [features]
 default = ["std"]

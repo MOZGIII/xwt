@@ -5,9 +5,9 @@ edition = "2021"
 publish = false
 
 [dependencies]
-cfg-if = "1"
+cfg-if = { workspace = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwt-example-server-native = { path = "../server-native", default-features = false }
 
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

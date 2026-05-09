@@ -14,14 +14,14 @@ repository = "https://github.com/MOZGIII/xwt"
 ignored = ["sha2", "p256", "spki", "rand", "getrandom"]
 
 [dependencies]
-der = { version = "0.7", default-features = false, features = ["alloc"] }
-getrandom = { version = "0.2", features = ["js"] }
-sha2 = { version = "0.10", default-features = false, features = ["oid"] }
-signature = { version = "2.2", default-features = false, features = ["alloc"] }
-spki = { version = "0.7", default-features = false, features = ["alloc", "fingerprint"] }
-thiserror = "2"
-x509-cert = { version = "0.2", default-features = false, features = ["pem", "builder"] }
+der = { workspace = true }
+getrandom = { workspace = true }
+sha2 = { workspace = true, features = ["oid"] }
+signature = { workspace = true }
+spki = { workspace = true }
+thiserror = { workspace = true }
+x509-cert = { workspace = true }
 
 [dev-dependencies]
 p256 = { version = "0.13", features = ["ecdsa"] }
-rand = { version = "0.8" }
+rand = { workspace = true }

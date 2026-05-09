@@ -9,13 +9,13 @@ publish = false
 xwt-erased-example-server-shared = { path = "../server-shared", default-features = false }
 
 # Core xwt primitives and driver.
-xwt-erased = { path = "../../../crates/xwt-erased", default-features = false }
-xwt-wtransport = { path = "../../../crates/xwt-wtransport", default-features = false }
+xwt-erased = { workspace = true }
+xwt-wtransport = { workspace = true }
 
 # The dependency specific to this being an xwt example that is designed to
 # work with an xwt test server.
-xwt-test-assets = { path = "../../../crates/xwt-test-assets", default-features = false }
+xwt-test-assets = { workspace = true }
 
 # The rest of the dependencies.
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-wtransport = { version = "0.7", default-features = false, features = ["ring"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+wtransport = { workspace = true, features = ["ring"] }

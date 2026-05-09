@@ -1,3 +1,58 @@
 [workspace]
 members = ["crates/*", "examples/*/*"]
 resolver = "2"
+
+[workspace.dependencies]
+# External dependencies
+async-timer = { version = "1.0.0-beta.13", features = ["tokio1"] }
+base64 = { version = "0.22", default-features = false, features = ["alloc"] }
+cfg-if = "1"
+color-eyre = { version = "0.6" }
+console_error_panic_hook = "0.1"
+constcat = "0.5.0"
+der = { version = "0.7", default-features = false, features = ["alloc"] }
+dyn_safe = "0.1"
+envfury = { version = "0.2" }
+futures-util = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
+js-sys = { version = "0.3" }
+p256 = { version = "0.13", features = ["ecdsa", "pkcs8"] }
+pastey = "0.1"
+rand = { version = "0.8" }
+rustls-pki-types = { version = "1", default-features = false }
+sha2 = { version = "0.10", default-features = false }
+signature = { version = "2.2", default-features = false, features = ["alloc"] }
+spki = { version = "0.7", default-features = false, features = ["alloc", "fingerprint"] }
+static_assertions = "1"
+thiserror = "2"
+time = { version = "0.3.38", default-features = false, features = ["std", "formatting", "parsing"] }
+tokio = { version = "1", default-features = false }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3" }
+tracing-wasm = "0.2"
+typle = "0.10"
+wasm-bindgen = { version = "0.2" }
+wasm-bindgen-futures = { version = "0.4" }
+wasm-bindgen-test = "0.3"
+web-sys = { version = "0.3" }
+wtransport = { version = "0.7", default-features = false, features = ["quinn"] }
+x509-cert = { version = "0.2", default-features = false, features = ["pem", "builder"] }
+
+# Internal workspace crates
+web-sys-async-io = { version = "0.5", path = "crates/web-sys-async-io" }
+web-sys-stream-utils = { version = "0.2", path = "crates/web-sys-stream-utils" }
+web-wt-sys = { version = "0.2", path = "crates/web-wt-sys", default-features = false }
+xwt = { version = "0.18", path = "crates/xwt" }
+xwt-anchor = { version = "0.8", path = "crates/xwt-anchor", default-features = false }
+xwt-cert-fingerprint = { version = "0.1", path = "crates/xwt-cert-fingerprint", default-features = false }
+xwt-cert-gen = { version = "0.2", path = "crates/xwt-cert-gen" }
+xwt-core = { version = "0.9", path = "crates/xwt-core", default-features = false }
+xwt-dyn = { version = "0.3", path = "crates/xwt-dyn", default-features = false }
+xwt-erased = { version = "0.6", path = "crates/xwt-erased", default-features = false }
+xwt-erased-error = { version = "0.6", path = "crates/xwt-erased-error", default-features = false }
+xwt-error = { version = "0.9", path = "crates/xwt-error", default-features = false }
+xwt-test-assets = { version = "0.2", path = "crates/xwt-test-assets" }
+xwt-test-assets-build = { version = "0.4", path = "crates/xwt-test-assets-build", default-features = false }
+xwt-tests = { version = "0.12", path = "crates/xwt-tests" }
+xwt-web = { version = "0.20", path = "crates/xwt-web", default-features = false }
+xwt-wtransport = { version = "0.19", path = "crates/xwt-wtransport", default-features = false }

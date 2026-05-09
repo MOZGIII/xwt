@@ -17,17 +17,17 @@ path = "src/main.rs"
 required-features = ["bin"]
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint" }
-xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
+xwt-cert-fingerprint = { workspace = true }
+xwt-test-assets = { workspace = true }
 
-color-eyre = { version = "0.6", optional = true }
-envfury = { version = "0.2", optional = true }
-thiserror = "2"
-tokio = { version = "1", default-features = false, features = ["rt-multi-thread"] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", optional = true }
-typle = "0.10"
-wtransport = { version = "0.7", default-features = false, features = ["quinn"] }
+color-eyre = { workspace = true, optional = true }
+envfury = { workspace = true, optional = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true, optional = true }
+typle = { workspace = true }
+wtransport = { workspace = true }
 
 [features]
 bin = ["dep:color-eyre", "dep:envfury", "dep:tracing-subscriber", "tokio/macros", "wtransport/ring"]

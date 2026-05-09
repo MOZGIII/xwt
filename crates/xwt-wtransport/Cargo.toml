@@ -10,22 +10,22 @@ An implementation of the xwt that runs natively via wtransport crate.
 repository = "https://github.com/MOZGIII/xwt"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-xwt-core = { version = "0.9", path = "../xwt-core", default-features = false, features = ["std"] }
+xwt-core = { workspace = true, features = ["std"] }
 
-thiserror = "2"
-tokio = { version = "1", default-features = false, optional = true }
-wtransport = { version = "0.7", default-features = false, features = ["quinn"] }
+thiserror = { workspace = true }
+tokio = { workspace = true, default-features = false, optional = true }
+wtransport = { workspace = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
-xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint" }
-xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
-xwt-tests = { version = "0.12", path = "../xwt-tests" }
+xwt-cert-fingerprint = { workspace = true }
+xwt-test-assets = { workspace = true }
+xwt-tests = { workspace = true }
 
-color-eyre = "0.6"
-static_assertions = "1"
-tokio = { version = "1", features = ["macros"] }
-tracing = "0.1"
-tracing-subscriber = "0.3"
+color-eyre = { workspace = true }
+static_assertions = { workspace = true }
+tokio = { workspace = true, features = ["macros"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
 
 [features]
 default = ["tokio", "wtransport/ring"]

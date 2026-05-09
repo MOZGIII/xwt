@@ -11,4 +11,4 @@ Use when you don't want/need your own more precise types.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-erased = { version = "0.6", path = "../xwt-erased", default-features = false }
+xwt-erased = { workspace = true }

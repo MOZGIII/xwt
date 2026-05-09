@@ -12,10 +12,10 @@ environments.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-core = { version = "0.9", path = "../xwt-core", default-features = false }
-xwt-error = { version = "0.9", path = "../xwt-error", default-features = false }
+xwt-core = { workspace = true }
+xwt-error = { workspace = true }
 
-constcat = "0.5.0"
-thiserror = "2"
-tokio = { version = "1", default-features = false, features = ["io-util"] }
-tracing = "0.1"
+constcat = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["io-util"] }
+tracing = { workspace = true }

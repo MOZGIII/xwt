@@ -14,24 +14,24 @@ repository = "https://github.com/MOZGIII/xwt"
 default-target = "wasm32-unknown-unknown"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-web-sys-async-io = { version = "0.5", path = "../web-sys-async-io" }
-web-sys-stream-utils = { version = "0.2", path = "../web-sys-stream-utils" }
-web-wt-sys = { version = "0.2", path = "../web-wt-sys", default-features = false }
-xwt-core = { version = "0.9", path = "../xwt-core", default-features = false }
+web-sys-async-io = { workspace = true }
+web-sys-stream-utils = { workspace = true }
+web-wt-sys = { workspace = true }
+xwt-core = { workspace = true }
 
-js-sys = "0.3"
-thiserror = "2"
-tokio = { version = "1", default-features = false, features = ["sync"] }
-wasm-bindgen = { version = "0.2" }
-wasm-bindgen-futures = { version = "0.4" }
-web-sys = { version = "0.3", features = ["ReadableStream", "WritableStream", "DomException"] }
+js-sys = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["sync"] }
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+web-sys = { workspace = true, features = ["ReadableStream", "WritableStream", "DomException"] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwt-cert-fingerprint = { version = "0.1", path = "../xwt-cert-fingerprint", default-features = false }
-xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
-xwt-tests = { version = "0.12", path = "../xwt-tests" }
+xwt-cert-fingerprint = { workspace = true }
+xwt-test-assets = { workspace = true }
+xwt-tests = { workspace = true }
 
-static_assertions = "1"
-tracing-wasm = "0.2"
-wasm-bindgen-test = "0.3"
-web-sys = { version = "0.3", features = ["console"] }
+static_assertions = { workspace = true }
+tracing-wasm = { workspace = true }
+wasm-bindgen-test = { workspace = true }
+web-sys = { workspace = true, features = ["console"] }

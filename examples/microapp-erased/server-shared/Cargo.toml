@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-xwt-erased = { path = "../../../crates/xwt-erased" }
+xwt-erased = { workspace = true }
 
-futures-util = "0.3"
-tokio = { version = "1", default-features = false, features = ["time"] }
+futures-util = { workspace = true }
+tokio = { workspace = true, default-features = false, features = ["time"] }
