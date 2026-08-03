@@ -10,7 +10,7 @@ pub mod reader;
 mod sys;
 pub mod writer;
 
-pub use self::reader::Reader;
+pub use self::reader::{ReadableStreamReader, Reader};
 pub use self::writer::Writer;
 
 fn js_value_to_io_error(error: wasm_bindgen::JsValue) -> std::io::Error {

@@ -8,7 +8,7 @@
 )]
 #![cfg(target_family = "wasm")]
 
-use std::{num::NonZeroUsize, rc::Rc};
+use std::{cell::Cell, num::NonZeroUsize, rc::Rc};
 
 use wasm_bindgen::prelude::*;
 
@@ -74,6 +74,9 @@ pub struct Session {
     /// The datagrams state for this session.
     pub datagrams: Datagrams,
 
+    /// Whether this session must use default readable stream readers.
+    use_default_readers: Rc<Cell<bool>>,
+
     /// Whether to close the session on drop.
     pub close_on_drop: bool,
 }
@@ -81,10 +84,12 @@ pub struct Session {
 impl Session {
     /// Construct a new session from a [`web_wt_sys::WebTransport`].
     pub fn new(transport: web_wt_sys::WebTransport) -> Self {
-        let datagrams = Datagrams::from_transport(&transport);
+        let use_default_readers = Rc::new(Cell::new(false));
+        let datagrams = Datagrams::from_transport_with_fallback(&transport, &use_default_readers);
         Self {
             transport: Some(Rc::new(transport)),
             datagrams,
+            use_default_readers,
             close_on_drop: true,
         }
     }
@@ -141,7 +146,7 @@ impl Drop for Session {
 #[derive(Debug)]
 pub struct Datagrams {
     /// The datagram reader.
-    pub readable_stream_reader: web_sys::ReadableStreamByobReader,
+    pub readable_stream_reader: DatagramReader,
 
     /// The datagram writer.
     pub writable_stream_writer: web_sys::WritableStreamDefaultWriter,
@@ -157,6 +162,25 @@ pub struct Datagrams {
     pub unlock_streams_on_drop: bool,
 }
 
+/// A reader for incoming WebTransport datagrams.
+#[derive(Debug)]
+pub enum DatagramReader {
+    /// A bring-your-own-buffer reader.
+    Byob(web_sys::ReadableStreamByobReader),
+    /// A default reader, used when BYOB readers are unsupported.
+    Default(web_sys::ReadableStreamDefaultReader),
+}
+
+impl DatagramReader {
+    /// Release this reader's lock on its stream.
+    fn release_lock(&self) {
+        match self {
+            Self::Byob(reader) => reader.release_lock(),
+            Self::Default(reader) => reader.release_lock(),
+        }
+    }
+}
+
 impl Datagrams {
     /// Create a datagrams state from the transport.
     pub fn from_transport(transport: &web_wt_sys::WebTransport) -> Self {
@@ -167,9 +191,36 @@ impl Datagrams {
     pub fn from_transport_datagrams(
         datagrams: &web_wt_sys::WebTransportDatagramDuplexStream,
     ) -> Self {
+        Self::from_transport_datagrams_with_fallback(datagrams, &Cell::new(false))
+    }
+
+    /// Create datagram state while sharing a session's reader fallback state.
+    fn from_transport_with_fallback(
+        transport: &web_wt_sys::WebTransport,
+        use_default_readers: &Cell<bool>,
+    ) -> Self {
+        Self::from_transport_datagrams_with_fallback(&transport.datagrams(), use_default_readers)
+    }
+
+    /// Create datagram state, falling back when BYOB acquisition fails.
+    fn from_transport_datagrams_with_fallback(
+        datagrams: &web_wt_sys::WebTransportDatagramDuplexStream,
+        use_default_readers: &Cell<bool>,
+    ) -> Self {
         let read_buffer_size = 65536; // 65k buffers as per spec recommendation
 
-        let readable_stream_reader = web_sys_stream_utils::get_reader_byob(datagrams.readable());
+        let readable = datagrams.readable();
+        let readable_stream_reader = if use_default_readers.get() {
+            DatagramReader::Default(web_sys_stream_utils::get_reader(readable))
+        } else {
+            match web_sys_stream_utils::try_get_reader_byob(readable.clone()) {
+                Ok(reader) => DatagramReader::Byob(reader),
+                Err(_) => {
+                    use_default_readers.set(true);
+                    DatagramReader::Default(web_sys_stream_utils::get_reader(readable))
+                }
+            }
+        };
         let writable_stream_writer = web_sys_stream_utils::get_writer(datagrams.writable());
 
         let read_buffer = js_sys::ArrayBuffer::new(read_buffer_size);
@@ -252,11 +303,20 @@ impl Drop for RecvStream {
 fn wrap_recv_stream(
     transport: &Rc<web_wt_sys::WebTransport>,
     stream: web_wt_sys::WebTransportReceiveStream,
+    use_default_readers: &Cell<bool>,
 ) -> RecvStream {
-    let reader = web_sys_stream_utils::get_reader_byob(stream.clone());
-    let reader: JsValue = reader.into();
-    let reader = reader.into();
-    let reader = web_sys_async_io::Reader::new(reader);
+    let readable: web_sys::ReadableStream = stream.clone().into();
+    let reader = if use_default_readers.get() {
+        web_sys_async_io::Reader::new_default(web_sys_stream_utils::get_reader(readable))
+    } else {
+        match web_sys_stream_utils::try_get_reader_byob(readable.clone()) {
+            Ok(reader) => web_sys_async_io::Reader::new(reader),
+            Err(_) => {
+                use_default_readers.set(true);
+                web_sys_async_io::Reader::new_default(web_sys_stream_utils::get_reader(readable))
+            }
+        }
+    };
 
     RecvStream {
         transport: Rc::clone(transport),
@@ -285,12 +345,13 @@ fn wrap_send_stream(
 fn wrap_bi_stream(
     transport: &Rc<web_wt_sys::WebTransport>,
     stream: web_wt_sys::WebTransportBidirectionalStream,
+    use_default_readers: &Cell<bool>,
 ) -> (SendStream, RecvStream) {
     let writeable = stream.writable();
     let readable = stream.readable();
 
     let send_stream = wrap_send_stream(transport, writeable);
-    let recv_stream = wrap_recv_stream(transport, readable);
+    let recv_stream = wrap_recv_stream(transport, readable, use_default_readers);
 
     (send_stream, recv_stream)
 }
@@ -303,7 +364,7 @@ impl xwt_core::session::stream::OpenBi for Session {
     async fn open_bi(&self) -> Result<Self::Opening, Self::Error> {
         let transport = self.transport_ref();
         let value = transport.create_bidirectional_stream().await?;
-        let value = wrap_bi_stream(transport, value);
+        let value = wrap_bi_stream(transport, value, &self.use_default_readers);
         Ok(xwt_core::utils::dummy::OpeningBiStream(value))
     }
 }
@@ -322,7 +383,7 @@ impl xwt_core::session::stream::AcceptBi for Session {
             return Err(Error(JsError::new("xwt: accept bi reader is done").into()));
         }
         let value: web_wt_sys::WebTransportBidirectionalStream = read_result.get_value().into();
-        let value = wrap_bi_stream(transport, value);
+        let value = wrap_bi_stream(transport, value, &self.use_default_readers);
         Ok(value)
     }
 }
@@ -353,7 +414,7 @@ impl xwt_core::session::stream::AcceptUni for Session {
             return Err(Error(JsError::new("xwt: accept uni reader is done").into()));
         }
         let value: web_wt_sys::WebTransportReceiveStream = read_result.get_value().into();
-        let recv_stream = wrap_recv_stream(transport, value);
+        let recv_stream = wrap_recv_stream(transport, value, &self.use_default_readers);
         Ok(recv_stream)
     }
 }
@@ -506,39 +567,19 @@ impl xwt_core::stream::Read for RecvStream {
     type Error = StreamReadError;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<NonZeroUsize, Self::Error> {
-        let requested_size = buf.len().try_into().unwrap();
-        let internal_buf = self
-            .reader
-            .internal_buf
-            .take()
-            .filter(|internal_buf| {
-                let actual_size = internal_buf.byte_length();
-                debug_assert!(actual_size > 0);
-                actual_size >= requested_size
-            })
-            .unwrap_or_else(|| js_sys::ArrayBuffer::new(requested_size));
-        let internal_buf_view =
-            js_sys::Uint8Array::new_with_byte_offset_and_length(&internal_buf, 0, requested_size);
-        let maybe_internal_buf_view =
-            web_sys_stream_utils::read_byob(&self.reader.inner, internal_buf_view)
-                .await
-                .map_err(|err| StreamReadError::Read(err.into()))?;
-        let Some(internal_buf_view) = maybe_internal_buf_view else {
-            return Err(StreamReadError::ByobReadConsumedBuffer);
-        };
-
-        // Unwrap is safe assuming the `usize` is `u32` in wasm.
-        let len = internal_buf_view.byte_length().try_into().unwrap();
+        let mut read_buf = tokio::io::ReadBuf::new(buf);
+        std::future::poll_fn(|cx| {
+            std::pin::Pin::new(&mut self.reader).poll_read_js(cx, &mut read_buf)
+        })
+        .await
+        .map_err(|error| StreamReadError::Read(error.into()))?;
+        let len = read_buf.filled().len();
 
         // Detect when the read is aborted because the stream was closed without
         // an error.
         let Some(len) = NonZeroUsize::new(len) else {
             return Err(StreamReadError::Closed);
         };
-
-        internal_buf_view.copy_to(&mut buf[..len.get()]);
-
-        self.reader.internal_buf = Some(internal_buf_view.buffer());
 
         Ok(len)
     }
@@ -607,15 +648,29 @@ impl Datagrams {
             js_sys::Uint8Array::new(&buffer)
         };
 
-        let maybe_view =
-            web_sys_stream_utils::read_byob(&self.readable_stream_reader, view).await?;
+        let maybe_view = match &self.readable_stream_reader {
+            DatagramReader::Byob(reader) => web_sys_stream_utils::read_byob(reader, view).await?,
+            DatagramReader::Default(reader) => {
+                let maybe_view = web_sys_stream_utils::read_array(reader).await?;
+                maybe_view.map(|view| {
+                    max_read_size
+                        .filter(|max_read_size| view.length() > *max_read_size)
+                        .map_or(view.clone(), |max_read_size| {
+                            view.subarray(0, max_read_size)
+                        })
+                })
+            }
+        };
         let Some(mut view) = maybe_view else {
             return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
         };
 
         let result = f(&mut view);
 
-        *buffer_guard = Some(view.buffer());
+        *buffer_guard = Some(match self.readable_stream_reader {
+            DatagramReader::Byob(_) => view.buffer(),
+            DatagramReader::Default(_) => buffer,
+        });
         Ok(result)
     }
 }

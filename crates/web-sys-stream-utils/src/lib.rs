@@ -3,6 +3,8 @@
 #![cfg(target_family = "wasm")]
 #![allow(missing_docs, clippy::missing_docs_in_private_items)]
 
+use wasm_bindgen::JsCast;
+
 pub mod sys;
 
 pub fn get_reader(
@@ -16,11 +18,22 @@ pub fn get_reader(
 pub fn get_reader_byob(
     readable_stream: impl Into<web_sys::ReadableStream>,
 ) -> web_sys::ReadableStreamByobReader {
+    try_get_reader_byob(readable_stream).unwrap()
+}
+
+pub fn try_get_reader_byob(
+    readable_stream: impl Into<web_sys::ReadableStream>,
+) -> Result<web_sys::ReadableStreamByobReader, wasm_bindgen::JsValue> {
     let readable_stream = readable_stream.into();
     let options = web_sys::ReadableStreamGetReaderOptions::new();
     options.set_mode(web_sys::ReadableStreamReaderMode::Byob);
-    let reader: wasm_bindgen::JsValue = readable_stream.get_reader_with_options(&options).into();
-    reader.into()
+    let get_reader = js_sys::Reflect::get(
+        readable_stream.as_ref(),
+        &wasm_bindgen::JsValue::from_str("getReader"),
+    )?;
+    let get_reader: js_sys::Function = get_reader.dyn_into()?;
+    let reader = get_reader.call1(readable_stream.as_ref(), options.as_ref())?;
+    Ok(reader.into())
 }
 
 pub fn get_writer(
@@ -32,6 +45,12 @@ pub fn get_writer(
 pub async fn read(
     reader: &web_sys::ReadableStreamDefaultReader,
 ) -> Result<Option<Vec<u8>>, wasm_bindgen::JsValue> {
+    Ok(read_array(reader).await?.map(|buf| buf.to_vec()))
+}
+
+pub async fn read_array(
+    reader: &web_sys::ReadableStreamDefaultReader,
+) -> Result<Option<js_sys::Uint8Array>, wasm_bindgen::JsValue> {
     let fut = wasm_bindgen_futures::JsFuture::from(reader.read());
     let result = fut.await?;
     let result: crate::sys::ReadableStreamDefaultReaderValue = result.into();
@@ -44,7 +63,7 @@ pub async fn read(
         unreachable!("no value and we are also not done, this should be impossible");
     };
 
-    Ok(Some(js_buf.to_vec()))
+    Ok(Some(js_buf))
 }
 
 pub async fn read_byob(
