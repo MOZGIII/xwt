@@ -23,10 +23,10 @@ pub fn get_reader_byob(
     reader.into()
 }
 
-pub fn get_writer(
+pub fn try_get_writer(
     writable_stream: web_sys::WritableStream,
-) -> web_sys::WritableStreamDefaultWriter {
-    writable_stream.get_writer().unwrap()
+) -> Result<web_sys::WritableStreamDefaultWriter, wasm_bindgen::JsValue> {
+    writable_stream.get_writer()
 }
 
 pub async fn read(

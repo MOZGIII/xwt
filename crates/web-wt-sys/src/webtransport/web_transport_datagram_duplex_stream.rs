@@ -2,8 +2,9 @@
 //!
 //! <https://w3c.github.io/webtransport/#duplex-stream>
 
-use js_sys::Object;
+use js_sys::{Function, Object, Reflect};
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsCast;
 use web_sys::{ReadableStream, WritableStream};
 
 #[wasm_bindgen]
@@ -107,6 +108,17 @@ extern "C" {
 }
 
 impl WebTransportDatagramDuplexStream {
+    /// Creates a writable datagram stream using the current standardized API,
+    /// falling back to the older property still exposed by some browsers.
+    pub fn compatible_writable(&self) -> Result<WritableStream, JsValue> {
+        let create_writable = Reflect::get(self.as_ref(), &JsValue::from_str("createWritable"))?;
+        if let Some(create_writable) = create_writable.dyn_ref::<Function>() {
+            return create_writable.call0(self.as_ref())?.dyn_into();
+        }
+
+        Reflect::get(self.as_ref(), &JsValue::from_str("writable"))?.dyn_into()
+    }
+
     crate::set_option_accessors! {
         /// ```webidl
         /// attribute unrestricted double? incomingMaxAge;

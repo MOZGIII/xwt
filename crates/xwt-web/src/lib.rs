@@ -58,7 +58,7 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
         let Connecting { transport } = self;
         transport.ready().await?;
 
-        Ok(Session::new(transport))
+        Session::new(transport)
     }
 }
 
@@ -80,13 +80,13 @@ pub struct Session {
 
 impl Session {
     /// Construct a new session from a [`web_wt_sys::WebTransport`].
-    pub fn new(transport: web_wt_sys::WebTransport) -> Self {
-        let datagrams = Datagrams::from_transport(&transport);
-        Self {
+    pub fn new(transport: web_wt_sys::WebTransport) -> Result<Self, Error> {
+        let datagrams = Datagrams::from_transport(&transport)?;
+        Ok(Self {
             transport: Some(Rc::new(transport)),
             datagrams,
             close_on_drop: true,
-        }
+        })
     }
 
     /// If possible, relieves the underlying [`web_wt_sys::WebTransport`] of
@@ -159,29 +159,30 @@ pub struct Datagrams {
 
 impl Datagrams {
     /// Create a datagrams state from the transport.
-    pub fn from_transport(transport: &web_wt_sys::WebTransport) -> Self {
+    pub fn from_transport(transport: &web_wt_sys::WebTransport) -> Result<Self, Error> {
         Self::from_transport_datagrams(&transport.datagrams())
     }
 
     /// Create a datagrams state from the transport datagrams.
     pub fn from_transport_datagrams(
         datagrams: &web_wt_sys::WebTransportDatagramDuplexStream,
-    ) -> Self {
+    ) -> Result<Self, Error> {
         let read_buffer_size = 65536; // 65k buffers as per spec recommendation
 
         let readable_stream_reader = web_sys_stream_utils::get_reader_byob(datagrams.readable());
-        let writable_stream_writer = web_sys_stream_utils::get_writer(datagrams.writable());
+        let writable = datagrams.compatible_writable()?;
+        let writable_stream_writer = web_sys_stream_utils::try_get_writer(writable)?;
 
         let read_buffer = js_sys::ArrayBuffer::new(read_buffer_size);
         let read_buffer = tokio::sync::Mutex::new(Some(read_buffer));
 
-        Self {
+        Ok(Self {
             readable_stream_reader,
             writable_stream_writer,
             read_buffer_size,
             read_buffer,
             unlock_streams_on_drop: true,
-        }
+        })
     }
 }
 
