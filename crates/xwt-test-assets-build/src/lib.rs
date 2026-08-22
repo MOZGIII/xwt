@@ -108,7 +108,7 @@ pub fn save(dir: impl AsRef<Path>, files: Vec<(&'static str, AnyBytes)>) -> Save
 
     eprintln!("Saving new xwt test assets");
 
-    for (result, (file_name, data)) in results.into_iter().zip(files.into_iter()) {
+    for (result, (file_name, data)) in results.into_iter().zip(files) {
         let mut file = match result {
             Ok(file) => file,
             Err(err) if err.kind() == ErrorKind::AlreadyExists => std::fs::OpenOptions::new()
