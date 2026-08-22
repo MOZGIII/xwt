@@ -2210,7 +2210,7 @@ dependencies = [
 name = "xwt-erased-example-client-native"
 version = "0.1.0"
 dependencies = [
- "rand 0.8.7",
+ "rand 0.10.2",
  "wtransport",
  "xwt-cert-fingerprint",
  "xwt-erased",
@@ -2225,7 +2225,7 @@ version = "0.1.0"
 dependencies = [
  "async-timer",
  "futures-util",
- "rand 0.8.7",
+ "rand 0.10.2",
  "xwt-erased",
 ]
 
@@ -2233,8 +2233,8 @@ dependencies = [
 name = "xwt-erased-example-client-web"
 version = "0.1.0"
 dependencies = [
- "getrandom 0.2.17",
- "rand 0.8.7",
+ "getrandom 0.4.3",
+ "rand 0.10.2",
  "wasm-bindgen",
  "web-sys",
  "xwt-cert-fingerprint",
@@ -2298,7 +2298,7 @@ dependencies = [
 name = "xwt-example-client-native"
 version = "0.1.0"
 dependencies = [
- "rand 0.8.7",
+ "rand 0.10.2",
  "tokio",
  "wtransport",
  "xwt-cert-fingerprint",
@@ -2314,7 +2314,7 @@ version = "0.1.0"
 dependencies = [
  "async-timer",
  "futures-util",
- "rand 0.8.7",
+ "rand 0.10.2",
  "xwt-core",
 ]
 
@@ -2322,8 +2322,8 @@ dependencies = [
 name = "xwt-example-client-web"
 version = "0.1.0"
 dependencies = [
- "getrandom 0.2.17",
- "rand 0.8.7",
+ "getrandom 0.4.3",
+ "rand 0.10.2",
  "wasm-bindgen",
  "web-sys",
  "xwt-cert-fingerprint",

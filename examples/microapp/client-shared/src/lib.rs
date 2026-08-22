@@ -1,6 +1,6 @@
 //! Portable client code that can work with any `xwt` backend.
 
-use rand::{seq::SliceRandom, thread_rng, Rng};
+use rand::{rng, seq::IndexedRandom, RngExt};
 use xwt_core::prelude::*;
 
 /// An example client that showcases the use of [`xwt_core`] to abstract
@@ -47,7 +47,7 @@ impl<Session: xwt_core::base::Session> ExampleClient<Session> {
 
         loop {
             // Select random move as input.
-            let movement_input = moves.choose(&mut thread_rng()).unwrap();
+            let movement_input = moves.choose(&mut rng()).unwrap();
 
             // Send it to the connection as a datagram.
             self.session.send_datagram(movement_input).await.unwrap();
@@ -63,7 +63,7 @@ impl<Session: xwt_core::base::Session> ExampleClient<Session> {
 
         loop {
             // Select random chat message as input.
-            let chat_input = chat_messages.choose(&mut thread_rng()).unwrap();
+            let chat_input = chat_messages.choose(&mut rng()).unwrap();
 
             // Prepare a chat message.
             let chat_message = format!("{}: {}\n", self.nickname, chat_input);
@@ -72,7 +72,7 @@ impl<Session: xwt_core::base::Session> ExampleClient<Session> {
             chat_stream.write(chat_message.as_bytes()).await.unwrap();
 
             // Wait for 3 to 5 second before sending the next chat message.
-            let seconds = thread_rng().gen_range(3..=5);
+            let seconds = rng().random_range(3..=5);
             async_timer::new_timer(std::time::Duration::from_secs(seconds)).await;
         }
     }
