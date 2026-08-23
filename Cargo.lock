@@ -1899,7 +1899,7 @@ dependencies = [
 
 [[package]]
 name = "web-wt-sys"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "js-sys",
  "pastey",
@@ -2105,7 +2105,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-cert-fingerprint"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "base64 0.23.1",
  "rustls-pki-types",
@@ -2115,7 +2115,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-cert-gen"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "der",
  "getrandom 0.4.3",
@@ -2339,7 +2339,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-assets-build"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "p256",
  "rand",
@@ -2349,7 +2349,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-server"
-version = "0.7.5"
+version = "0.7.6"
 dependencies = [
  "color-eyre",
  "envfury",
@@ -2365,7 +2365,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.12.0"
+version = "0.13.0"
 dependencies = [
  "constcat",
  "thiserror",
@@ -2377,7 +2377,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web"
-version = "0.20.0"
+version = "0.20.1"
 dependencies = [
  "js-sys",
  "static_assertions",
@@ -2399,7 +2399,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.19.0"
+version = "0.19.1"
 dependencies = [
  "color-eyre",
  "static_assertions",
