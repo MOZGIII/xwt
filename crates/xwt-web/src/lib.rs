@@ -136,12 +136,48 @@ impl Drop for Session {
     }
 }
 
+/// The reader for the datagrams readable stream.
+///
+/// Per the WebTransport spec, the datagrams readable is a regular (non-byte)
+/// [`web_sys::ReadableStream`], which only supports default readers
+/// (this is what Firefox implements); Chrome, however, exposes it as
+/// a byte stream, allowing BYOB reads.
+/// We feature-detect BYOB support and fall back to a default reader.
+#[derive(Debug)]
+pub enum DatagramsReader {
+    /// A BYOB reader, used when the datagrams readable is a byte stream.
+    Byob(web_sys::ReadableStreamByobReader),
+
+    /// A default reader, used when the datagrams readable is not
+    /// a byte stream.
+    Default(web_sys::ReadableStreamDefaultReader),
+}
+
+impl DatagramsReader {
+    /// Acquire a reader for the given datagrams readable stream, preferring
+    /// a BYOB reader when the stream supports it.
+    pub fn for_stream(readable_stream: web_sys::ReadableStream) -> Self {
+        match web_sys_stream_utils::try_get_reader_byob(readable_stream.clone()) {
+            Ok(reader) => Self::Byob(reader),
+            Err(_) => Self::Default(web_sys_stream_utils::get_reader(readable_stream)),
+        }
+    }
+
+    /// Release the stream lock held by the reader.
+    pub fn release_lock(&self) {
+        match self {
+            Self::Byob(reader) => reader.release_lock(),
+            Self::Default(reader) => reader.release_lock(),
+        }
+    }
+}
+
 /// Datagrams hold the portions of the session that are responsible for working
 /// with the datagrams.
 #[derive(Debug)]
 pub struct Datagrams {
     /// The datagram reader.
-    pub readable_stream_reader: web_sys::ReadableStreamByobReader,
+    pub readable_stream_reader: DatagramsReader,
 
     /// The datagram writer.
     pub writable_stream_writer: web_sys::WritableStreamDefaultWriter,
@@ -169,7 +205,7 @@ impl Datagrams {
     ) -> Self {
         let read_buffer_size = 65536; // 65k buffers as per spec recommendation
 
-        let readable_stream_reader = web_sys_stream_utils::get_reader_byob(datagrams.readable());
+        let readable_stream_reader = DatagramsReader::for_stream(datagrams.readable());
         // Feature-detect `createWritable`; fall back to the legacy `writable`
         // attribute on browsers that do not implement it yet.
         let writable: web_sys::WritableStream = if datagrams.has_create_writable() {
@@ -618,26 +654,52 @@ impl Datagrams {
     ) -> Result<R, Error> {
         let mut buffer_guard = self.read_buffer.lock().await;
 
-        let buffer = buffer_guard
-            .take()
-            .unwrap_or_else(|| js_sys::ArrayBuffer::new(self.read_buffer_size));
-        let view = if let Some(max_read_size) = max_read_size {
-            let desired_buffer_length = buffer.byte_length().min(max_read_size);
-            js_sys::Uint8Array::new_with_byte_offset_and_length(&buffer, 0, desired_buffer_length)
-        } else {
-            js_sys::Uint8Array::new(&buffer)
-        };
+        match &self.readable_stream_reader {
+            DatagramsReader::Byob(reader) => {
+                let buffer = buffer_guard
+                    .take()
+                    .unwrap_or_else(|| js_sys::ArrayBuffer::new(self.read_buffer_size));
+                let view = if let Some(max_read_size) = max_read_size {
+                    let desired_buffer_length = buffer.byte_length().min(max_read_size);
+                    js_sys::Uint8Array::new_with_byte_offset_and_length(
+                        &buffer,
+                        0,
+                        desired_buffer_length,
+                    )
+                } else {
+                    js_sys::Uint8Array::new(&buffer)
+                };
 
-        let maybe_view =
-            web_sys_stream_utils::read_byob(&self.readable_stream_reader, view).await?;
-        let Some(mut view) = maybe_view else {
-            return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
-        };
+                let maybe_view = web_sys_stream_utils::read_byob(reader, view).await?;
+                let Some(mut view) = maybe_view else {
+                    return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
+                };
 
-        let result = f(&mut view);
+                let result = f(&mut view);
 
-        *buffer_guard = Some(view.buffer());
-        Ok(result)
+                *buffer_guard = Some(view.buffer());
+                Ok(result)
+            }
+            DatagramsReader::Default(reader) => {
+                let maybe_view = web_sys_stream_utils::read_uint8array(reader).await?;
+                let Some(view) = maybe_view else {
+                    return Err(wasm_bindgen::JsError::new("unexpected stream termination").into());
+                };
+
+                // A default reader always yields the whole datagram; honor
+                // the requested read size limit by truncating the view.
+                let mut view = match max_read_size {
+                    Some(max_read_size) if view.length() > max_read_size => {
+                        view.subarray(0, max_read_size)
+                    }
+                    _ => view,
+                };
+
+                let result = f(&mut view);
+
+                Ok(result)
+            }
+        }
     }
 }
 
