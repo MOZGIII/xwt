@@ -62,6 +62,17 @@ install_firefox() {
   printf "GECKODRIVER_ARGS=--binary %s/%s\n" "$(pwd)" "${FIREFOXES[0]}" >>"$GITHUB_ENV"
 }
 
+install_cargo_hack() {
+  local VERSION="$1"
+  curl -sSL "https://github.com/taiki-e/cargo-hack/releases/download/v${VERSION}/cargo-hack-x86_64-unknown-linux-musl.tar.gz" |
+    sudo tar -xzvf - -C /usr/local/bin
+}
+
+# Install cargo-hack when requested.
+if [[ -n "${INSTALL_CARGO_HACK_VERSION:-}" ]]; then
+  install_cargo_hack "$INSTALL_CARGO_HACK_VERSION"
+fi
+
 # Install the wasm test environment when a wasm test browser is requested.
 case "${WASM_TEST_BROWSER:-}" in
 chrome)

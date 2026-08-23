@@ -42,6 +42,65 @@ export const wasmTestBrowsers = {
   },
 } satisfies Record<string, WasmTestBrowser>;
 
+// The `cargo-hack` version to install for the feature permutation checks.
+// The build env script interprets the env var and installs the tool.
+const cargoHackEnv = {
+  INSTALL_CARGO_HACK_VERSION: "0.6.45",
+};
+
+export type FeaturePowersetExceptionGroup = {
+  name: string;
+  crates: string[];
+  extraArgs: string;
+};
+
+// The exceptions to the feature powerset check.
+//
+// Some crates cannot be checked with the plain feature powerset invocation;
+// each entry here defines a group of such crates, together with the extra
+// `cargo hack` arguments that make the check work for them.
+//
+// The crates listed here are excluded from the main feature powerset run,
+// and each group gets a dedicated generated mode instead.
+export const featurePowersetExceptionGroups = {
+  wtransport: {
+    name: "wtransport crates",
+    // The `wtransport` crate does not compile unless one of its TLS crypto
+    // provider features is enabled, so keep one always enabled while checking
+    // the feature permutations of the crates that depend on it.
+    crates: ["xwt-wtransport", "xwt-test-server"],
+    extraArgs: "--features wtransport/ring",
+  },
+} satisfies Record<string, FeaturePowersetExceptionGroup>;
+
+// All the crates covered by the feature powerset exception groups; excluded
+// from the main feature powerset run.
+const featurePowersetExcludedCrates = Object.values(
+  featurePowersetExceptionGroups as Record<string, FeaturePowersetExceptionGroup>
+).flatMap((group) => group.crates);
+
+// A feature powerset check mode for each of the exception groups.
+const featuresExceptionModes = Object.fromEntries(
+  Object.entries(
+    featurePowersetExceptionGroups as Record<string, FeaturePowersetExceptionGroup>
+  ).map(([key, group]) => [
+    `features_${key}`,
+    {
+      name: `cargo hack clippy (feature powerset, ${group.name})`,
+      cargoCommand: "hack",
+      cargoArgs: [
+        "clippy --locked --feature-powerset",
+        ...group.crates.map((crate) => `--package ${crate}`),
+        group.extraArgs,
+        "-- -D warnings",
+      ].join(" "),
+      platformIndependent: true,
+      cargoCacheKey: `features-${key}`,
+      env: cargoHackEnv,
+    } satisfies Mode,
+  ])
+) satisfies Modes;
+
 // A wasm test mode for each of the browsers.
 const testWasmModes = Object.fromEntries(
   Object.entries(wasmTestBrowsers as Record<string, WasmTestBrowser>).map(
@@ -95,6 +154,28 @@ export const code = {
     cargoArgs: "--locked --workspace --target wasm32-unknown-unknown",
     platformIndependent: true,
     cargoCacheKey: "build-wasm",
+  },
+  features: {
+    name: "cargo hack clippy (feature powerset)",
+    cargoCommand: "hack",
+    cargoArgs: [
+      "clippy --locked --workspace --feature-powerset",
+      ...featurePowersetExcludedCrates.map((crate) => `--exclude ${crate}`),
+      "-- -D warnings",
+    ].join(" "),
+    platformIndependent: true,
+    cargoCacheKey: "features",
+    env: cargoHackEnv,
+  },
+  ...featuresExceptionModes,
+  features_wasm: {
+    name: "cargo hack clippy (feature powerset, wasm)",
+    cargoCommand: "hack",
+    cargoArgs:
+      "clippy --locked --workspace --feature-powerset --target wasm32-unknown-unknown -- -D warnings",
+    platformIndependent: true,
+    cargoCacheKey: "features-wasm",
+    env: cargoHackEnv,
   },
   fmt: {
     name: "cargo fmt",
