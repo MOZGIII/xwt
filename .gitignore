@@ -1,3 +1,5 @@
 /target
 /chrome
 /chromedriver
+/firefox
+/geckodriver

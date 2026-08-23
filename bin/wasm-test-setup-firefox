@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+GECKODRIVER_VERSION="${GECKODRIVER_VERSION:-$(
+  curl -sSL "https://api.github.com/repos/mozilla/geckodriver/releases/latest" |
+    sed -n 's/.*"tag_name": *"v\([^"]*\)".*/\1/p'
+)}"
+
+npx @puppeteer/browsers install "firefox@${FIREFOX_VERSION:-stable}"
+
+mkdir -p geckodriver
+curl -sSL "https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz" |
+  tar -xzvf - -C geckodriver
