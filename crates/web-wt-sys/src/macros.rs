@@ -3,6 +3,27 @@
 /// Define a dictionary constructor.
 #[macro_export]
 macro_rules! dictionary_constructor {
+    ($name:ident<$generic:ident>) => {
+        impl<$generic> $name<$generic>
+        where
+            Self: ::wasm_bindgen::JsCast,
+        {
+            /// Create a new instance.
+            pub fn new() -> Self {
+                ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new())
+            }
+        }
+
+        impl<$generic> Default for $name<$generic>
+        where
+            Self: ::wasm_bindgen::JsCast,
+        {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
+    };
+
     ($name:ident) => {
         impl $name {
             /// Create a new instance.
@@ -66,6 +87,45 @@ macro_rules! _dictionary_type_non_wasm_bindgen_accessors {
 /// Define a dictionary type.
 #[macro_export]
 macro_rules! dictionary_type {
+    (
+        $( #[$attrs:meta] )*
+        pub type $name:ident<$generic:ident = $default:ty> {
+            $($attr:ident: $value_type:ty => $js_name:ident)*
+        }
+    ) => {
+        ::pastey::paste! {
+            #[wasm_bindgen]
+            extern "C" {
+                #[doc = "[`" $name "`] dictionary type."]
+                $(#[$attrs])*
+                #[wasm_bindgen(extends = ::js_sys::Object, js_name = Object)]
+                #[derive(Debug, Clone, PartialEq, Eq)]
+                pub type $name<$generic = $default>;
+
+                $(
+                    #[doc = "Get `" $js_name "` field value, if set."]
+                    #[wasm_bindgen(method, getter = $js_name)]
+                    pub fn [<get_ $attr>]<$generic>(this: &$name<$generic>) -> Option<$value_type>;
+
+                    #[doc = "Set `" $js_name "` field to the given value or unset it."]
+                    #[wasm_bindgen(method, setter = $js_name)]
+                    pub fn [<set_option_ $attr>]<$generic>(this: &$name<$generic>, val: Option<$value_type>);
+                )*
+            }
+
+            impl<$generic> $name<$generic>
+            where
+                $generic: ::wasm_bindgen::ErasableGeneric<Repr = ::wasm_bindgen::JsValue>,
+            {
+                $(
+                    $crate::_dictionary_type_non_wasm_bindgen_accessors!($attr, $value_type, $js_name);
+                )*
+            }
+        }
+
+        $crate::dictionary_constructor!($name<$generic>);
+    };
+
     (
         $( #[$attrs:meta] )*
         pub type $name:ident {
