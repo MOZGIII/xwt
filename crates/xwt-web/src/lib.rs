@@ -317,11 +317,17 @@ impl xwt_core::session::stream::AcceptBi for Session {
         let reader: JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
-        let read_result: web_wt_sys::ReadableStreamReadResult = read_result.into();
+        let read_result: web_wt_sys::ReadableStreamReadResult<
+            web_wt_sys::WebTransportBidirectionalStream,
+        > = read_result.unchecked_into();
         if read_result.is_done() {
             return Err(Error(JsError::new("xwt: accept bi reader is done").into()));
         }
-        let value: web_wt_sys::WebTransportBidirectionalStream = read_result.get_value().into();
+        let Some(value) = read_result.get_value() else {
+            return Err(Error(
+                JsError::new("xwt: accept bi read result has no value").into(),
+            ));
+        };
         let value = wrap_bi_stream(transport, value);
         Ok(value)
     }
@@ -348,11 +354,17 @@ impl xwt_core::session::stream::AcceptUni for Session {
         let reader: JsValue = incoming.get_reader().into();
         let reader: web_sys::ReadableStreamDefaultReader = reader.into();
         let read_result = wasm_bindgen_futures::JsFuture::from(reader.read()).await?;
-        let read_result: web_wt_sys::ReadableStreamReadResult = read_result.into();
+        let read_result: web_wt_sys::ReadableStreamReadResult<
+            web_wt_sys::WebTransportReceiveStream,
+        > = read_result.unchecked_into();
         if read_result.is_done() {
             return Err(Error(JsError::new("xwt: accept uni reader is done").into()));
         }
-        let value: web_wt_sys::WebTransportReceiveStream = read_result.get_value().into();
+        let Some(value) = read_result.get_value() else {
+            return Err(Error(
+                JsError::new("xwt: accept uni read result has no value").into(),
+            ));
+        };
         let recv_stream = wrap_recv_stream(transport, value);
         Ok(recv_stream)
     }
