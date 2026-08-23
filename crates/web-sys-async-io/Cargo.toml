@@ -18,4 +18,8 @@ js-sys = "0.3.89"
 tokio = { version = "1", default-features = false, features = [] }
 wasm-bindgen = { version = "0.2.112" }
 wasm-bindgen-futures = { version = "0.4.62" }
-web-sys = { version = "0.3.89", features = ["ReadableStreamDefaultReader", "WritableStreamDefaultWriter"] }
+web-sys = { version = "0.3.89", features = [
+  "ReadableStreamByobReader",
+  "ReadableStreamDefaultReader",
+  "WritableStreamDefaultWriter",
+] }
