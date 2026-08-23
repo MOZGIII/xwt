@@ -5,9 +5,60 @@ export type Mode = {
   cargoCacheKey: string;
   platformIndependent?: true;
   needsEchoServer?: true;
+  env?: Record<string, string>;
 };
 
 export type Modes = Record<string, Mode>;
+
+export type WasmTestBrowser = {
+  name: string;
+  env: Record<string, string>;
+};
+
+// The browsers (and their versions) to run the wasm tests in.
+// The build env script interprets the env vars and installs the browser.
+export const wasmTestBrowsers = {
+  chrome_141: {
+    name: "Chrome 141.0.7376.0",
+    env: {
+      WASM_TEST_BROWSER: "chrome",
+      WASM_TEST_BROWSER_VERSION: "141.0.7376.0",
+    },
+  },
+  chrome_154: {
+    name: "Chrome 154.0.8016.0",
+    env: {
+      WASM_TEST_BROWSER: "chrome",
+      WASM_TEST_BROWSER_VERSION: "154.0.8016.0",
+    },
+  },
+  firefox_154: {
+    name: "Firefox 154.0",
+    env: {
+      WASM_TEST_BROWSER: "firefox",
+      WASM_TEST_BROWSER_VERSION: "154.0",
+      WASM_TEST_GECKODRIVER_VERSION: "0.37.1",
+    },
+  },
+} satisfies Record<string, WasmTestBrowser>;
+
+// A wasm test mode for each of the browsers.
+const testWasmModes = Object.fromEntries(
+  Object.entries(wasmTestBrowsers as Record<string, WasmTestBrowser>).map(
+    ([key, browser]) => [
+      `test_wasm_${key}`,
+      {
+        name: `cargo test (wasm, ${browser.name})`,
+        cargoCommand: "test",
+        cargoArgs: "--locked --workspace --target wasm32-unknown-unknown",
+        platformIndependent: true,
+        cargoCacheKey: "test-wasm",
+        needsEchoServer: true,
+        env: browser.env,
+      } satisfies Mode,
+    ]
+  )
+) satisfies Modes;
 
 export const code = {
   clippy: {
@@ -31,14 +82,7 @@ export const code = {
     cargoCacheKey: "test",
     needsEchoServer: true,
   },
-  test_wasm: {
-    name: "cargo test (wasm)",
-    cargoCommand: "test",
-    cargoArgs: "--locked --workspace --target wasm32-unknown-unknown",
-    platformIndependent: true,
-    cargoCacheKey: "test-wasm",
-    needsEchoServer: true,
-  },
+  ...testWasmModes,
   build: {
     name: "cargo build",
     cargoCommand: "build",

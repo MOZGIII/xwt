@@ -39,7 +39,11 @@ export const buildMatrix = <M extends modes.Modes>(
       mode: activeModes,
     },
     includes
-  );
+  ).map((item) => ({
+    ...item,
+    // Merge the platform and mode env vars into the effective job env.
+    env: { ...item.platform.env, ...item.mode.env },
+  }));
   const matrix = { plan };
 
   // Print the matrix, useful for local debugging.
