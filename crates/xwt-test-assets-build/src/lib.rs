@@ -22,7 +22,8 @@ pub fn generate() -> Vec<(&'static str, AnyBytes)> {
     let params =
         xwt_cert_gen::Params::new("xwt-test-certificate", &["localhost", "127.0.0.1", "::1"]);
 
-    let key = p256::SecretKey::random(&mut rand::thread_rng());
+    use p256::elliptic_curve::Generate as _;
+    let key = p256::SecretKey::generate_from_rng(&mut rand::rng());
     let key = p256::ecdsa::SigningKey::from(key);
     let cert = params
         .self_signed::<_, p256::ecdsa::DerSignature>(&key)

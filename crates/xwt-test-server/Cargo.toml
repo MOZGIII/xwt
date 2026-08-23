@@ -26,7 +26,7 @@ thiserror = "2"
 tokio = { version = "1", default-features = false, features = ["rt-multi-thread"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", optional = true }
-typle = "0.10"
+typle = "0.13"
 wtransport = { version = "0.7", default-features = false, features = ["quinn"] }
 
 [features]

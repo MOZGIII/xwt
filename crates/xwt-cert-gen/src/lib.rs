@@ -47,7 +47,7 @@ pub enum Error {
     #[error("unable to create a certificate builder")]
     Builder(x509_cert::builder::Error),
     #[error("unable to add a subject alt name extension")]
-    SubjectAltNameExtension(x509_cert::builder::Error),
+    SubjectAltNameExtension(der::Error),
     #[error("unable to build the certificate")]
     Build(x509_cert::builder::Error),
 }
@@ -73,7 +73,8 @@ impl Params<'_> {
     /// };
     ///
     /// // Using `p256` crate to create a NIST P-256 secret key.
-    /// let key = p256::SecretKey::random(&mut rand::thread_rng());
+    /// use p256::elliptic_curve::Generate as _;
+    /// let key = p256::SecretKey::generate_from_rng(&mut rand::rng());
     ///
     /// // Prepare ECDSA/P-256 signing key.
     /// let key = p256::ecdsa::SigningKey::from(key);
@@ -100,35 +101,6 @@ impl Params<'_> {
             .parse()
             .map_err(Error::BadCommonName)?;
 
-        let profile = x509_cert::builder::Profile::Leaf {
-            issuer: subject.clone(),
-            enable_key_agreement: true,
-            enable_key_encipherment: true,
-        };
-        let serial_number = x509_cert::serial_number::SerialNumber::from(1u8);
-        let validity = x509_cert::time::Validity {
-            not_before: (now - (self.valid_days_before * DAY))
-                .try_into()
-                .map_err(|_| Error::BadValidDaysBefore)?,
-            not_after: (now + (self.valid_days_after * DAY))
-                .try_into()
-                .map_err(|_| Error::BadValidDaysAfter)?,
-        };
-
-        let subject_public_key_info =
-            x509_cert::spki::SubjectPublicKeyInfoOwned::from_key(key.verifying_key())
-                .map_err(|_| Error::BadKey)?;
-
-        let mut builder = x509_cert::builder::CertificateBuilder::new(
-            profile,
-            serial_number,
-            validity,
-            subject,
-            subject_public_key_info,
-            key,
-        )
-        .map_err(Error::Builder)?;
-
         let parse_subject_alt_name =
             |s: &str| -> Result<x509_cert::ext::pkix::name::GeneralName, Error> {
                 Ok(match s.parse::<core::net::IpAddr>() {
@@ -141,18 +113,50 @@ impl Params<'_> {
                 })
             };
 
-        let subject_alt_names = self
+        let subject_alt_names: x509_cert::ext::pkix::name::GeneralNames = self
             .subject_alt_names
             .iter()
             .copied()
             .map(parse_subject_alt_name)
             .collect::<Result<_, _>>()?;
 
+        let profile = x509_cert::builder::profile::cabf::tls::Subscriber {
+            certificate_type:
+                x509_cert::builder::profile::cabf::tls::CertificateType::domain_validated(
+                    subject.clone(),
+                    subject_alt_names.clone(),
+                )
+                .map_err(Error::Builder)?,
+            issuer: subject,
+            client_auth: false,
+        };
+        let serial_number = x509_cert::serial_number::SerialNumber::from(1u8);
+        let validity = x509_cert::time::Validity::new(
+            (now - (self.valid_days_before * DAY))
+                .try_into()
+                .map_err(|_| Error::BadValidDaysBefore)?,
+            (now + (self.valid_days_after * DAY))
+                .try_into()
+                .map_err(|_| Error::BadValidDaysAfter)?,
+        );
+
+        let subject_public_key_info =
+            x509_cert::spki::SubjectPublicKeyInfoOwned::from_key(&key.verifying_key())
+                .map_err(|_| Error::BadKey)?;
+
+        let mut builder = x509_cert::builder::CertificateBuilder::new(
+            profile,
+            serial_number,
+            validity,
+            subject_public_key_info,
+        )
+        .map_err(Error::Builder)?;
+
         builder
             .add_extension(&x509_cert::ext::pkix::SubjectAltName(subject_alt_names))
             .map_err(Error::SubjectAltNameExtension)?;
 
-        let cert = builder.build().map_err(Error::Builder)?;
+        let cert = builder.build::<_, Signature>(key).map_err(Error::Build)?;
         Ok(cert)
     }
 }

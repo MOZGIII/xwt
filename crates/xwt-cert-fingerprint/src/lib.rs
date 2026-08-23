@@ -18,8 +18,8 @@ impl Rfc7469 {
     #[cfg(feature = "x509-cert")]
     pub fn compute_x509_cert(cert: &x509_cert::Certificate) -> alloc::string::String {
         Self::compute_for_public_key_bytes(
-            cert.tbs_certificate
-                .subject_public_key_info
+            cert.tbs_certificate()
+                .subject_public_key_info()
                 .subject_public_key
                 .raw_bytes(),
         )
