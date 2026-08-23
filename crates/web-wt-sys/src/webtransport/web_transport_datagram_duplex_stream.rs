@@ -4,7 +4,9 @@
 
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
-use web_sys::{ReadableStream, WritableStream};
+use web_sys::{DomException, ReadableStream};
+
+use super::*;
 
 #[wasm_bindgen]
 extern "C" {
@@ -16,20 +18,39 @@ extern "C" {
     pub type WebTransportDatagramDuplexStream;
 
     /// ```webidl
+    /// WebTransportDatagramsWritable createWritable(
+    ///     optional WebTransportSendOptions options = {});
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-createwritable>
+    ///
+    /// Creates a [`WebTransportDatagramsWritable`] for outgoing datagrams.
+    #[wasm_bindgen(method, js_name = createWritable, catch)]
+    pub fn create_writable(
+        this: &WebTransportDatagramDuplexStream,
+    ) -> Result<WebTransportDatagramsWritable, DomException>;
+
+    /// ```webidl
+    /// WebTransportDatagramsWritable createWritable(
+    ///     optional WebTransportSendOptions options = {});
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-createwritable>
+    ///
+    /// Creates a [`WebTransportDatagramsWritable`] for outgoing datagrams.
+    #[wasm_bindgen(method, js_name = createWritable, catch)]
+    pub fn create_writable_with_options(
+        this: &WebTransportDatagramDuplexStream,
+        options: &WebTransportSendOptions,
+    ) -> Result<WebTransportDatagramsWritable, DomException>;
+
+    /// ```webidl
     /// readonly attribute ReadableStream readable;
     /// ```
     ///
     /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-readable>
     #[wasm_bindgen(method, getter)]
     pub fn readable(this: &WebTransportDatagramDuplexStream) -> ReadableStream;
-
-    /// ```webidl
-    /// readonly attribute WritableStream writable;
-    /// ```
-    ///
-    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-writable>
-    #[wasm_bindgen(method, getter)]
-    pub fn writable(this: &WebTransportDatagramDuplexStream) -> WritableStream;
 
     // =====
 
@@ -63,7 +84,7 @@ extern "C" {
     ///
     /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-outgoingmaxage>
     #[wasm_bindgen(method, getter, js_name = outgoingMaxAge)]
-    pub fn outgoing_max_age(this: &WebTransportDatagramDuplexStream) -> f64;
+    pub fn outgoing_max_age(this: &WebTransportDatagramDuplexStream) -> Option<f64>;
 
     /// ```webidl
     /// attribute unrestricted double? outgoingMaxAge;
@@ -74,36 +95,36 @@ extern "C" {
     pub fn set_option_outgoing_max_age(this: &WebTransportDatagramDuplexStream, value: Option<f64>);
 
     /// ```webidl
-    /// attribute unrestricted double incomingHighWaterMark;
+    /// attribute unsigned long incomingMaxBufferedDatagrams;
     /// ```
     ///
-    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-incominghighwatermark>
-    #[wasm_bindgen(method, getter, js_name = incomingHighWaterMark)]
-    pub fn incoming_high_water_mark(this: &WebTransportDatagramDuplexStream) -> f64;
+    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams>
+    #[wasm_bindgen(method, getter, js_name = incomingMaxBufferedDatagrams)]
+    pub fn incoming_max_buffered_datagrams(this: &WebTransportDatagramDuplexStream) -> u32;
 
     /// ```webidl
-    /// attribute unrestricted double incomingHighWaterMark;
+    /// attribute unsigned long incomingMaxBufferedDatagrams;
     /// ```
     ///
-    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-incominghighwatermark>
-    #[wasm_bindgen(method, setter, js_name = incomingHighWaterMark)]
-    pub fn set_incoming_high_water_mark(this: &WebTransportDatagramDuplexStream, value: f64);
+    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-incomingmaxbuffereddatagrams>
+    #[wasm_bindgen(method, setter, js_name = incomingMaxBufferedDatagrams)]
+    pub fn set_incoming_max_buffered_datagrams(this: &WebTransportDatagramDuplexStream, value: u32);
 
     /// ```webidl
-    /// attribute unrestricted double outgoingHighWaterMark;
+    /// attribute unsigned long outgoingMaxBufferedDatagrams;
     /// ```
     ///
-    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-outgoinghighwatermark>
-    #[wasm_bindgen(method, getter, js_name = outgoingHighWaterMark)]
-    pub fn outgoing_high_water_mark(this: &WebTransportDatagramDuplexStream) -> f64;
+    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams>
+    #[wasm_bindgen(method, getter, js_name = outgoingMaxBufferedDatagrams)]
+    pub fn outgoing_max_buffered_datagrams(this: &WebTransportDatagramDuplexStream) -> u32;
 
     /// ```webidl
-    /// attribute unrestricted double outgoingHighWaterMark;
+    /// attribute unsigned long outgoingMaxBufferedDatagrams;
     /// ```
     ///
-    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-outgoinghighwatermark>
-    #[wasm_bindgen(method, setter, js_name = outgoingHighWaterMark)]
-    pub fn set_outgoing_high_water_mark(this: &WebTransportDatagramDuplexStream, value: f64);
+    /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-outgoingmaxbuffereddatagrams>
+    #[wasm_bindgen(method, setter, js_name = outgoingMaxBufferedDatagrams)]
+    pub fn set_outgoing_max_buffered_datagrams(this: &WebTransportDatagramDuplexStream, value: u32);
 }
 
 impl WebTransportDatagramDuplexStream {

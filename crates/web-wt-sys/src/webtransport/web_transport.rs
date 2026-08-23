@@ -4,7 +4,7 @@
 
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
-use web_sys::{DomException, ReadableStream};
+use web_sys::{DomException, Headers, ReadableStream};
 
 use super::*;
 
@@ -54,6 +54,24 @@ extern "C" {
     /// the result asynchronously.
     #[wasm_bindgen(method, js_name = getStats)]
     pub async fn get_stats(this: &WebTransport) -> WebTransportConnectionStats;
+
+    /// ```webidl
+    /// [NewObject] Promise<Uint8Array> exportKeyingMaterial(BufferSource label, BufferSource context, unsigned long outputLength);
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransport-exportkeyingmaterial>
+    ///
+    /// Exports keying material from a TLS Keying Material Exporter
+    /// ([RFC9846] Section 7.3) for the TLS session uniquely associated with
+    /// this WebTransport's underlying connection.
+    /// Both `label` and `context` must be at most 255 bytes long.
+    #[wasm_bindgen(method, js_name = exportKeyingMaterial, catch)]
+    pub async fn export_keying_material(
+        this: &WebTransport,
+        label: &[u8],
+        context: &[u8],
+        output_length: u32,
+    ) -> Result<js_sys::Uint8Array, DomException>;
 
     /// ```webidl
     /// readonly attribute Promise<undefined> ready;
@@ -158,6 +176,31 @@ extern "C" {
         this: &WebTransport,
         val: Option<u16>,
     );
+
+    /// ```webidl
+    /// [SameObject] readonly attribute Headers? responseHeaders;
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransport-responseheaders>
+    ///
+    /// Once a WebTransport session has been established, holds
+    /// the application-level response headers set by the server, if any.
+    /// Initially null.
+    #[wasm_bindgen(method, getter = responseHeaders)]
+    pub fn response_headers(this: &WebTransport) -> Option<Headers>;
+
+    /// ```webidl
+    /// readonly attribute DOMString protocol;
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransport-protocol>
+    ///
+    /// Once a WebTransport session has been established and the `protocols`
+    /// constructor option was used to provide a non-empty array, returns
+    /// the application-level protocol selected by the server, if any.
+    /// Otherwise, an empty string.
+    #[wasm_bindgen(method, getter)]
+    pub fn protocol(this: &WebTransport) -> js_sys::JsString;
 
     // =====
 

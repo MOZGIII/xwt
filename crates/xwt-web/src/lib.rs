@@ -170,7 +170,8 @@ impl Datagrams {
         let read_buffer_size = 65536; // 65k buffers as per spec recommendation
 
         let readable_stream_reader = web_sys_stream_utils::get_reader_byob(datagrams.readable());
-        let writable_stream_writer = web_sys_stream_utils::get_writer(datagrams.writable());
+        let writable = datagrams.create_writable().unwrap();
+        let writable_stream_writer = web_sys_stream_utils::get_writer(writable.into());
 
         let read_buffer = js_sys::ArrayBuffer::new(read_buffer_size);
         let read_buffer = tokio::sync::Mutex::new(Some(read_buffer));
