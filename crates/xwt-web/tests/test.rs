@@ -17,6 +17,19 @@ fn setup() {
     });
 }
 
+/// Detect Firefox from the user agent string.
+///
+/// Used to skip the tests that exercise the WebTransport behaviors that
+/// Firefox does not implement properly yet.
+fn is_firefox() -> bool {
+    let user_agent = js_sys::Reflect::get(&js_sys::global(), &"navigator".into())
+        .and_then(|navigator| js_sys::Reflect::get(&navigator, &"userAgent".into()))
+        .ok()
+        .and_then(|user_agent| user_agent.as_string())
+        .unwrap_or_default();
+    user_agent.contains("Firefox")
+}
+
 fn test_endpoint() -> xwt_web::Endpoint {
     let digest = xwt_cert_fingerprint::Sha256::compute_for_der(xwt_test_assets::CERT);
     console_log!("certificate sha256 digest: {digest}");
@@ -130,7 +143,13 @@ async fn session_drop() {
 
     xwt_tests::tests::session_drop::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL, |error| {
         let known_bad_errors = ["Connection lost."];
-        let known_good_errors = ["WebTransportError: The session is closed."];
+        let known_good_errors = [
+            // Chrome.
+            "WebTransportError: The session is closed.",
+            // Firefox reports the reads canceled by the session closure with
+            // the name of the operation that caused the cancellation.
+            "WebTransportError: close()",
+        ];
         let actual_error = error.to_string();
 
         let is_bad_error = known_bad_errors
@@ -163,6 +182,19 @@ async fn accept_bi_stream() {
 async fn closed_uni_stream() {
     setup();
 
+    if is_firefox() {
+        // Firefox does not reject the writer `closed` promise when the peer
+        // sends a `STOP_SENDING`, so waiting for the send stream abortion
+        // hangs forever.
+        // See:
+        // - <https://bugzilla.mozilla.org/show_bug.cgi?id=1986138>
+        // - <https://bugzilla.mozilla.org/show_bug.cgi?id=2009530>
+        console_log!(
+            "skipping this test on Firefox: STOP_SENDING is not propagated to the send stream"
+        );
+        return;
+    }
+
     let endpoint = test_endpoint();
 
     xwt_tests::tests::closed_uni_stream::run(
@@ -177,6 +209,19 @@ async fn closed_uni_stream() {
 #[wasm_bindgen_test]
 async fn closed_uni_stream_with_error() {
     setup();
+
+    if is_firefox() {
+        // Firefox does not reject the writer `closed` promise when the peer
+        // sends a `STOP_SENDING`, so waiting for the send stream abortion
+        // hangs forever.
+        // See:
+        // - <https://bugzilla.mozilla.org/show_bug.cgi?id=1986138>
+        // - <https://bugzilla.mozilla.org/show_bug.cgi?id=2009530>
+        console_log!(
+            "skipping this test on Firefox: STOP_SENDING is not propagated to the send stream"
+        );
+        return;
+    }
 
     let endpoint = test_endpoint();
 
@@ -237,6 +282,20 @@ async fn closed_bi_send_stream() {
 #[wasm_bindgen_test]
 async fn closed_bi_send_stream_with_error() {
     setup();
+
+    if is_firefox() {
+        // Firefox rejects the reads on a stream that got a `RESET_STREAM`
+        // with a generic `TypeError: Error in input stream` instead of
+        // a `WebTransportError` carrying the `streamErrorCode`, so there is
+        // no error code to observe.
+        // See:
+        // - <https://bugzilla.mozilla.org/show_bug.cgi?id=2009530>
+        // - <https://bugzilla.mozilla.org/show_bug.cgi?id=2009593>
+        console_log!(
+            "skipping this test on Firefox: RESET_STREAM error code is not exposed to reads"
+        );
+        return;
+    }
 
     let endpoint = test_endpoint();
 
