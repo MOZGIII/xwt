@@ -1,6 +1,6 @@
 //! [`WebTransportSendStreamOptions`]
 //!
-//! <https://w3c.github.io/webtransport/#uni-stream-options>
+//! <https://w3c.github.io/webtransport/#dictdef-webtransportsendstreamoptions>
 
 #![allow(missing_docs)]
 
@@ -10,12 +10,13 @@ use super::*;
 
 crate::dictionary_type! {
     /// ```webidl
-    /// dictionary WebTransportSendStreamOptions {
-    ///   WebTransportSendGroup? sendGroup = null;
-    ///   long long sendOrder = 0;
+    /// dictionary WebTransportSendStreamOptions : WebTransportSendOptions {
     ///   boolean waitUntilAvailable = false;
     /// };
     /// ```
+    ///
+    /// The `sendGroup` and `sendOrder` members are inherited from
+    /// [`WebTransportSendOptions`].
     ///
     /// <https://w3c.github.io/webtransport/#dictdef-webtransportsendstreamoptions>
     pub type WebTransportSendStreamOptions {

@@ -14,9 +14,9 @@ crate::dictionary_type! {
     ///
     /// <https://w3c.github.io/webtransport/#dictdef-webtransportdatagramstats>
     pub type WebTransportDatagramStats {
-        dropped_incoming: u16 => droppedIncoming
-        expired_incoming: u16 => expiredIncoming
-        expired_outgoing: u16 => expiredOutgoing
-        lost_outgoing: u16 => lostOutgoing
+        dropped_incoming: u64 => droppedIncoming
+        expired_incoming: u64 => expiredIncoming
+        expired_outgoing: u64 => expiredOutgoing
+        lost_outgoing: u64 => lostOutgoing
     }
 }

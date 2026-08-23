@@ -7,8 +7,8 @@ use wasm_bindgen::prelude::*;
 crate::dictionary_type! {
     /// ```webidl
     /// dictionary WebTransportHash {
-    ///   DOMString algorithm;
-    ///   BufferSource value;
+    ///   required DOMString algorithm;
+    ///   required BufferSource value;
     /// };
     /// ```
     ///

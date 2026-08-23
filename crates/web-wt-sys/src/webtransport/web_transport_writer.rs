@@ -73,4 +73,21 @@ extern "C" {
         this: &WebTransportWriter,
         chunk: &JsValue,
     ) -> Result<(), DomException>;
+
+    /// ```webidl
+    /// undefined commit();
+    /// ```
+    ///
+    /// <https://w3c.github.io/webtransport/#dom-webtransportwriter-commit>
+    ///
+    /// Updates the `[[CommittedOffset]]` of a stream to match the number of
+    /// bytes written to that stream (`[[BytesWritten]]`).
+    /// This ensures that those bytes will be delivered to a peer reliably,
+    /// even after writing is aborted, causing the stream to abort sending.
+    /// This uses the mechanism described in [RELIABLE-RESET].
+    ///
+    /// NOTE: This does not guarantee delivery in the event that a connection
+    /// fails, only when a stream has aborted sending.
+    #[wasm_bindgen(method)]
+    pub fn commit(this: &WebTransportWriter);
 }
