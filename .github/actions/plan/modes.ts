@@ -32,14 +32,14 @@ export const wasmTestBrowsers = {
       WASM_TEST_BROWSER_VERSION: "154.0.8016.0",
     },
   },
-  // firefox_154: {
-  //   name: "Firefox 154.0",
-  //   env: {
-  //     WASM_TEST_BROWSER: "firefox",
-  //     WASM_TEST_BROWSER_VERSION: "154.0",
-  //     WASM_TEST_GECKODRIVER_VERSION: "0.37.1",
-  //   },
-  // },
+  firefox_154: {
+    name: "Firefox 154.0",
+    env: {
+      WASM_TEST_BROWSER: "firefox",
+      WASM_TEST_BROWSER_VERSION: "154.0",
+      WASM_TEST_GECKODRIVER_VERSION: "0.37.1",
+    },
+  },
 } satisfies Record<string, WasmTestBrowser>;
 
 // A wasm test mode for each of the browsers.
