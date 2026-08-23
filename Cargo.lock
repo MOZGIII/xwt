@@ -2192,6 +2192,7 @@ version = "0.1.0"
 dependencies = [
  "async-timer",
  "futures-util",
+ "getrandom 0.4.3",
  "rand",
  "xwt-erased",
 ]
@@ -2281,6 +2282,7 @@ version = "0.1.0"
 dependencies = [
  "async-timer",
  "futures-util",
+ "getrandom 0.4.3",
  "rand",
  "xwt-core",
 ]

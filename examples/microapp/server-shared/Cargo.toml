@@ -8,4 +8,4 @@ publish = false
 xwt-core = { path = "../../../crates/xwt-core" }
 
 futures-util = "0.3"
-tokio = { version = "1", default-features = false, features = ["time"] }
+tokio = { version = "1", default-features = false, features = ["sync", "time"] }

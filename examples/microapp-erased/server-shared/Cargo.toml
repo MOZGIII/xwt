@@ -8,4 +8,4 @@ publish = false
 xwt-erased = { path = "../../../crates/xwt-erased" }
 
 futures-util = "0.3"
-tokio = { version = "1", default-features = false, features = ["time"] }
+tokio = { version = "1", default-features = false, features = ["sync", "time"] }
