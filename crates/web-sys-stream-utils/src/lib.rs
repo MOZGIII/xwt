@@ -23,6 +23,20 @@ pub fn get_reader_byob(
     reader.into()
 }
 
+/// Like [`get_reader_byob`], but returns an error instead of throwing when
+/// the stream does not support BYOB readers (i.e. is not a byte stream).
+pub fn try_get_reader_byob(
+    readable_stream: impl Into<web_sys::ReadableStream>,
+) -> Result<web_sys::ReadableStreamByobReader, wasm_bindgen::JsValue> {
+    let readable_stream = readable_stream.into();
+    let options = web_sys::ReadableStreamGetReaderOptions::new();
+    options.set_mode(web_sys::ReadableStreamReaderMode::Byob);
+    let readable_stream: crate::sys::ReadableStreamWithFallibleGetReader =
+        wasm_bindgen::JsValue::from(readable_stream).into();
+    let reader = readable_stream.get_reader_with_options(&options)?;
+    Ok(reader.into())
+}
+
 pub fn get_writer(
     writable_stream: web_sys::WritableStream,
 ) -> web_sys::WritableStreamDefaultWriter {
@@ -45,6 +59,26 @@ pub async fn read(
     };
 
     Ok(Some(js_buf.to_vec()))
+}
+
+/// Like [`read`], but returns the [`js_sys::Uint8Array`] chunk as-is instead
+/// of copying the data into a [`Vec`].
+pub async fn read_uint8array(
+    reader: &web_sys::ReadableStreamDefaultReader,
+) -> Result<Option<js_sys::Uint8Array>, wasm_bindgen::JsValue> {
+    let fut = wasm_bindgen_futures::JsFuture::from(reader.read());
+    let result = fut.await?;
+    let result: crate::sys::ReadableStreamDefaultReaderValue = result.into();
+    let value = result.value();
+
+    let Some(js_buf) = value else {
+        if result.is_done() {
+            return Ok(None);
+        }
+        unreachable!("no value and we are also not done, this should be impossible");
+    };
+
+    Ok(Some(js_buf))
 }
 
 pub async fn read_byob(
