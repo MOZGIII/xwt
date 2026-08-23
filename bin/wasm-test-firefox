@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+FIREFOX_PATH=$(pwd)/$(find firefox -mindepth 2 -maxdepth 2 -type d)
+
+export GECKODRIVER="$(pwd)/geckodriver/geckodriver"
+export GECKODRIVER_ARGS="--binary $FIREFOX_PATH/firefox"
+
+exec cargo test --target wasm32-unknown-unknown "$@"

@@ -103,11 +103,18 @@ the sha256-authenticated certificates, i.e. when not using WebPKI).
 3. Run the WASM tests.
 
    ```shell
-   bin/wasm-test
+   bin/wasm-test-chrome
+   ```
+
+   or
+
+   ```shell
+   bin/wasm-test-firefox
    ```
 
    For this step, you might have to install some extra dependencies;
-   you can use `bin/wasm-test-setup` to help with that.
+   you can use `bin/wasm-test-setup-chrome` and `bin/wasm-test-setup-firefox`
+   to help with that.
 
 ### Microapp Example
 
