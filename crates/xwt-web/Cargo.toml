@@ -19,12 +19,12 @@ web-sys-stream-utils = { version = "0.2", path = "../web-sys-stream-utils" }
 web-wt-sys = { version = "0.2", path = "../web-wt-sys", default-features = false }
 xwt-core = { version = "0.9", path = "../xwt-core", default-features = false }
 
-js-sys = "0.3"
+js-sys = "0.3.104"
 thiserror = "2"
 tokio = { version = "1", default-features = false, features = ["sync"] }
-wasm-bindgen = { version = "0.2" }
-wasm-bindgen-futures = { version = "0.4" }
-web-sys = { version = "0.3", features = ["ReadableStream", "WritableStream", "DomException"] }
+wasm-bindgen = { version = "0.2.127" }
+wasm-bindgen-futures = { version = "0.4.77" }
+web-sys = { version = "0.3.104", features = ["ReadableStream", "WritableStream", "DomException"] }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
 xwt-cert-fingerprint = { version = "0.2", path = "../xwt-cert-fingerprint", default-features = false }
@@ -33,5 +33,5 @@ xwt-tests = { version = "0.13", path = "../xwt-tests" }
 
 static_assertions = "1"
 tracing-wasm = "0.2"
-wasm-bindgen-test = "0.3"
-web-sys = { version = "0.3", features = ["console"] }
+wasm-bindgen-test = "0.3.77"
+web-sys = { version = "0.3.104", features = ["console"] }
