@@ -170,8 +170,16 @@ impl Datagrams {
         let read_buffer_size = 65536; // 65k buffers as per spec recommendation
 
         let readable_stream_reader = web_sys_stream_utils::get_reader_byob(datagrams.readable());
-        let writable = datagrams.create_writable().unwrap();
-        let writable_stream_writer = web_sys_stream_utils::get_writer(writable.into());
+        // Feature-detect `createWritable`; fall back to the legacy `writable`
+        // attribute on browsers that do not implement it yet.
+        let writable: web_sys::WritableStream = if datagrams.has_create_writable() {
+            datagrams.create_writable().unwrap().into()
+        } else {
+            #[expect(deprecated)]
+            let writable = datagrams.writable();
+            writable
+        };
+        let writable_stream_writer = web_sys_stream_utils::get_writer(writable);
 
         let read_buffer = js_sys::ArrayBuffer::new(read_buffer_size);
         let read_buffer = tokio::sync::Mutex::new(Some(read_buffer));

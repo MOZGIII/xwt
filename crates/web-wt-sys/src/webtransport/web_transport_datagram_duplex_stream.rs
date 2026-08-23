@@ -4,7 +4,7 @@
 
 use js_sys::Object;
 use wasm_bindgen::prelude::*;
-use web_sys::{DomException, ReadableStream};
+use web_sys::{DomException, ReadableStream, WritableStream};
 
 use super::*;
 
@@ -51,6 +51,21 @@ extern "C" {
     /// <https://w3c.github.io/webtransport/#dom-webtransportdatagramduplexstream-readable>
     #[wasm_bindgen(method, getter)]
     pub fn readable(this: &WebTransportDatagramDuplexStream) -> ReadableStream;
+
+    /// ```webidl
+    /// readonly attribute WritableStream writable;
+    /// ```
+    ///
+    /// The legacy way of writing the datagrams; removed from the spec in favor
+    /// of [`create_writable`][Self::create_writable], but still the only
+    /// implemented way of writing the datagrams in the current browsers.
+    ///
+    /// Use [`has_create_writable`][Self::has_create_writable] to detect
+    /// whether the runtime supports the new API.
+    #[deprecated = "removed from the spec in favor of `create_writable`"]
+    #[allow(deprecated)]
+    #[wasm_bindgen(method, getter)]
+    pub fn writable(this: &WebTransportDatagramDuplexStream) -> WritableStream;
 
     // =====
 
@@ -128,6 +143,19 @@ extern "C" {
 }
 
 impl WebTransportDatagramDuplexStream {
+    /// Detect whether the runtime implements
+    /// the [`create_writable`][Self::create_writable] API.
+    ///
+    /// Returns `false` for the runtimes that only implement the legacy
+    /// [`writable`][Self::writable] API.
+    ///
+    /// This is not part of the spec, but a utility for smoothing
+    /// the transition.
+    pub fn has_create_writable(&self) -> bool {
+        js_sys::Reflect::has(self.as_ref(), &JsValue::from_str("createWritable"))
+            .unwrap_or_default()
+    }
+
     crate::set_option_accessors! {
         /// ```webidl
         /// attribute unrestricted double? incomingMaxAge;
