@@ -1,6 +1,6 @@
 [package]
 name = "xwt-wtransport"
-version = "0.20.0"
+version = "0.20.1"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -22,7 +22,7 @@ wtransport = { version = "0.7", default-features = false, features = ["quinn"] }
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
 xwt-cert-fingerprint = { version = "0.2", path = "../xwt-cert-fingerprint" }
 xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
-xwt-tests = { version = "0.14", path = "../xwt-tests" }
+xwt-tests = { version = "0.14.1", path = "../xwt-tests" }
 
 color-eyre = "0.6"
 static_assertions = "1"

@@ -1899,7 +1899,7 @@ dependencies = [
 
 [[package]]
 name = "web-wt-sys"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "js-sys",
  "pastey",
@@ -2351,7 +2351,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-server"
-version = "0.7.7"
+version = "0.7.8"
 dependencies = [
  "color-eyre",
  "envfury",
@@ -2367,7 +2367,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-tests"
-version = "0.14.0"
+version = "0.14.1"
 dependencies = [
  "constcat",
  "thiserror",
@@ -2379,7 +2379,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web"
-version = "0.22.0"
+version = "0.22.1"
 dependencies = [
  "js-sys",
  "static_assertions",
@@ -2401,7 +2401,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.20.0"
+version = "0.20.1"
 dependencies = [
  "color-eyre",
  "static_assertions",
