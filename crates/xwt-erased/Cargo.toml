@@ -1,6 +1,6 @@
 [package]
 name = "xwt-erased"
-version = "0.6.1"
+version = "0.7.0"
 edition = "2021"
 resolver = "2"
 rust-version = "1.81"
@@ -17,8 +17,8 @@ core-compat = ["dep:xwt-core", "dep:static_assertions"]
 trace-calls = ["dep:tracing"]
 
 [dependencies]
-xwt-core = { version = "0.9", path = "../xwt-core", default-features = false, optional = true }
-xwt-dyn = { version = "0.3", path = "../xwt-dyn", default-features = false }
+xwt-core = { version = "0.10", path = "../xwt-core", default-features = false, optional = true }
+xwt-dyn = { version = "0.4", path = "../xwt-dyn", default-features = false }
 
 static_assertions = { version = "1", optional = true }
 tracing = { version = "0.1", default-features = false, optional = true }
@@ -27,9 +27,9 @@ tracing = { version = "0.1", default-features = false, optional = true }
 tracing = "0.1"
 
 [target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
-xwt-wtransport = { version = "0.19", path = "../xwt-wtransport", default-features = false }
+xwt-wtransport = { version = "0.20", path = "../xwt-wtransport", default-features = false }
 
 wtransport = { version = "0.7", default-features = false }
 
 [target.'cfg(target_family = "wasm")'.dev-dependencies]
-xwt-web = { version = "0.21", path = "../xwt-web", default-features = false }
+xwt-web = { version = "0.22", path = "../xwt-web", default-features = false }
