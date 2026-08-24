@@ -83,14 +83,14 @@ jobs:
         util:
           - name: cargo deny
             download: >
-              curl -sSL "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.18.9/cargo-deny-0.18.9-x86_64-unknown-linux-musl.tar.gz" |
+              curl -sSL "https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz" |
                 sudo tar -xzvf - -C /usr/local/bin --strip-components=1
             run: cargo-deny check --hide-inclusion-graph --show-stats
             requiresRust: true
 
           - name: taplo
             download: >
-              curl -sSL "https://github.com/tamasfe/taplo/releases/download/0.9.3/taplo-linux-x86_64.gz" |
+              curl -sSL "https://github.com/tamasfe/taplo/releases/download/0.10.0/taplo-linux-x86_64.gz" |
                 zcat > /usr/local/bin/taplo \
               && chmod +x /usr/local/bin/taplo
             run: taplo format --check
@@ -103,13 +103,13 @@ jobs:
 
           - name: cargo shear
             download: >
-              curl -sSL "https://github.com/Boshen/cargo-shear/releases/download/v1.1.8/cargo-shear-x86_64-unknown-linux-gnu.tar.gz" |
+              curl -sSL "https://github.com/Boshen/cargo-shear/releases/download/v1.13.4/cargo-shear-x86_64-unknown-linux-gnu.tar.gz" |
                 sudo tar -xzvf - -C /usr/local/bin
             run: cargo-shear
 
           - name: typos
             download: >
-              curl -sSL "https://github.com/crate-ci/typos/releases/download/v1.29.4/typos-v1.29.4-x86_64-unknown-linux-musl.tar.gz" |
+              curl -sSL "https://github.com/crate-ci/typos/releases/download/v1.49.0/typos-v1.49.0-x86_64-unknown-linux-musl.tar.gz" |
                 sudo tar -xzvf - -C /usr/local/bin
             run: typos
 
