@@ -78,3 +78,13 @@ export const all = {
 
 // A platform for running things that are platform-independent.
 export const core = all.ubuntu2404_amd64 satisfies Platform;
+
+// The preferred platforms for the operations that need a specific platform
+// kind instead of the core one.
+export const preferred = {
+  // The preferred platform for running things that need macOS.
+  macos: all.macos15_aarch64,
+} satisfies Platforms;
+
+// The name of a preferred platform that a mode can request.
+export type PreferredPlatformName = keyof typeof preferred;

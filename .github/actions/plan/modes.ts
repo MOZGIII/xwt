@@ -1,9 +1,15 @@
+import type { PreferredPlatformName } from "./platforms.js";
+
 export type Mode = {
   name: string;
   cargoCommand: string;
   cargoArgs: string;
   cargoCacheKey: string;
   platformIndependent?: true;
+  // The name of the preferred platform to run this platform-independent
+  // mode on, resolved at the plan stage; the core platform is used
+  // when unset.
+  preferredPlatform?: PreferredPlatformName;
   needsEchoServer?: true;
   env?: Record<string, string>;
 };
@@ -13,6 +19,9 @@ export type Modes = Record<string, Mode>;
 export type WasmTestBrowser = {
   name: string;
   env: Record<string, string>;
+  // The name of the preferred platform to run the tests in this browser
+  // on, resolved at the plan stage; the core platform is used when unset.
+  preferredPlatform?: PreferredPlatformName;
 };
 
 // The browsers (and their versions) to run the wasm tests in.
@@ -39,6 +48,15 @@ export const wasmTestBrowsers = {
       WASM_TEST_BROWSER_VERSION: "154.0",
       WASM_TEST_GECKODRIVER_VERSION: "0.37.1",
     },
+  },
+  safari: {
+    // Safari ships with the OS and cannot be pinned to a version;
+    // we get whatever the runner image provides.
+    name: "Safari",
+    env: {
+      WASM_TEST_BROWSER: "safari",
+    },
+    preferredPlatform: "macos",
   },
 } satisfies Record<string, WasmTestBrowser>;
 
@@ -111,6 +129,9 @@ const testWasmModes = Object.fromEntries(
         cargoCommand: "test",
         cargoArgs: "--locked --workspace --target wasm32-unknown-unknown",
         platformIndependent: true,
+        ...(browser.preferredPlatform
+          ? { preferredPlatform: browser.preferredPlatform }
+          : {}),
         cargoCacheKey: "test-wasm",
         needsEchoServer: true,
         env: browser.env,
