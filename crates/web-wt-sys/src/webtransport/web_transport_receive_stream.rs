@@ -2,7 +2,7 @@
 //!
 //! <https://w3c.github.io/webtransport/#receive-stream>
 
-use js_sys::Object;
+use js_sys::{Object, Promise};
 use wasm_bindgen::prelude::*;
 use web_sys::ReadableStream;
 
@@ -23,5 +23,5 @@ extern "C" {
     ///
     /// <https://w3c.github.io/webtransport/#dom-webtransportreceivestream-getstats>
     #[wasm_bindgen(method, js_name = getStats)]
-    pub async fn get_stats(this: &WebTransportReceiveStream) -> WebTransportReceiveStreamStats;
+    pub fn get_stats(this: &WebTransportReceiveStream) -> Promise<WebTransportReceiveStreamStats>;
 }

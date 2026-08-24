@@ -2,9 +2,9 @@
 //!
 //! <https://w3c.github.io/webtransport/#web-transport-writer-interface>
 
-use js_sys::Object;
+use js_sys::{Object, Promise};
 use wasm_bindgen::prelude::*;
-use web_sys::{DomException, WritableStreamDefaultWriter};
+use web_sys::WritableStreamDefaultWriter;
 
 #[wasm_bindgen]
 extern "C" {
@@ -40,8 +40,8 @@ extern "C" {
     /// moment will be rejected as well.
     /// Any non-atomic writes rejected in this way will error the stream.
     /// Applications are therefore encouraged to always await atomic writes.
-    #[wasm_bindgen(method, js_name = atomicWrite, catch)]
-    pub async fn atomic_write(this: &WebTransportWriter) -> Result<(), DomException>;
+    #[wasm_bindgen(method, js_name = atomicWrite)]
+    pub fn atomic_write(this: &WebTransportWriter) -> Promise;
 
     /// ```webidl
     /// Promise<undefined> atomicWrite(optional any chunk);
@@ -68,11 +68,8 @@ extern "C" {
     /// moment will be rejected as well.
     /// Any non-atomic writes rejected in this way will error the stream.
     /// Applications are therefore encouraged to always await atomic writes.
-    #[wasm_bindgen(method, js_name = atomicWrite, catch)]
-    pub async fn atomic_write_with_chunk(
-        this: &WebTransportWriter,
-        chunk: &JsValue,
-    ) -> Result<(), DomException>;
+    #[wasm_bindgen(method, js_name = atomicWrite)]
+    pub fn atomic_write_with_chunk(this: &WebTransportWriter, chunk: &JsValue) -> Promise;
 
     /// ```webidl
     /// undefined commit();
