@@ -136,6 +136,17 @@ async fn tokio_io_read_shrink_buf() {
 }
 
 #[wasm_bindgen_test]
+async fn tokio_io_read_partial_buf() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::tokio_io_read_partial_buf::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
 async fn tokio_io_read_buf_resize() {
     setup();
 
