@@ -298,9 +298,19 @@ fn wrap_recv_stream(
     transport: &Rc<web_wt_sys::WebTransport>,
     stream: web_wt_sys::WebTransportReceiveStream,
 ) -> RecvStream {
-    let reader = web_sys_stream_utils::get_reader_byob(stream.clone());
-    let reader: JsValue = reader.into();
-    let reader = reader.into();
+    // Per the WebTransport spec, the receive stream is a byte stream
+    // supporting BYOB reads (this is what Chrome and Firefox implement);
+    // Safari, however, does not implement it as a byte stream.
+    // We feature-detect BYOB support and fall back to a default reader.
+    let reader = match web_sys_stream_utils::try_get_reader_byob(stream.clone()) {
+        Ok(reader) => web_sys_async_io::reader::Mode::Byob {
+            reader,
+            internal_buf: None,
+        },
+        Err(_) => web_sys_async_io::reader::Mode::Default {
+            reader: web_sys_stream_utils::get_reader(stream.clone()),
+        },
+    };
     let reader = web_sys_async_io::Reader::new(reader);
 
     RecvStream {
@@ -561,45 +571,24 @@ pub enum StreamReadError {
     Closed,
 }
 
+impl From<web_sys_async_io::ReadError> for StreamReadError {
+    fn from(err: web_sys_async_io::ReadError) -> Self {
+        match err {
+            web_sys_async_io::ReadError::Read(err) => Self::Read(err.into()),
+            web_sys_async_io::ReadError::ByobReadConsumedBuffer => Self::ByobReadConsumedBuffer,
+        }
+    }
+}
+
 impl xwt_core::stream::Read for RecvStream {
     type Error = StreamReadError;
 
     async fn read(&mut self, buf: &mut [u8]) -> Result<NonZeroUsize, Self::Error> {
-        let requested_size = buf.len().try_into().unwrap();
-        let internal_buf = self
-            .reader
-            .internal_buf
-            .take()
-            .filter(|internal_buf| {
-                let actual_size = internal_buf.byte_length();
-                debug_assert!(actual_size > 0);
-                actual_size >= requested_size
-            })
-            .unwrap_or_else(|| js_sys::ArrayBuffer::new(requested_size));
-        let internal_buf_view =
-            js_sys::Uint8Array::new_with_byte_offset_and_length(&internal_buf, 0, requested_size);
-        let maybe_internal_buf_view =
-            web_sys_stream_utils::read_byob(&self.reader.inner, internal_buf_view)
-                .await
-                .map_err(|err| StreamReadError::Read(err.into()))?;
-        let Some(internal_buf_view) = maybe_internal_buf_view else {
-            return Err(StreamReadError::ByobReadConsumedBuffer);
-        };
+        let len = self.reader.read_into(buf).await?;
 
-        // Unwrap is safe assuming the `usize` is `u32` in wasm.
-        let len = internal_buf_view.byte_length().try_into().unwrap();
-
-        // Detect when the read is aborted because the stream was closed without
-        // an error.
-        let Some(len) = NonZeroUsize::new(len) else {
-            return Err(StreamReadError::Closed);
-        };
-
-        internal_buf_view.copy_to(&mut buf[..len.get()]);
-
-        self.reader.internal_buf = Some(internal_buf_view.buffer());
-
-        Ok(len)
+        // Detect when the read is aborted because the stream was closed
+        // without an error.
+        NonZeroUsize::new(len).ok_or(StreamReadError::Closed)
     }
 }
 
