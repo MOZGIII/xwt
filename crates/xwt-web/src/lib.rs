@@ -489,12 +489,26 @@ impl xwt_core::stream::Write for SendStream {
     }
 }
 
+/// Build the abort reason that carries the given stream error code.
+///
+/// The code only reaches the peer when the reason is a
+/// [`web_wt_sys::WebTransportError`] with the `streamErrorCode` set; for any
+/// other reason the code `0` is sent instead.
+fn stream_abort_reason(error_code: xwt_core::stream::ErrorCode) -> JsValue {
+    let options = web_wt_sys::WebTransportErrorOptions::new();
+    options.set_source(web_wt_sys::WebTransportErrorSource::Stream);
+    options.set_stream_error_code(error_code);
+    web_wt_sys::WebTransportError::new_with_init(&options).into()
+}
+
 impl xwt_core::stream::WriteAbort for SendStream {
     type Error = Error;
 
     async fn abort(self, error_code: xwt_core::stream::ErrorCode) -> Result<(), Self::Error> {
         wasm_bindgen_futures::JsFuture::from(
-            self.writer.inner.abort_with_reason(&error_code.into()),
+            self.writer
+                .inner
+                .abort_with_reason(&stream_abort_reason(error_code)),
         )
         .await
         .map(|val| {
@@ -597,7 +611,9 @@ impl xwt_core::stream::ReadAbort for RecvStream {
 
     async fn abort(self, error_code: xwt_core::stream::ErrorCode) -> Result<(), Self::Error> {
         wasm_bindgen_futures::JsFuture::from(
-            self.reader.inner.cancel_with_reason(&error_code.into()),
+            self.reader
+                .inner
+                .cancel_with_reason(&stream_abort_reason(error_code)),
         )
         .await
         .map(|_| ())
