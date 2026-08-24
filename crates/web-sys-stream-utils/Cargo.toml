@@ -1,6 +1,6 @@
 [package]
 name = "web-sys-stream-utils"
-version = "0.2.5"
+version = "0.2.6"
 edition = "2021"
 resolver = "2"
 license = "MIT"

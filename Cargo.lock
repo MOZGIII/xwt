@@ -1879,7 +1879,7 @@ dependencies = [
 
 [[package]]
 name = "web-sys-stream-utils"
-version = "0.2.5"
+version = "0.2.6"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
@@ -2379,7 +2379,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web"
-version = "0.21.1"
+version = "0.21.2"
 dependencies = [
  "js-sys",
  "static_assertions",
