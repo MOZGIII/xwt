@@ -1,6 +1,6 @@
 [package]
 name = "xwt-tests"
-version = "0.13.1"
+version = "0.14.0"
 edition = "2021"
 resolver = "2"
 license = "MIT"
@@ -12,8 +12,8 @@ environments.
 repository = "https://github.com/MOZGIII/xwt"
 
 [dependencies]
-xwt-core = { version = "0.9", path = "../xwt-core", default-features = false }
-xwt-error = { version = "0.9", path = "../xwt-error", default-features = false }
+xwt-core = { version = "0.10", path = "../xwt-core", default-features = false }
+xwt-error = { version = "0.10", path = "../xwt-error", default-features = false }
 
 constcat = "0.6"
 thiserror = "2"
