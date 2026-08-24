@@ -105,7 +105,7 @@ impl tokio::io::AsyncRead for Reader {
                 } else {
                     self.op = Op::ConsumingReadBuffer {
                         read_buffer: read_buffer.clone(),
-                        already_read: copy_size,
+                        already_read: already_read + copy_size,
                     };
                     Poll::Ready(Ok(()))
                 }
