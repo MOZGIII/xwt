@@ -56,7 +56,27 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
 
     async fn wait_connect(self) -> Result<Self::Session, Self::Error> {
         let Connecting { transport } = self;
-        wasm_bindgen_futures::JsFuture::from(transport.ready()).await?;
+
+        // Wait for whichever of the two settles first.
+        //
+        // Waiting on `ready` alone is not enough: Safari does not reliably
+        // settle it when the session fails to establish, while `closed` does
+        // settle in that case - so watching both keeps a refused session from
+        // hanging forever.
+        let ready = transport.ready();
+        let closed = transport.closed();
+        let candidates = js_sys::Array::of2(&ready, &closed);
+        let outcome =
+            wasm_bindgen_futures::JsFuture::from(js_sys::Promise::race(&candidates)).await?;
+
+        // `ready` fulfills with `undefined`, while `closed` fulfills with
+        // a close info, so any other value means the session was closed before
+        // it ever became ready.
+        if !outcome.is_undefined() {
+            return Err(Error(
+                JsError::new("xwt: the session was closed before it became ready").into(),
+            ));
+        }
 
         Ok(Session::new(transport))
     }
