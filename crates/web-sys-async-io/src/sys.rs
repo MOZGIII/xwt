@@ -4,13 +4,15 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen]
 extern "C" {
     /// A result returned by
-    /// [`ReadableStreamByobReader.read`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamByobReader/read).
+    /// [`ReadableStreamByobReader.read`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamByobReader/read)
+    /// and
+    /// [`ReadableStreamDefaultReader.read`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read).
     #[derive(Clone, Debug)]
-    pub type ReadableStreamByobReaderValue;
+    pub type ReadableStreamReaderValue;
 
     #[wasm_bindgen(method, getter, js_name = done)]
-    pub fn is_done(this: &ReadableStreamByobReaderValue) -> bool;
+    pub fn is_done(this: &ReadableStreamReaderValue) -> bool;
 
     #[wasm_bindgen(method, getter, js_name = value)]
-    pub fn value(this: &ReadableStreamByobReaderValue) -> Option<Uint8Array>;
+    pub fn value(this: &ReadableStreamReaderValue) -> Option<Uint8Array>;
 }
