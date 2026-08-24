@@ -102,6 +102,18 @@ async fn read_resize_buf() -> color_eyre::eyre::Result<()> {
 }
 
 #[tokio::test]
+async fn tokio_io_read_shrink_buf() -> color_eyre::eyre::Result<()> {
+    setup()?;
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::tokio_io_read_shrink_buf::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+        .await?;
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn session_drop() -> color_eyre::eyre::Result<()> {
     setup()?;
 
