@@ -425,3 +425,125 @@ async fn closed_bi_send_stream_with_error() {
     .await
     .unwrap();
 }
+
+#[wasm_bindgen_test]
+async fn large_payload() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::large_payload::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn multiple_streams() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::multiple_streams::run(endpoint, xwt_tests::consts::ECHO_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn uni_streams() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::uni_streams::run(endpoint, xwt_tests::consts::ECHO_UNI_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn connect_rejected() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::connect_rejected::run(endpoint, xwt_tests::consts::UNKNOWN_SERVER_URL)
+        .await
+        .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn finished_bi_read_stream() {
+    setup();
+
+    if is_firefox() {
+        // Firefox does not settle the reader `closed` promise when the peer
+        // cleanly finishes the stream (as required by
+        // <https://w3c.github.io/webtransport/#webtransportreceivestream>),
+        // so waiting for the stream finish hangs forever.
+        // No dedicated Bugzilla bug is filed for this as of 2026-08.
+        console_log!("skipping this test on Firefox: stream FIN is not propagated to the reader");
+        return;
+    }
+
+    if is_safari() {
+        // Safari does not settle the reads on a stream that was cleanly
+        // closed by the peer, so the reader `closed` promise is expected to
+        // hang here the same way it does in Firefox.
+        // No dedicated WebKit bug is filed for this as of 2026-08; the spec
+        // compliance umbrella issue:
+        // - <https://bugs.webkit.org/show_bug.cgi?id=297534>
+        console_log!("skipping this test on Safari: stream FIN is not propagated to the reader");
+        return;
+    }
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::finished_bi_read_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/send"),
+    )
+    .await
+    .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn aborted_bi_read_stream_with_error() {
+    setup();
+
+    if is_safari() {
+        // Safari does not propagate a `RESET_STREAM` to the receive stream at
+        // all (as required by
+        // <https://w3c.github.io/webtransport/#webtransportreceivestream>),
+        // so the reader `closed` promise never settles and waiting for
+        // the read stream abortion hangs forever.
+        // No dedicated WebKit bug is filed for this as of 2026-08; the spec
+        // compliance umbrella issue:
+        // - <https://bugs.webkit.org/show_bug.cgi?id=297534>
+        console_log!("skipping this test on Safari: RESET_STREAM is not propagated to the reads");
+        return;
+    }
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::aborted_bi_read_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/send/error"),
+        123,
+    )
+    .await
+    .unwrap();
+}
+
+#[wasm_bindgen_test]
+async fn abort_bi_send_stream() {
+    setup();
+
+    let endpoint = test_endpoint();
+
+    xwt_tests::tests::abort_bi_send_stream::run(
+        endpoint,
+        xwt_tests::concat!(xwt_tests::consts::ABORT_SERVER_URL, "/bi/send"),
+        123,
+    )
+    .await
+    .unwrap();
+}
