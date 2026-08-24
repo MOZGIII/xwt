@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export SAFARIDRIVER="${SAFARIDRIVER:-/usr/bin/safaridriver}"
+
+exec cargo test --target wasm32-unknown-unknown "$@"

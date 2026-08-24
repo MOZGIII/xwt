@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  printf "Safari is only available on macOS\n" >&2
+  exit 1
+fi
+
+# Safari and safaridriver ship with macOS; we just need to enable
+# the automation support.
+sudo safaridriver --enable
