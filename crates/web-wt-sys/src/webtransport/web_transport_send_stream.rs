@@ -2,7 +2,7 @@
 //!
 //! <https://w3c.github.io/webtransport/#send-stream>
 
-use js_sys::Object;
+use js_sys::{Object, Promise};
 use wasm_bindgen::prelude::*;
 use web_sys::{DomException, WritableStream};
 
@@ -58,7 +58,7 @@ extern "C" {
     ///
     /// <https://w3c.github.io/webtransport/#dom-webtransportsendstream-getstats>
     #[wasm_bindgen(method, js_name = getStats)]
-    pub async fn get_stats(this: &WebTransportSendStream) -> WebTransportSendStreamStats;
+    pub fn get_stats(this: &WebTransportSendStream) -> Promise<WebTransportSendStreamStats>;
 
     /// ```webidl
     /// WebTransportWriter getWriter();

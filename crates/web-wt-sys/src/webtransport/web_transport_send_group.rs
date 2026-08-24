@@ -3,7 +3,7 @@
 //! <https://w3c.github.io/webtransport/#sendGroup>
 
 use super::*;
-use js_sys::Object;
+use js_sys::{Object, Promise};
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -22,5 +22,5 @@ extern "C" {
     /// Aggregates stats from all WebTransportSendStreams grouped under this
     /// sendGroup, and reports the result asynchronously.
     #[wasm_bindgen(method, js_name = getStats)]
-    pub async fn get_stats(this: &WebTransportSendGroup) -> WebTransportSendStreamStats;
+    pub fn get_stats(this: &WebTransportSendGroup) -> Promise<WebTransportSendStreamStats>;
 }

@@ -56,7 +56,7 @@ impl xwt_core::endpoint::connect::Connecting for Connecting {
 
     async fn wait_connect(self) -> Result<Self::Session, Self::Error> {
         let Connecting { transport } = self;
-        transport.ready().await?;
+        wasm_bindgen_futures::JsFuture::from(transport.ready()).await?;
 
         Ok(Session::new(transport))
     }
@@ -347,7 +347,8 @@ impl xwt_core::session::stream::OpenBi for Session {
 
     async fn open_bi(&self) -> Result<Self::Opening, Self::Error> {
         let transport = self.transport_ref();
-        let value = transport.create_bidirectional_stream().await?;
+        let value =
+            wasm_bindgen_futures::JsFuture::from(transport.create_bidirectional_stream()).await?;
         let value = wrap_bi_stream(transport, value);
         Ok(xwt_core::utils::dummy::OpeningBiStream(value))
     }
@@ -384,7 +385,8 @@ impl xwt_core::session::stream::OpenUni for Session {
 
     async fn open_uni(&self) -> Result<Self::Opening, Self::Error> {
         let transport = self.transport_ref();
-        let value = transport.create_unidirectional_stream().await?;
+        let value =
+            wasm_bindgen_futures::JsFuture::from(transport.create_unidirectional_stream()).await?;
         let send_stream = wrap_send_stream(transport, value);
         Ok(xwt_core::utils::dummy::OpeningUniStream(send_stream))
     }

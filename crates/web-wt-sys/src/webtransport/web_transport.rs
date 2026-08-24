@@ -2,7 +2,7 @@
 //!
 //! <https://w3c.github.io/webtransport/#webtransport>
 
-use js_sys::Object;
+use js_sys::{Object, Promise};
 use wasm_bindgen::prelude::*;
 use web_sys::{DomException, Headers, ReadableStream};
 
@@ -53,7 +53,7 @@ extern "C" {
     /// Gathers stats for this WebTransport's underlying connection and reports
     /// the result asynchronously.
     #[wasm_bindgen(method, js_name = getStats)]
-    pub async fn get_stats(this: &WebTransport) -> WebTransportConnectionStats;
+    pub fn get_stats(this: &WebTransport) -> Promise<WebTransportConnectionStats>;
 
     /// ```webidl
     /// [NewObject] Promise<Uint8Array> exportKeyingMaterial(BufferSource label, BufferSource context, unsigned long outputLength);
@@ -65,13 +65,13 @@ extern "C" {
     /// ([RFC9846] Section 7.3) for the TLS session uniquely associated with
     /// this WebTransport's underlying connection.
     /// Both `label` and `context` must be at most 255 bytes long.
-    #[wasm_bindgen(method, js_name = exportKeyingMaterial, catch)]
-    pub async fn export_keying_material(
+    #[wasm_bindgen(method, js_name = exportKeyingMaterial)]
+    pub fn export_keying_material(
         this: &WebTransport,
         label: &[u8],
         context: &[u8],
         output_length: u32,
-    ) -> Result<js_sys::Uint8Array, DomException>;
+    ) -> Promise<js_sys::Uint8Array>;
 
     /// ```webidl
     /// readonly attribute Promise<undefined> ready;
@@ -81,8 +81,8 @@ extern "C" {
     ///
     /// A promise fulfilled when the associated WebTransport session gets
     /// established, or rejected if the establishment process failed.
-    #[wasm_bindgen(method, getter, catch)]
-    pub async fn ready(this: &WebTransport) -> Result<(), DomException>;
+    #[wasm_bindgen(method, getter)]
+    pub fn ready(this: &WebTransport) -> Promise;
 
     /// ```webidl
     /// readonly attribute WebTransportReliabilityMode reliability;
@@ -213,8 +213,8 @@ extern "C" {
     /// A promise fulfilled when the associated WebTransport object is closed
     /// gracefully, or rejected when it is closed abruptly or
     /// failed on initialization.
-    #[wasm_bindgen(method, getter, catch)]
-    pub async fn closed(this: &WebTransport) -> Result<WebTransportCloseInfo, DomException>;
+    #[wasm_bindgen(method, getter)]
+    pub fn closed(this: &WebTransport) -> Promise<WebTransportCloseInfo>;
 
     /// ```webidl
     /// readonly attribute Promise<undefined> draining;
@@ -225,7 +225,7 @@ extern "C" {
     /// A promise fulfilled when the associated WebTransport session receives
     /// a DRAIN_WEBTRANSPORT_SESSION capsule or a GOAWAY frame.
     #[wasm_bindgen(method, getter)]
-    pub async fn draining(this: &WebTransport);
+    pub fn draining(this: &WebTransport) -> Promise;
 
     /// ```webidl
     /// undefined close(optional WebTransportCloseInfo closeInfo = {});
@@ -269,10 +269,10 @@ extern "C" {
     /// bidirectional stream.
     /// Note that the mere creation of a stream is not immediately visible
     /// to the peer until it is used to send data.
-    #[wasm_bindgen(method, js_name = createBidirectionalStream, catch)]
-    pub async fn create_bidirectional_stream(
+    #[wasm_bindgen(method, js_name = createBidirectionalStream)]
+    pub fn create_bidirectional_stream(
         this: &WebTransport,
-    ) -> Result<WebTransportBidirectionalStream, DomException>;
+    ) -> Promise<WebTransportBidirectionalStream>;
 
     /// ```webidl
     /// Promise<WebTransportBidirectionalStream> createBidirectionalStream(
@@ -285,11 +285,11 @@ extern "C" {
     /// bidirectional stream.
     /// Note that the mere creation of a stream is not immediately visible
     /// to the peer until it is used to send data.
-    #[wasm_bindgen(method, js_name = createBidirectionalStream, catch)]
-    pub async fn create_bidirectional_stream_with_options(
+    #[wasm_bindgen(method, js_name = createBidirectionalStream)]
+    pub fn create_bidirectional_stream_with_options(
         this: &WebTransport,
         options: WebTransportSendStreamOptions,
-    ) -> Result<WebTransportBidirectionalStream, DomException>;
+    ) -> Promise<WebTransportBidirectionalStream>;
 
     /// ```webidl
     /// /* a ReadableStream of WebTransportBidirectionalStream objects */
@@ -316,10 +316,8 @@ extern "C" {
     /// stream.
     /// Note that the mere creation of a stream is not immediately visible
     /// to the server until it is used to send data.
-    #[wasm_bindgen(method, js_name = createUnidirectionalStream, catch)]
-    pub async fn create_unidirectional_stream(
-        this: &WebTransport,
-    ) -> Result<WebTransportSendStream, DomException>;
+    #[wasm_bindgen(method, js_name = createUnidirectionalStream)]
+    pub fn create_unidirectional_stream(this: &WebTransport) -> Promise<WebTransportSendStream>;
 
     /// ```webidl
     /// Promise<WebTransportSendStream> createUnidirectionalStream(
@@ -332,11 +330,11 @@ extern "C" {
     /// stream.
     /// Note that the mere creation of a stream is not immediately visible
     /// to the server until it is used to send data.
-    #[wasm_bindgen(method, js_name = createUnidirectionalStream, catch)]
-    pub async fn create_unidirectional_stream_with_options(
+    #[wasm_bindgen(method, js_name = createUnidirectionalStream)]
+    pub fn create_unidirectional_stream_with_options(
         this: &WebTransport,
         options: WebTransportSendStreamOptions,
-    ) -> Result<WebTransportSendStream, DomException>;
+    ) -> Promise<WebTransportSendStream>;
 
     /// ```webidl
     /// /* a ReadableStream of WebTransportReceiveStream objects */
