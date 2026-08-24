@@ -28,7 +28,7 @@ pub mod utils {
 }
 
 pub mod prelude {
-    //! A prelude of the ferquently used types.
+    //! A prelude of the frequently used types.
 
     pub use crate::base::Session as _;
     pub use crate::endpoint::accept::{Accept as _, Accepting as _, Request as _};

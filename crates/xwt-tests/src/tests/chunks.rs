@@ -7,7 +7,7 @@ where
     Endpoint::Connecting: std::fmt::Debug,
     ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
 
-    WriteChunk: xwt_core::WriteableChunk + std::fmt::Debug,
+    WriteChunk: xwt_core::WritableChunk + std::fmt::Debug,
     ReadChunk: xwt_core::ReadableChunk + std::fmt::Debug,
 
     SendStreamFor<ConnectSessionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,
@@ -36,10 +36,10 @@ where
     Endpoint::Connecting: std::fmt::Debug,
     ConnectSessionFor<Endpoint>: xwt_core::session::stream::OpenBi + std::fmt::Debug,
 
-    WriteChunk: xwt_core::WriteableChunk + std::fmt::Debug,
+    WriteChunk: xwt_core::WritableChunk + std::fmt::Debug,
     ReadChunk: xwt_core::ReadableChunk + std::fmt::Debug,
 
-    <WriteChunk as xwt_core::WriteableChunk>::Data<'static>: From<&'static [u8]>,
+    <WriteChunk as xwt_core::WritableChunk>::Data<'static>: From<&'static [u8]>,
     for<'a> <ReadChunk as xwt_core::ReadableChunk>::Data<'a>: AsRef<[u8]>,
 
     SendStreamFor<ConnectSessionFor<Endpoint>>: xwt_core::WriteChunk<WriteChunk>,

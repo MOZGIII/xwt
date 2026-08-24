@@ -184,14 +184,14 @@ pub trait ReadChunk<ChunkType: ?Sized + ReadableChunk>: maybe::Send {
 }
 
 /// Write a [`Chunk`] to a stream.
-pub trait WriteChunk<ChunkType: ?Sized + WriteableChunk>: maybe::Send {
+pub trait WriteChunk<ChunkType: ?Sized + WritableChunk>: maybe::Send {
     /// An error that can occur while writing the chunk to a stream.
     type Error: Error + maybe::Send + maybe::Sync + 'static;
 
     /// Write the data with the offset information from a stream.
     fn write_chunk<'a>(
         &'a mut self,
-        buf: <ChunkType as WriteableChunk>::Data<'a>,
+        buf: <ChunkType as WritableChunk>::Data<'a>,
     ) -> impl Future<Output = Result<(), Self::Error>> + 'a + maybe::Send;
 }
 
@@ -204,14 +204,14 @@ pub trait ReadableChunk: maybe::Send {
 
 /// Something that specifies the data type for a [`Chunk`] that can
 /// be written to a stream.
-pub trait WriteableChunk: maybe::Send {
+pub trait WritableChunk: maybe::Send {
     /// The type that will hold the data to write.
     type Data<'a>: From<&'a [u8]>;
 }
 
 #[cfg(feature = "alloc")]
 pub mod chunk {
-    //! Provided [`ReadableChunk`] and [`WriteableChunk`] implementations.
+    //! Provided [`ReadableChunk`] and [`WritableChunk`] implementations.
 
     use super::*;
 
@@ -220,7 +220,7 @@ pub mod chunk {
     #[derive(Debug)]
     pub struct U8;
 
-    impl WriteableChunk for U8 {
+    impl WritableChunk for U8 {
         type Data<'b> = &'b [u8];
     }
 
