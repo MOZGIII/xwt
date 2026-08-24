@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Verify that every publishable crate whose contents changed since its last
+# release got a version bump.
+#
+# A crate is stale when its current version is already published on
+# crates.io, yet there are commits touching the crate after the commit that
+# set that version - meaning the changes would silently never reach
+# the registry.
+#
+# Requires full git history (in CI: actions/checkout with fetch-depth: 0).
+
+published_versions() {
+  # Fetch the published versions of a crate from the sparse registry index.
+  local name="$1" path
+  case "${#name}" in
+    1) path="1/$name" ;;
+    2) path="2/$name" ;;
+    3) path="3/${name:0:1}/$name" ;;
+    *) path="${name:0:2}/${name:2:2}/$name" ;;
+  esac
+  curl -sSf --retry 3 "https://index.crates.io/$path" |
+    sed -n 's/.*"vers":"\([^"]*\)".*/\1/p'
+}
+
+publishable_packages() {
+  # Print a `name<TAB>version<TAB>directory` line per publishable package.
+  cargo metadata --no-deps --format-version 1 |
+    jq -r '
+      .workspace_root as $root |
+      .packages[]
+      | select(.publish != [])
+      | [
+          .name,
+          .version,
+          (.manifest_path | rtrimstr("/Cargo.toml") | ltrimstr($root + "/"))
+        ]
+      | @tsv
+    '
+}
+
+STALE=0
+while IFS=$'\t' read -r crate version dir; do
+  if ! published_versions "$crate" | grep -qxF "$version"; then
+    printf 'ok:    %s %s (not published yet)\n' "$crate" "$version"
+    continue
+  fi
+
+  bump_commit="$(
+    git log --format=%H -S"version = \"$version\"" -- "$dir/Cargo.toml" |
+      tail -n 1
+  )"
+  if [[ -z "$bump_commit" ]]; then
+    printf 'error: %s %s - cannot find the version bump commit\n' \
+      "$crate" "$version"
+    STALE=1
+    continue
+  fi
+
+  commits_since="$(git rev-list --count "$bump_commit..HEAD" -- "$dir")"
+  if [[ "$commits_since" == "0" ]]; then
+    printf 'ok:    %s %s\n' "$crate" "$version"
+  else
+    printf 'STALE: %s %s is published but has %s commits since its release\n' \
+      "$crate" "$version" "$commits_since"
+    STALE=1
+  fi
+done < <(publishable_packages)
+
+exit "$STALE"

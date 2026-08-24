@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Verify that publishing the workspace crates in their current state will not
+# break consumers building from crates.io.
+#
+# Packaging all the publishable crates in one `cargo package` invocation
+# builds every packaged crate against the real registry, with the
+# not-yet-published sibling versions provided through a local overlay
+# registry.
+#
+# The crates gate their contents by target family, so a verify build for
+# the wrong target compiles a crate to nothing and catches nothing.
+# Run the verify for both target families.
+#
+# Extra arguments are passed through to `cargo package`; use `--allow-dirty`
+# to run with uncommitted changes in the working tree.
+
+# `--workspace` would also package the unpublishable members, so select
+# the publishable packages explicitly.
+PACKAGES=()
+while IFS= read -r name; do
+  PACKAGES+=(-p "$name")
+done < <(
+  cargo metadata --no-deps --format-version 1 |
+    jq -r '.packages[] | select(.publish != []) | .name'
+)
+
+cargo package "${PACKAGES[@]}" "$@"
+cargo package "${PACKAGES[@]}" --target wasm32-unknown-unknown "$@"
