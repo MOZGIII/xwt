@@ -17,17 +17,31 @@ fn setup() {
     });
 }
 
+/// Obtain the user agent string.
+fn user_agent() -> String {
+    js_sys::Reflect::get(&js_sys::global(), &"navigator".into())
+        .and_then(|navigator| js_sys::Reflect::get(&navigator, &"userAgent".into()))
+        .ok()
+        .and_then(|user_agent| user_agent.as_string())
+        .unwrap_or_default()
+}
+
 /// Detect Firefox from the user agent string.
 ///
 /// Used to skip the tests that exercise the WebTransport behaviors that
 /// Firefox does not implement properly yet.
 fn is_firefox() -> bool {
-    let user_agent = js_sys::Reflect::get(&js_sys::global(), &"navigator".into())
-        .and_then(|navigator| js_sys::Reflect::get(&navigator, &"userAgent".into()))
-        .ok()
-        .and_then(|user_agent| user_agent.as_string())
-        .unwrap_or_default();
-    user_agent.contains("Firefox")
+    user_agent().contains("Firefox")
+}
+
+/// Detect Safari from the user agent string.
+///
+/// Used to skip the tests that exercise the WebTransport behaviors that
+/// Safari does not implement properly yet.
+fn is_safari() -> bool {
+    // The Chrome user agent contains "Safari" too, so rule it out.
+    let user_agent = user_agent();
+    user_agent.contains("Safari") && !user_agent.contains("Chrome")
 }
 
 fn test_endpoint() -> xwt_web::Endpoint {
@@ -171,6 +185,9 @@ async fn session_drop() {
             // Firefox reports the reads canceled by the session closure with
             // the name of the operation that caused the cancellation.
             "WebTransportError: close()",
+            // Safari reports the reads canceled by the session closure with
+            // a generic abort error.
+            "AbortError: The operation was aborted.",
         ];
         let actual_error = error.to_string();
 
@@ -217,6 +234,20 @@ async fn closed_uni_stream() {
         return;
     }
 
+    if is_safari() {
+        // Safari has the same issue as Firefox: the writer `closed` promise
+        // is not rejected when the peer sends a `STOP_SENDING` (as required
+        // by <https://w3c.github.io/webtransport/#webtransportsendstream>),
+        // so waiting for the send stream abortion hangs forever.
+        // No dedicated WebKit bug is filed for this as of 2026-08; the spec
+        // compliance umbrella issue:
+        // - <https://bugs.webkit.org/show_bug.cgi?id=297534>
+        console_log!(
+            "skipping this test on Safari: STOP_SENDING is not propagated to the send stream"
+        );
+        return;
+    }
+
     let endpoint = test_endpoint();
 
     xwt_tests::tests::closed_uni_stream::run(
@@ -245,6 +276,20 @@ async fn closed_uni_stream_with_error() {
         return;
     }
 
+    if is_safari() {
+        // Safari has the same issue as Firefox: the writer `closed` promise
+        // is not rejected when the peer sends a `STOP_SENDING` (as required
+        // by <https://w3c.github.io/webtransport/#webtransportsendstream>),
+        // so waiting for the send stream abortion hangs forever.
+        // No dedicated WebKit bug is filed for this as of 2026-08; the spec
+        // compliance umbrella issue:
+        // - <https://bugs.webkit.org/show_bug.cgi?id=297534>
+        console_log!(
+            "skipping this test on Safari: STOP_SENDING is not propagated to the send stream"
+        );
+        return;
+    }
+
     let endpoint = test_endpoint();
 
     xwt_tests::tests::closed_uni_stream::run(
@@ -259,6 +304,20 @@ async fn closed_uni_stream_with_error() {
 #[wasm_bindgen_test]
 async fn closed_bi_read_stream() {
     setup();
+
+    if is_safari() {
+        // Safari does not reject the writer `closed` promise when the peer
+        // sends a `STOP_SENDING` (as required by
+        // <https://w3c.github.io/webtransport/#webtransportsendstream>),
+        // so waiting for the send stream abortion hangs forever.
+        // No dedicated WebKit bug is filed for this as of 2026-08; the spec
+        // compliance umbrella issue:
+        // - <https://bugs.webkit.org/show_bug.cgi?id=297534>
+        console_log!(
+            "skipping this test on Safari: STOP_SENDING is not propagated to the send stream"
+        );
+        return;
+    }
 
     let endpoint = test_endpoint();
 
@@ -275,6 +334,20 @@ async fn closed_bi_read_stream() {
 async fn closed_bi_read_stream_with_error() {
     setup();
 
+    if is_safari() {
+        // Safari does not reject the writer `closed` promise when the peer
+        // sends a `STOP_SENDING` (as required by
+        // <https://w3c.github.io/webtransport/#webtransportsendstream>),
+        // so waiting for the send stream abortion hangs forever.
+        // No dedicated WebKit bug is filed for this as of 2026-08; the spec
+        // compliance umbrella issue:
+        // - <https://bugs.webkit.org/show_bug.cgi?id=297534>
+        console_log!(
+            "skipping this test on Safari: STOP_SENDING is not propagated to the send stream"
+        );
+        return;
+    }
+
     let endpoint = test_endpoint();
 
     xwt_tests::tests::closed_bi_read_stream::run(
@@ -289,6 +362,17 @@ async fn closed_bi_read_stream_with_error() {
 #[wasm_bindgen_test]
 async fn closed_bi_send_stream() {
     setup();
+
+    if is_safari() {
+        // Safari does not settle the reads on a stream that was cleanly
+        // closed by the peer: the end of stream is never signaled to
+        // the reader, so the read hangs forever.
+        // No dedicated WebKit bug is filed for this as of 2026-08; the spec
+        // compliance umbrella issue:
+        // - <https://bugs.webkit.org/show_bug.cgi?id=297534>
+        console_log!("skipping this test on Safari: stream FIN is not propagated to the reads");
+        return;
+    }
 
     let endpoint = test_endpoint();
 
@@ -316,6 +400,18 @@ async fn closed_bi_send_stream_with_error() {
         console_log!(
             "skipping this test on Firefox: RESET_STREAM error code is not exposed to reads"
         );
+        return;
+    }
+
+    if is_safari() {
+        // Safari does not settle the reads on a stream that got
+        // a `RESET_STREAM` at all (as required by
+        // <https://w3c.github.io/webtransport/#webtransportreceivestream>),
+        // so the read hangs forever.
+        // No dedicated WebKit bug is filed for this as of 2026-08; the spec
+        // compliance umbrella issue:
+        // - <https://bugs.webkit.org/show_bug.cgi?id=297534>
+        console_log!("skipping this test on Safari: RESET_STREAM is not propagated to the reads");
         return;
     }
 
