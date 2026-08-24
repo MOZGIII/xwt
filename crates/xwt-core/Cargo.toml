@@ -11,10 +11,10 @@ Write once, run anywhere.
 """
 repository = "https://github.com/MOZGIII/xwt"
 
-[dependencies]
-
 [features]
 default = ["std"]
 
 alloc = []
 std = ["alloc"]
+
+[dependencies]

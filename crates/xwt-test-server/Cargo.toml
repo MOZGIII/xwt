@@ -16,6 +16,11 @@ name = "xwt-test-server"
 path = "src/main.rs"
 required-features = ["bin"]
 
+[features]
+default = ["bin"]
+
+bin = ["dep:color-eyre", "dep:envfury", "dep:tracing-subscriber", "tokio/macros", "wtransport/ring"]
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwt-cert-fingerprint = { version = "0.2", path = "../xwt-cert-fingerprint" }
 xwt-test-assets = { version = "0.2", path = "../xwt-test-assets" }
@@ -28,7 +33,3 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", optional = true }
 typle = "0.13"
 wtransport = { version = "0.7", default-features = false, features = ["quinn"] }
-
-[features]
-bin = ["dep:color-eyre", "dep:envfury", "dep:tracing-subscriber", "tokio/macros", "wtransport/ring"]
-default = ["bin"]

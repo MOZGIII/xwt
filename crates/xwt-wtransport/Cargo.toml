@@ -9,6 +9,9 @@ An implementation of the xwt that runs natively via wtransport crate.
 """
 repository = "https://github.com/MOZGIII/xwt"
 
+[features]
+default = ["tokio", "wtransport/ring"]
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 xwt-core = { version = "0.9", path = "../xwt-core", default-features = false, features = ["std"] }
 
@@ -26,6 +29,3 @@ static_assertions = "1"
 tokio = { version = "1", features = ["macros"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
-
-[features]
-default = ["tokio", "wtransport/ring"]
