@@ -112,9 +112,15 @@ the sha256-authenticated certificates, i.e. when not using WebPKI).
    bin/wasm-test-firefox
    ```
 
+   or (macOS only)
+
+   ```shell
+   bin/wasm-test-safari
+   ```
+
    For this step, you might have to install some extra dependencies;
-   you can use `bin/wasm-test-setup-chrome` and `bin/wasm-test-setup-firefox`
-   to help with that.
+   you can use `bin/wasm-test-setup-chrome`, `bin/wasm-test-setup-firefox`
+   and `bin/wasm-test-setup-safari` to help with that.
 
 ### Microapp Example
 
