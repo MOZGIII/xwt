@@ -10,5 +10,6 @@ pub mod session_drop;
 pub mod streams;
 pub mod tokio_io;
 pub mod tokio_io_read_buf_resize;
+pub mod tokio_io_read_partial_buf;
 pub mod tokio_io_read_shrink_buf;
 pub mod tokio_io_read_small_buf;

@@ -51,6 +51,12 @@ impl tokio::io::AsyncRead for Reader {
         cx: &mut std::task::Context<'_>,
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> Poll<std::io::Result<()>> {
+        // A read into a buffer with no remaining capacity must complete
+        // immediately without requesting more data from the stream.
+        if buf.remaining() == 0 {
+            return Poll::Ready(Ok(()));
+        }
+
         match self.op {
             Op::ReadPending(ref mut fut) => {
                 let result = ready!(Pin::new(fut).poll(cx));
@@ -111,7 +117,7 @@ impl tokio::io::AsyncRead for Reader {
                 }
             }
             Op::Idle => {
-                let requested_size = buf.capacity().try_into().unwrap();
+                let requested_size = buf.remaining().try_into().unwrap();
                 let internal_buf = self
                     .internal_buf
                     .take()
