@@ -341,10 +341,10 @@ fn wrap_bi_stream(
     transport: &Rc<web_wt_sys::WebTransport>,
     stream: web_wt_sys::WebTransportBidirectionalStream,
 ) -> (SendStream, RecvStream) {
-    let writeable = stream.writable();
+    let writable = stream.writable();
     let readable = stream.readable();
 
-    let send_stream = wrap_send_stream(transport, writeable);
+    let send_stream = wrap_send_stream(transport, writable);
     let recv_stream = wrap_recv_stream(transport, readable);
 
     (send_stream, recv_stream)
@@ -566,7 +566,7 @@ pub enum StreamReadError {
     #[error("read error: {0}")]
     Read(Error),
 
-    /// The stream was closed, and there is no more data to exect there.
+    /// The stream was closed, and there is no more data to expect there.
     #[error("stream closed")]
     Closed,
 }
