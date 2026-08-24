@@ -26,11 +26,16 @@ export const buildMatrix = <M extends modes.Modes>(
   );
 
   // Compute the individual mixins for indep modes.
-  const includes = activePlatformIndependentModes.map((mode) => ({
-    // Run the platform independent tests on the core platform.
-    platform: platforms.core,
-    mode,
-  }));
+  const includes = activePlatformIndependentModes.map(
+    ({ preferredPlatform, ...mode }) => ({
+      // Run the platform independent tests on the core platform, unless
+      // the mode requests a specific preferred platform.
+      platform: preferredPlatform
+        ? platforms.preferred[preferredPlatform]
+        : platforms.core,
+      mode,
+    })
+  );
 
   // Prepare the effective matrix.
   const plan = evalMatrix(
