@@ -3,6 +3,7 @@ export type RunnerOS =
   | "ubuntu-24.04-arm"
   | "macos-15" // arm
   | "macos-15-large" // intel
+  | "macos-26" // arm
   | "windows-latest";
 
 export type Platform = {
@@ -68,9 +69,19 @@ export const all = {
     name: "macOS 15 (aarch64)",
     os: "macos-15",
     buildEnvScript: buildEnvScriptPath("macos.sh"),
-    essential: true,
+    essential: false,
     env: {},
     cacheKey: "macos15-aarch64",
+    artifactMarker: "aarch64-macos15",
+    isBroken: false,
+  },
+  macos26_aarch64: {
+    name: "macOS 26 (aarch64)",
+    os: "macos-26",
+    buildEnvScript: buildEnvScriptPath("macos.sh"),
+    essential: true,
+    env: {},
+    cacheKey: "macos26-aarch64",
     artifactMarker: "aarch64",
     isBroken: false,
   },
@@ -83,7 +94,7 @@ export const core = all.ubuntu2404_amd64 satisfies Platform;
 // kind instead of the core one.
 export const preferred = {
   // The preferred platform for running things that need macOS.
-  macos: all.macos15_aarch64,
+  macos: all.macos26_aarch64,
 } satisfies Platforms;
 
 // The name of a preferred platform that a mode can request.
