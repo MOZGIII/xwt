@@ -159,9 +159,11 @@ impl Drop for Session {
 /// The reader for the datagrams readable stream.
 ///
 /// Per the WebTransport spec, the datagrams readable is a regular (non-byte)
-/// [`web_sys::ReadableStream`], which only supports default readers
-/// (this is what Firefox implements); Chrome, however, exposes it as
-/// a byte stream, allowing BYOB reads.
+/// [`web_sys::ReadableStream`], which only supports default readers. Setting
+/// `datagramsReadableType` to `"bytes"` enables BYOB reading. Chromium has historically allowed
+/// BYOB even without `datagramsReadableType` set, but this behavior contradicts the latest
+/// WebTransport spec and we must not rely on it.
+///
 /// We feature-detect BYOB support and fall back to a default reader.
 #[derive(Debug)]
 pub enum DatagramsReader {
