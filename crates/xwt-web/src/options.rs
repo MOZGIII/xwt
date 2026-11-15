@@ -41,6 +41,8 @@ pub struct WebTransportOptions {
     /// challenging, such as hosts that are not publicly routable, or ephemeral
     /// hosts like virtual machines.
     pub server_certificate_hashes: Vec<CertificateHash>,
+    /// The readable stream type for datagrams.
+    pub datagrams_readable_type: ReadableStreamType,
 }
 
 /// The application's preference that the congestion control algorithm used when
@@ -55,6 +57,16 @@ pub enum CongestionControl {
     Throughput,
     /// Favour low latency.
     LowLatency,
+}
+
+/// The readable stream type for datagrams.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+pub enum ReadableStreamType {
+    /// Use the browser default by omitting the stream type option.
+    Default,
+    /// A byte stream supporting BYOB reads.
+    #[default]
+    Bytes,
 }
 
 /// Hash of a server certificate which the transport can connect to.
@@ -97,6 +109,13 @@ impl WebTransportOptions {
             CongestionControl::LowLatency => web_wt_sys::WebTransportCongestionControl::LowLatency,
         });
         js.set_require_unreliable(self.require_unreliable);
+        // Allow users to request a byte stream (required for BYOB) or another stream type.
+        match self.datagrams_readable_type {
+            ReadableStreamType::Default => {}
+            ReadableStreamType::Bytes => {
+                js.set_datagrams_readable_type(web_sys::ReadableStreamType::Bytes);
+            }
+        }
 
         let cert_hashes = self
             .server_certificate_hashes
