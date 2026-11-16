@@ -49,6 +49,14 @@ export const wasmTestBrowsers = {
       WASM_TEST_GECKODRIVER_VERSION: "0.37.1",
     },
   },
+  firefox_160: {
+    name: "Firefox 160.0",
+    env: {
+      WASM_TEST_BROWSER: "firefox",
+      WASM_TEST_BROWSER_VERSION: "160.0",
+      WASM_TEST_GECKODRIVER_VERSION: "0.37.1",
+    },
+  },
   safari: {
     // Safari ships with the OS and cannot be pinned to a version;
     // we get whatever the runner image provides.
