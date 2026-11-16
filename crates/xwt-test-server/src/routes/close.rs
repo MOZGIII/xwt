@@ -18,7 +18,7 @@ pub async fn accept_and_close_uni_streams(
     let session = session.as_ref();
     loop {
         let stream = session.accept_uni().await?;
-        stream.stop(0u8.into());
+        stream.stop(webtransport_code_to_http_code(0));
     }
 }
 
@@ -58,7 +58,7 @@ pub async fn accept_and_close_bi_recv_streams(
     let session = session.as_ref();
     loop {
         let (_send_stream, recv_stream) = session.accept_bi().await?;
-        recv_stream.stop(0u8.into());
+        recv_stream.stop(webtransport_code_to_http_code(0));
     }
 }
 

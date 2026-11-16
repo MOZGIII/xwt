@@ -537,6 +537,12 @@ async fn aborted_bi_read_stream_with_error() {
 async fn abort_bi_send_stream() {
     setup();
 
+    let options = web_wt_sys::WebTransportErrorOptions::new();
+    options.set_source(web_wt_sys::WebTransportErrorSource::Stream);
+    options.set_stream_error_code(123);
+    let reason = web_wt_sys::WebTransportError::new_with_init(&options);
+    assert_eq!(reason.stream_error_code(), Some(123));
+
     let endpoint = test_endpoint();
 
     xwt_tests::tests::abort_bi_send_stream::run(
