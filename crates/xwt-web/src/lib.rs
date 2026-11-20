@@ -516,10 +516,30 @@ impl xwt_core::stream::Write for SendStream {
 /// The code only reaches the peer when the reason is a
 /// [`web_wt_sys::WebTransportError`] with the `streamErrorCode` set; for any
 /// other reason the code `0` is sent instead.
+///
+/// Engines differ in which constructor form they implement, so we try both:
+///
+/// - the spec form first: engines with only the legacy form throw on it,
+///   while engines with the spec form (such as Firefox 160) accept the legacy
+///   form without throwing but drop the code, so the reverse order would never
+///   reach the spec form there;
+/// - then the legacy form.
+///
+/// A form only counts when the resulting error reads back the code. If neither
+/// does, we use the legacy-form error anyway. That happens on engines with
+/// only the legacy form for codes above `255`, which that form cannot carry,
+/// so the peer gets a different code than the one given.
 fn stream_abort_reason(error_code: xwt_core::stream::ErrorCode) -> JsValue {
     let options = web_wt_sys::WebTransportErrorOptions::new();
     options.set_source(web_wt_sys::WebTransportErrorSource::Stream);
     options.set_stream_error_code(error_code);
+
+    if let Ok(error) = web_wt_sys::WebTransportError::new_with_message_and_options("", &options) {
+        if error.stream_error_code() == Some(error_code) {
+            return error.into();
+        }
+    }
+
     web_wt_sys::WebTransportError::new_with_init(&options).into()
 }
 
