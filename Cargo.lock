@@ -1898,7 +1898,7 @@ dependencies = [
 
 [[package]]
 name = "web-wt-sys"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "js-sys",
  "pastey",
@@ -2142,7 +2142,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-erased"
-version = "0.7.0"
+version = "0.7.1"
 dependencies = [
  "static_assertions",
  "tracing",
@@ -2351,7 +2351,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-test-server"
-version = "0.7.8"
+version = "0.7.9"
 dependencies = [
  "color-eyre",
  "envfury",
@@ -2379,7 +2379,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-web"
-version = "0.22.1"
+version = "0.23.0"
 dependencies = [
  "js-sys",
  "static_assertions",
@@ -2401,7 +2401,7 @@ dependencies = [
 
 [[package]]
 name = "xwt-wtransport"
-version = "0.20.1"
+version = "0.21.0"
 dependencies = [
  "color-eyre",
  "static_assertions",
