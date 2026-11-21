@@ -44,6 +44,60 @@ fn is_safari() -> bool {
     user_agent.contains("Safari") && !user_agent.contains("Chrome")
 }
 
+/// PROBE: detect Firefox before 160 from the user agent string.
+fn is_firefox_before_160() -> bool {
+    let user_agent = user_agent();
+    let Some(rest) = user_agent.split("Firefox/").nth(1) else {
+        return false;
+    };
+    let major: Option<u32> = rest
+        .split(|c: char| !c.is_ascii_digit())
+        .next()
+        .and_then(|major| major.parse().ok());
+    major.is_some_and(|major| major < 160)
+}
+
+/// PROBE: resolve after the given number of milliseconds.
+async fn sleep(ms: u32) {
+    use wasm_bindgen::JsCast;
+
+    let promise = js_sys::Promise::new(&mut |resolve, _reject| {
+        let global = js_sys::global();
+        let set_timeout: js_sys::Function = js_sys::Reflect::get(&global, &"setTimeout".into())
+            .unwrap()
+            .unchecked_into();
+        set_timeout.call2(&global, &resolve, &ms.into()).unwrap();
+    });
+    wasm_bindgen_futures::JsFuture::from(promise).await.unwrap();
+}
+
+/// PROBE: run the future, panicking if it does not complete in time, so that
+/// a hang fails this test instead of stalling the whole suite.
+async fn with_timeout<F: std::future::Future>(name: &str, fut: F) -> F::Output {
+    use std::future::Future as _;
+    use std::task::Poll;
+
+    let mut fut = std::pin::pin!(fut);
+    let mut timer = std::pin::pin!(sleep(2_000));
+    let result = std::future::poll_fn(|cx| {
+        if let Poll::Ready(output) = fut.as_mut().poll(cx) {
+            return Poll::Ready(Some(output));
+        }
+        if timer.as_mut().poll(cx).is_ready() {
+            return Poll::Ready(None);
+        }
+        Poll::Pending
+    })
+    .await;
+    match result {
+        Some(output) => {
+            console_log!("PROBE {name}: completed");
+            output
+        }
+        None => panic!("PROBE {name}: timed out"),
+    }
+}
+
 fn test_endpoint() -> xwt_web::Endpoint {
     let digest = xwt_cert_fingerprint::Sha256::compute_for_der(xwt_test_assets::CERT);
     console_log!("certificate sha256 digest: {digest}");
@@ -221,7 +275,7 @@ async fn accept_bi_stream() {
 async fn closed_uni_stream() {
     setup();
 
-    if is_firefox() {
+    if is_firefox_before_160() {
         // Firefox does not reject the writer `closed` promise when the peer
         // sends a `STOP_SENDING`, so waiting for the send stream abortion
         // hangs forever.
@@ -250,10 +304,13 @@ async fn closed_uni_stream() {
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::closed_uni_stream::run(
-        endpoint,
-        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni"),
-        0,
+    with_timeout(
+        "closed_uni_stream",
+        xwt_tests::tests::closed_uni_stream::run(
+            endpoint,
+            xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni"),
+            0,
+        ),
     )
     .await
     .unwrap();
@@ -263,7 +320,7 @@ async fn closed_uni_stream() {
 async fn closed_uni_stream_with_error() {
     setup();
 
-    if is_firefox() {
+    if is_firefox_before_160() {
         // Firefox does not reject the writer `closed` promise when the peer
         // sends a `STOP_SENDING`, so waiting for the send stream abortion
         // hangs forever.
@@ -292,10 +349,13 @@ async fn closed_uni_stream_with_error() {
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::closed_uni_stream::run(
-        endpoint,
-        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni/error"),
-        123,
+    with_timeout(
+        "closed_uni_stream_with_error",
+        xwt_tests::tests::closed_uni_stream::run(
+            endpoint,
+            xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/uni/error"),
+            123,
+        ),
     )
     .await
     .unwrap();
@@ -389,7 +449,7 @@ async fn closed_bi_send_stream() {
 async fn closed_bi_send_stream_with_error() {
     setup();
 
-    if is_firefox() {
+    if is_firefox_before_160() {
         // Firefox rejects the reads on a stream that got a `RESET_STREAM`
         // with a generic `TypeError: Error in input stream` instead of
         // a `WebTransportError` carrying the `streamErrorCode`, so there is
@@ -417,10 +477,13 @@ async fn closed_bi_send_stream_with_error() {
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::closed_bi_send_stream::run(
-        endpoint,
-        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/send/error"),
-        123.try_into().unwrap(),
+    with_timeout(
+        "closed_bi_send_stream_with_error",
+        xwt_tests::tests::closed_bi_send_stream::run(
+            endpoint,
+            xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/send/error"),
+            123.try_into().unwrap(),
+        ),
     )
     .await
     .unwrap();
@@ -474,7 +537,7 @@ async fn connect_rejected() {
 async fn finished_bi_read_stream() {
     setup();
 
-    if is_firefox() {
+    if is_firefox_before_160() {
         // Firefox does not settle the reader `closed` promise when the peer
         // cleanly finishes the stream (as required by
         // <https://w3c.github.io/webtransport/#webtransportreceivestream>),
@@ -497,9 +560,12 @@ async fn finished_bi_read_stream() {
 
     let endpoint = test_endpoint();
 
-    xwt_tests::tests::finished_bi_read_stream::run(
-        endpoint,
-        xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/send"),
+    with_timeout(
+        "finished_bi_read_stream",
+        xwt_tests::tests::finished_bi_read_stream::run(
+            endpoint,
+            xwt_tests::concat!(xwt_tests::consts::ECHO_CLOSE_SERVER_URL, "/bi/send"),
+        ),
     )
     .await
     .unwrap();
